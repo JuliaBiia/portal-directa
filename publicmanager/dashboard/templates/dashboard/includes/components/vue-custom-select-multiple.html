@@ -1,0 +1,119 @@
+'custom-select': Vue.component('custom-select', {
+    props: ['label', 'placeholder', 'options', 'loadOptions'],
+    delimiters: ["#{", "}"],
+    data() {
+        return {
+            isOpen: false,
+            searchQuery: '',
+            filteredOptions: [],
+            selectedOptions: [],
+            registerNotFound: false,
+        };
+    },
+    computed: {
+        availableOptions() {
+            // Retorna as opções que ainda não foram selecionadas
+            return this.filteredOptions.filter(option => !this.selectedOptions.includes(option.value));
+        }
+    },
+    watch: {
+        searchQuery() {
+            this.filterOptions();
+        },
+        isOpen(newValue) {
+            if (!newValue) {
+                this.searchQuery = '';
+            }
+        },
+        selectedOptions() {
+            // Fechar a lista de opções ao selecionar uma opção
+            this.isOpen = false;
+        }
+    },
+    methods: {
+        filterOptions() {
+            // Chama a API para obter os resultados da pesquisa
+            this.registerNotFound = false
+
+            const word = this.searchQuery.trim(); 
+            if (word.length > 2) {
+
+                this.loadOptions(this.searchQuery).then(response => {
+                    this.filteredOptions = response.data.slice(0, 30);
+
+                    if(response.data.slice(0, 5).length > 0){
+                        this.registerNotFound = false
+                    }else{
+                        this.registerNotFound = true
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao obter resultados da pesquisa:', error);
+                });
+            }
+        },
+        toggleDropdown() {
+            this.isOpen = !this.isOpen;
+        },
+        selectOption(option) {
+            const isOptionSelected = this.selectedOptions.some(selectedOption => selectedOption.value === option.value);
+
+            if (!isOptionSelected) {
+                this.selectedOptions.push(option);
+                this.$emit('input', this.selectedOptions);
+            }
+            this.searchQuery = '';
+            this.filteredOptions = [];
+        },
+        removeOption(index) {
+            this.selectedOptions.splice(index, 1);
+            this.$emit('input', this.selectedOptions);
+        },
+        closeDropdownOnOutsideClick(event) {
+            // Fechar a lista de opções se o clique ocorrer fora do componente
+            const isClickInside = this.$el.contains(event.target);
+            if (!isClickInside) {
+                this.isOpen = false;
+            }
+        },
+        truncateText(text, maxLength) {
+            if (text.length > maxLength) {
+                return text.substring(0, maxLength) + '...';
+            }
+            return text;
+        },
+    },
+    mounted() {
+        document.addEventListener('click', this.closeDropdownOnOutsideClick);
+    },
+    beforeDestroy() {
+        // Remover o ouvinte de eventos ao destruir o componente para evitar vazamentos de memória
+        document.removeEventListener('click', this.closeDropdownOnOutsideClick);
+    },
+    template: `
+        <div class="custom-select-container">
+            <div class="br-input large input-button" @click="toggleDropdown">
+                <label for="input-search-large">#{ label }</label>
+                <input id="input-search-large" type="search" v-model="searchQuery" @change="filterOptions" :placeholder="placeholder"/>
+                <button class="br-button" type="button" aria-label="Buscar"><i class="fas fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div v-if="isOpen" class="custom-options-list" style="text-transform: uppercase;">
+                <template v-if="availableOptions.length > 0">
+                    <div v-for="(option, index) in availableOptions" :key="index" @click="selectOption(option)">
+                        <span class="cursor: pointer;" v-if="option.codigo">#{ option.codigo } - </span> #{ option.text }
+                    </div>
+                </template>
+                <div v-if="registerNotFound">
+                    <span> Nenhum resgistro foi encontado.</span>
+                </div>
+                
+            </div>
+            <div class="custom-selected-options" style="text-transform: uppercase;">
+                <div v-for="(selected, index) in selectedOptions" :key="index">
+                    <span v-if="selected.codigo">#{ selected.codigo } - </span>#{ truncateText(selected.text, 25) }  <span class="badge-select" style="color: var(--interactive-light); cursor: pointer;" @click="removeOption(index)">x</span>
+                </div>
+            </div>
+        </div>
+    `
+})

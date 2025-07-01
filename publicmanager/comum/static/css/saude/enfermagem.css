@@ -1,0 +1,65 @@
+.btn-amarelo { color: #fff; background-color: #eae451; }
+.btn-azul { color: #fff; background-color: #4c9fe4; }
+.btn-verde { color: #fff; background-color: #3ec86d; }
+.btn-preto { color: #fff; background-color: #333333; }
+.btn-laranja { color: #fff; background-color: #ff9d29; }
+.btn-roxo { color: #fff; background-color: #5942D2; }
+.btn-cinza { color: #fff; background-color: #999; }
+.btn-vermelho { color: #fff; background-color: #e52207; }
+.progress-img{height:13px; width:100%; margin:0 auto; margin-top:20px; border-radius:5px;}
+.progress-img-sm{height:13px; margin-top:5px; border-radius:5px;}
+
+/* .br-step.vertical .step-progress-btn::before {bottom: 0; left: auto; right: auto; top: 0px; height: 65px; width: 65px;} */
+.br-step.vertical .step-progress-btn::after {bottom: 0; height: auto; left: auto; right: auto; top: -70px; width: var(--step-line);}
+.br-step.vertical[data-label=right] .step-progress-btn::before {left: -11px;}
+.br-step .step-progress-btn.active::before, .br-step .step-progress-btn[active]::before {background-color: var(--active);border-color: var(--active);color: var(--background);}
+.br-step.vertical[data-label=right] .step-progress-btn::after {left: calc(var(--step-size)* 0.7) !important;}
+.br-step.vertical .step-progress-btn::before {display: none;}
+
+@media (min-width: 900px) {
+    .custom-popup-view {width: 60%;}
+}
+
+@media (min-width: 1400px) {
+    .custom-popup-view {width: 40%;}
+}
+@media (max-width: 600px) {
+    .swal2-title{margin-top: -20px !important;}
+}
+
+.custom-swal-container {z-index: 999999999;}
+.custom-popup-view {height: 90%;}
+
+.swal2-image {margin-bottom: -36px;}
+.swal2-title-custom {background-color: var(--lt-color-gray-100) !important; color: #1351b4; text-transform: uppercase; border-bottom: 1px double #ccc;}
+.swal2-title-custom button {background: var(--lt-color-gray-100);}
+.actions-custom {background-color: #f2f2f2; width: 100%;position: absolute; bottom: 0; height: 60px; border: 1px solid #ccc;}
+.swal2-html-container {margin: 0px !important;}
+.swal2-textarea{height: 4.75em !important; padding: 0.75em !important;}
+
+.swal2-confirm-custom {background-color: #1351b4 !important; border-radius: 25px !important; font-weight: bold !important; width: 263px !important; padding: 8px;}
+.swal2-cancel-custom {border-radius: 25px !important; font-weight: bold !important; background-color: #fff !important; color: #1351b4 !important; border: 1px solid !important; width: 263px !important; padding: 8px;}
+.swal2-cancel-custom:hover{background-color: #ecf1f9 !important; width: 263px;}
+
+.swal2-container {z-index: 99999;}
+.swal2-confirm {background-color: #1351b4 !important; border-radius: 25px !important; font-weight: bold !important; width: 130px; padding: 8px;}
+.swal2-cancel{border-radius: 25px !important; font-weight: bold !important; background-color: #fff !important; color: #1351b4 !important; border: 1px solid !important; width: 130px; padding: 8px;}
+.swal2-cancel:hover{background-color: #ecf1f9 !important; width: 130px;}
+.custom-popup-anexar-arquivo {width: 60%; height: 80%;}
+.custom-popup-anexar-info {width: 590px !important;}
+.custom-popup-anexar-info .swal2-confirm {width: 130px !important;}
+.custom-popup-finalizar {width: 750px; height: 550px !important;}
+.custom-popup-finalizar-modal-simples {width: 650px !important; height: 315px !important;}
+.drop-container {position: relative; display: flex; gap: 10px; flex-direction: column; justify-content: center; align-items: center;
+    height: 162px; padding: 6px; border-radius: 10px; border: 2px dashed #555; color: #444; cursor: pointer; transition: background .2s ease-in-out, border .2s ease-in-out;} 
+.drop-container:hover {background: #eee; border-color: #111;}
+.drop-container:hover .drop-title {color: #222;}
+.drop-title {color: #444; font-size: 20px; font-weight: bold; text-align: center; transition: color .2s ease-in-out;}
+input::file-selector-button {font-weight: bold; color: dodgerblue; padding: 0.5em; border: thin solid #fff; border-radius: 3px; background-color: #fff;}
+
+#drop-area {border: 1px solid #0459A1; border-radius: 5px; padding: 20px; text-align: center; height: 170px;}
+#drop-area.drag {background-color: #f0f0f0;}
+#drop-custom-area {border: 1px solid #0459A1; padding: 6px; cursor: pointer; border-radius: 5px;}
+.custom-input-info {opacity: 1; background-color: var(--gray-2) !important; border: 1px solid #ccc !important;}
+.custom-text{font-size: 17px !important;}
+.col-left{text-align:right;}

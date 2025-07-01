@@ -1,0 +1,50 @@
+[
+  {
+    "fields": {
+      "codigo": "01",
+      "descricao": "ATIVO PERMANENTEMENTE"
+    },
+    "model": "rh.situacao",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "codigo": "02",
+      "descricao": "APOSENTADO"
+    },
+    "model": "rh.situacao",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "codigo": "03",
+      "descricao": "REQUISITADO"
+    },
+    "model": "rh.situacao",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "codigo": "04",
+      "descricao": "SEM VÍNCULOS"
+    },
+    "model": "rh.situacao",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "codigo": "05",
+      "descricao": "ESTAGIÁRIO"
+    },
+    "model": "rh.situacao",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "codigo": "06",
+      "descricao": "CEDIDO"
+    },
+    "model": "rh.situacao",
+    "pk": 6
+  }
+]

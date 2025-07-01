@@ -1,0 +1,44 @@
+[
+   {
+      "fields":{
+         "descricao":"Parda"
+      },
+      "model":"comum.raca",
+      "pk":1
+   },
+   {
+      "fields":{
+         "descricao":"Preta"
+      },
+      "model":"comum.raca",
+      "pk":2
+   },
+   {
+      "fields":{
+         "descricao":"Branca"
+      },
+      "model":"comum.raca",
+      "pk":3
+   },
+   {
+      "fields":{
+         "descricao":"Ind\u00edgena"
+      },
+      "model":"comum.raca",
+      "pk":4
+   },
+   {
+      "fields":{
+         "descricao":"Amarela"
+      },
+      "model":"comum.raca",
+      "pk":5
+   },
+   {
+      "fields":{
+         "descricao":"N\u00e3o declarado"
+      },
+      "model":"comum.raca",
+      "pk":7
+   }
+]

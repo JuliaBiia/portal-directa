@@ -1,0 +1,545 @@
+<div class="container mt-2" style="border-radius:10px;">
+
+    <div class="row w100" style="padding-top:15px;">
+        <div class="col-collapse-atendimento-info margin-0 tab-item tab-item-design">
+            <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine2 === 'informacoesPessoais' }" @click="activeTabLine2 = 'informacoesPessoais'">Informações Pessoas</button>
+        </div>
+        <div class="col-collapse-atendimento-info margin-0 tab-item tab-item-design">
+            <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine2 === 'endereco' }" @click="activeTabLine2 = 'endereco'">Endereço/Contato</button>
+        </div>
+        <div class="col-collapse-atendimento-info margin-0 tab-item tab-item-design">
+            <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine2 === 'responsavel' }" @click="activeTabLine2 = 'responsavel'">Informações dos Responsáveis</button>
+        </div>
+        <div class="col-collapse-atendimento-info margin-0 tab-item tab-item-design">
+            <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine2 === 'documentacao' }" @click="activeTabLine2 = 'documentacao'">Documentação</button>
+        </div>
+        <div class="col-12">
+            <hr id="hr-tab-antendimento">
+        </div>
+    </div>
+
+    <div v-if="atendimentoMedico" class="mt-5">
+        <div id="informacoesPessoais" class="collapse-content2" v-show="activeTabLine2 === 'informacoesPessoais'">
+
+            <div class="container br-input">
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Nome Completo:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <input style="height:40px; font-size:15px; margin-top: -5px !important;" type="text" :value="atendimentoMedico.atendimento_paciente.nome_paciente ? atendimentoMedico.atendimento_paciente.nome_paciente : 'Sem informação'" class="capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Nome da Mãe:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <input style="height:40px; font-size:15px; margin-top: -5px !important;" type="text" :value="atendimentoMedico.atendimento_paciente.nome_mae ? atendimentoMedico.atendimento_paciente.nome_mae : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Nome do Pai:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <input style="height:40px; font-size:15px; margin-top: -5px !important;" type="text" :value="atendimentoMedico.atendimento_paciente.nome_pai ? atendimentoMedico.atendimento_paciente.nome_pai : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Nome Social:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <input style="height:40px; font-size:15px; margin-top: -5px !important;" type="text" :value="atendimentoMedico.atendimento_paciente.nome_social ? atendimentoMedico.atendimento_paciente.nome_social : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Data Nascimento:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <input style="height:40px; font-size:15px; margin-top: -5px !important;" type="text" :value="atendimentoMedico.atendimento_paciente.data_nascimento ? convertDate(atendimentoMedico.atendimento_paciente.data_nascimento, 'DD/MM/YYYY') : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Nacionalidade:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <input style="height:40px; font-size:15px; margin-top: -5px !important;" type="text" :value="atendimentoMedico.atendimento_paciente.nacionalidade ? atendimentoMedico.atendimento_paciente.nacionalidade : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Naturalidade:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <input style="height:40px; font-size:15px; margin-top: -5px !important;" type="text" :value="atendimentoMedico.atendimento_paciente.naturalidade ? atendimentoMedico.atendimento_paciente.naturalidade : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Raça/Cor:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <input style="height:40px; font-size:15px; margin-top: -5px !important;" type="text" :value="atendimentoMedico.atendimento_paciente.raca_nome ? atendimentoMedico.atendimento_paciente.raca_nome : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Estado Civil:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <div class="readonly-input" style="height:40px; font-size:15px; margin-top: -5px !important;">
+                            <span v-if="atendimentoMedico.atendimento_paciente.estado_civil === 0">SOLTEIRO(A)</span>
+                            <span v-else-if="atendimentoMedico.atendimento_paciente.estado_civil === 1">CASADO(A)</span>
+                            <span v-else-if="atendimentoMedico.atendimento_paciente.estado_civil === 2">DIVORCIADO(A)</span>
+                            <span v-else-if="atendimentoMedico.atendimento_paciente.estado_civil === 3">VIÚVO(A)</span>
+                            <span v-else-if="atendimentoMedico.atendimento_paciente.estado_civil === 4">SEPARADO(A)</span>
+                            <span v-else>SEM INFORMAÇÃO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Grau de Instrução:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <input style="height:40px; font-size:15px; margin-top: -5px !important;" type="text" :value="atendimentoMedico.atendimento_paciente.grau_de_instrucao ? atendimentoMedico.atendimento_paciente.grau_de_instrucao : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-atendimento-info-left col-left">
+                        <span class="col-form-label ft-sz-atendimento font-size16 color-title">Profissão:</span>
+                    </div>
+                    <div class="col-atendimento-info-right">
+                        <input style="height:40px; font-size:15px; margin-top: -5px !important;" type="text" :value="atendimentoMedico.atendimento_paciente.prosissao_titulo ? atendimentoMedico.atendimento_paciente.prosissao_titulo : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+                
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-info-left-atendimentomedico col-left txt-left-w">
+                        <span class="col-sm-2 col-form-label ft-sz-atendimento font-size16 color-title">Grupo Sanguíneo:</span>
+                    </div>
+                    <div class="col-info-right-atendimentomedico mt-10-w">
+                        <input type="text" style="height:40px; font-size:15px; margin-top: -5px !important;" :value="atendimentoMedico.atendimento_paciente.grupo_sanguineo ? atendimentoMedico.atendimento_paciente.grupo_sanguineo : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                    <div class="col-info-left-atendimentomedico col-left mt-10-w txt-left-w">
+                        <span class="col-sm-2 col-form-label ft-sz-atendimento font-size16 color-title">Fator RH:</span>
+                    </div>
+                    <div class="col-info-right-atendimentomedico mt-10-w">
+                        <input type="text" style="height:40px; font-size:15px; margin-top: -5px !important;" :value="atendimentoMedico.atendimento_paciente.fator_rh ? atendimentoMedico.atendimento_paciente.fator_rh : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row row-atendimento-info mt-3">
+                    <div class="col-info-left-atendimentomedico col-left txt-left-w">
+                        <span class="col-sm-2 col-form-label ft-sz-atendimento font-size16 color-title">Doador Sanguíneo:</span>
+                    </div>
+                    <div class="col-info-right-atendimentomedico mt-10-w">
+                        <input type="te xt"style="height:40px; font-size:15px; margin-top: -5px !important;" :value="atendimentoMedico.atendimento_paciente.doador_sanguineo_nome ? atendimentoMedico.atendimento_paciente.doador_sanguineo_nome : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                    <div class="col-info-left-atendimentomedico col-left mt-10-w txt-left-w">
+                        <span class="col-sm-2 col-form-label ft-sz-atendimento font-size16 color-title">Doardor de Orgãos:</span>
+                    </div>
+                    <div class="col-info-right-atendimentomedico mt-10-w">
+                        <input type="text" style="height:40px; font-size:15px; margin-top: -5px !important;" :value="atendimentoMedico.atendimento_paciente.doador_orgaos_nome ? atendimentoMedico.atendimento_paciente.doador_orgaos_nome : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="endereco" class="collapse-content2" v-show="activeTabLine2 === 'endereco'">
+            
+            <div class="container br-input box-input box-card-border">
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <p class="color-title"><b>ENDEREÇO</b></p>
+                    </div>
+                    <div class="col-12">
+                        <hr id="hr-tab-antendimento">
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">CEP:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.cep ? atendimentoMedico.atendimento_paciente.cep : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">Endereço:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.endereco ? atendimentoMedico.atendimento_paciente.endereco : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">Número:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.numero ? atendimentoMedico.atendimento_paciente.numero : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">Complemento:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" class="form-control capslock" :value="atendimentoMedico.atendimento_paciente.complemento ? atendimentoMedico.atendimento_paciente.complemento : 'Sem informação'" readonly/>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">Bairro:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.bairro ? atendimentoMedico.atendimento_paciente.bairro : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">Cidade:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" class="form-control capslock" :value="atendimentoMedico.atendimento_paciente.municipio_nome ? atendimentoMedico.atendimento_paciente.municipio_nome : 'Sem informação'" readonly/>
+                    </div>
+                </div>
+
+
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">UF:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" class="form-control capslock" :value="atendimentoMedico.atendimento_paciente.uf ? atendimentoMedico.atendimento_paciente.uf : 'Sem informação'" readonly/>
+                    </div>
+                </div>
+                <div class="mt-2 white">.</div>
+            </div>
+
+            <div class="container br-input box-input box-card-border mt-3">
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <p class="color-title"><b>CONTATO</b></p>
+                    </div>
+                    <div class="col-12">
+                        <hr id="hr-tab-antendimento">
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">Celular:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.celular ? atendimentoMedico.atendimento_paciente.celular : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">Telefone Fixo:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.telefone_fixo ? atendimentoMedico.atendimento_paciente.telefone_fixo : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">WhatsApp:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.whatsapp ? atendimentoMedico.atendimento_paciente.whatsapp : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <label class="col-sm-2 col-form-label font-size16">E-Mail:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.email ? atendimentoMedico.atendimento_paciente.email : 'Sem informação'" class="form-control capslock" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 white">.</div>
+        </div>
+
+        <div id="responsavel" class="collapse-content2" v-show="activeTabLine2 === 'responsavel'">
+            
+            <div class="container br-input box-card-border">
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <p class="color-title"><b>RESPONSÁVEL 1</b></p>
+                    </div>
+                    <div class="col-12">
+                        <hr id="hr-tab-antendimento">
+                    </div>
+                </div>
+                
+                <div class="box-input">
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">Nome do Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.nome_responsavel_1 ? atendimentoMedico.atendimento_paciente.nome_responsavel_1 : 'Sem informação'" class="form-control capslock" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">Parentesco:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.parentesco_responsavel_1 ? atendimentoMedico.atendimento_paciente.parentesco_responsavel_1 : 'Sem informação'" class="form-control capslock" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">CPF Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.cpf_responsavel_1 ? atendimentoMedico.atendimento_paciente.cpf_responsavel_1 : 'Sem informação'" class="form-control capslock" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">RG Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.rg_responsavel_1 ? atendimentoMedico.atendimento_paciente.rg_responsavel_1 : 'Sem informação'" class="form-control capslock" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">Celular Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.celular_responsavel_1 ? atendimentoMedico.atendimento_paciente.celular_responsavel_1 : 'Sem informação'" class="form-control capslock" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">WhatsApp Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.whatsapp_responsavel_1 ? atendimentoMedico.atendimento_paciente.whatsapp_responsavel_1 : 'Sem informação'" class="form-control capslock" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">E-Mail Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.email_responsavel_1 ? atendimentoMedico.atendimento_paciente.email_responsavel_1 : 'Sem informação'" class="form-control capslock" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2 white">.</div>
+            </div>
+
+            <div class="container br-input box-card-border mt-3">
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <p class="color-title"><b>RESPONSÁVEL 2</b></p>
+                    </div>
+                    <div class="col-12">
+                        <hr id="hr-tab-antendimento">
+                    </div>
+                </div>
+                
+                <div class="box-input">
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">Nome do Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.nome_responsavel_2 ? atendimentoMedico.atendimento_paciente.nome_responsavel_2 : 'Sem informação'" class="form-control capslock input-tab" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">Parentesco:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.parentesco_responsavel_2 ? atendimentoMedico.atendimento_paciente.parentesco_responsavel_2 : 'Sem informação'" class="form-control capslock input-tab" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">CPF Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.cpf_responsavel_2 ? atendimentoMedico.atendimento_paciente.cpf_responsavel_2 : 'Sem informação'" class="form-control capslock input-tab" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">RG Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.rg_responsavel_2 ? atendimentoMedico.atendimento_paciente.rg_responsavel_2 : 'Sem informação'" class="form-control capslock input-tab" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">Celular Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.celular_responsavel_2 ? atendimentoMedico.atendimento_paciente.celular_responsavel_2 : 'Sem informação'" class="form-control capslock input-tab" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">WhatsApp Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.whatsapp_responsavel_2 ? atendimentoMedico.atendimento_paciente.whatsapp_responsavel_2 : 'Sem informação'" class="form-control capslock input-tab" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-3 col-left">
+                            <label class="col-sm-2 col-form-label font-size16">E-Mail Responsável:</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" :value="atendimentoMedico.atendimento_paciente.email_responsavel_2 ? atendimentoMedico.atendimento_paciente.email_responsavel_2 : 'Sem informação'" class="form-control capslock input-tab" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2 white">.</div>
+            </div>
+
+        </div>
+
+        <div id="documentacao" class="collapse-content2" v-show="activeTabLine2 === 'documentacao'">
+            
+            <div class="container box-input">
+                <div class="row mt-3 br-input">
+                    <div class="col-2 col-left">
+                        <label class="col-form-label font-size15">CARTÃO SUS:</label>
+                    </div>
+                    <div class="col-10">
+                        <input style="height:43px; margin-top: -5px !important; font-size:15px;" class="form-control capslock input-tab" type="text" :value="atendimentoMedico.atendimento_paciente.cartao_sus ? atendimentoMedico.atendimento_paciente.cartao_sus : 'Sem informação'" readonly/>
+                    </div>
+                </div>
+    
+                <div class="row mt-3 br-input">
+                    <div class="col-2 col-left">
+                        <label class="col-form-label font-size16">CPF:</label>
+                    </div>
+                    <div class="col-10">
+                        <input type="text" style="height:43px; margin-top: -5px !important; font-size:15px;" class="form-control capslock input-tab" :value="atendimentoMedico.atendimento_paciente.cpf ? atendimentoMedico.atendimento_paciente.cpf : 'Sem informação'" readonly/>
+                    </div>
+                </div>
+    
+                <div class="row mt-3 br-input">
+                    <div class="col-2 mt-2 col-left">
+                        <label class="col-form-label font-size16">RG:</label>
+                    </div>
+                    <div class="col-4 mt-2">
+                        <input style="height:43px; margin-top: -5px !important; font-size:15px;" class="form-control capslock input-tab" type="text" :value="atendimentoMedico.atendimento_paciente.rg ? atendimentoMedico.atendimento_paciente.rg : 'Sem informação'" readonly/>
+                    </div>
+
+                    <div class="col-2 col-left mt-2">
+                        <label class="col-form-label font-size16">Expedidor:</label>
+                    </div>
+                    <div class="col-4 mt-2">
+                        <input style="height:43px; margin-top: -5px !important; font-size:15px;" class="form-control capslock input-tab" type="text" :value="atendimentoMedico.atendimento_paciente.rg_orgao ? atendimentoMedico.atendimento_paciente.rg_orgao : 'Sem informação'" readonly/>
+                    </div>
+
+                    <div class="col-2 col-left mt-2">
+                        <label class="col-form-label font-size16">UF:</label>
+                    </div>
+                    <div class="col-4 mt-2">
+                        <input style="height:43px; margin-top: -5px !important; font-size:15px;" class="form-control capslock input-tab" type="text" :value="atendimentoMedico.atendimento_paciente.rg_uf ? atendimentoMedico.atendimento_paciente.rg_uf : 'Sem informação'" readonly/>
+                    </div>
+
+                    <div class="col-2 col-left mt-2">
+                        <label class="col-form-label font-size16">Expedição:</label>
+                    </div>
+                    <div class="col-4 mt-2">
+                        <input style="height:43px; margin-top: -5px !important; font-size:15px;" class="form-control capslock input-tab" type="text" :value="atendimentoMedico.atendimento_paciente.rg_data ? new Intl.DateTimeFormat('pt-br').format(new Date(atendimentoMedico.atendimento_paciente.rg_data.replaceAll('-',','))) : 'Sem informação'" readonly/>
+                    </div>
+                </div>
+
+                <span class="br-divider col-xl-12 col-lg-12 col-md-12 col-sm-12 mt-5"></span>
+
+                <div class="row mt-5">
+                    <div class="col-10">
+                        <p style="color:var(--interactive);"><b><i class="fas fa-paperclip"></i> Documentos Anexados</b></p>
+                    </div>
+                    <div class="col-2">
+                        <button class="br-button primary mr-3" :disabled="verificarAtendimentoEncerrado" @click="visualizarInformacoes('documentos', documento, 'salvar')" type="button" style="margin-top:-10px;"><i class="fas fa-paperclip"></i> Anexar</button></button>
+                    </div>
+                </div>
+
+                <table class="table table-striped mt-1">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width:5%;"></th>
+                            <th class="color-title" scope="col"><b>Nome Arquivo</b></th>
+                            <th class="color-title" scope="col"><b>Data</b></th>
+                            <th class="color-title" scope="col"><b>Descrição Resumida</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-if="atendimentoMedico.documentos.length > 0">
+                            <tr class="capslock" v-for="documento in atendimentoMedico.documentos">
+                                <td>
+                                    <i class="fa fa-eye font-size16" style="cursor: pointer;" @click="visualizarInformacoes('documentos', documento, 'visualizar')"></i>
+                                </td>
+                                <td>${documento.nome.length > 30 ? '...'+documento.nome.slice(-30) : documento.nome}</td>
+                                <td>${convertDate(documento.created_at, 'DD/MM/YYYY')} ${convertDate(documento.created_at, 'H:mm')}</td>
+                                <td>${documento.descricao.length > 30 ? documento.descricao.substring(0, 30)+'...' : documento.descricao}</td>
+                            </tr>
+                        </template>
+                        <tr v-else>
+                            <td class="text-center" colspan="7">
+                                <span>Ainda não existe nenhum documento vinculado a esse paciente!</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="mt-4">.</div>
+</div>

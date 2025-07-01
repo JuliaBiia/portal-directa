@@ -1,0 +1,979 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Solicitação{% endblock %}
+
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<style>
+    #switch-camera-btn {
+        display: none;
+    }
+    #video {
+    display: none;
+    }
+    .select2-selection__arrow b::before{
+        display: none;
+    }
+
+    @media only screen and (min-width: 414px) and (max-width: 736px) {
+        .text-custom {
+            margin-left: 0px !important;
+        }
+    }
+    @media only screen and (min-width: 900px) and (max-width: 1190px) {
+        .container, .container-sm {
+            --grid-maxwidth: 100% !important;
+        }
+        .col-btn-justificativa-left {
+            width: 19% !important;
+        }
+        .col-btn-justificativa-ringth {
+            width: 19% !important;
+        }
+    }
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #333;
+    }
+    .swal2-confirm {
+        background-color: var(--interactive-light) !important;
+    }
+    .drop-container {
+        position: relative;
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 162px;
+        padding: 6px;
+        border-radius: 10px;
+        border: 2px dashed #555;
+        color: #444;
+        cursor: pointer;
+        transition: background .2s ease-in-out, border .2s ease-in-out;
+    }
+    .drop-container:hover {
+        background: #eee;
+        border-color: #111;
+    }
+    .drop-container:hover .drop-title {
+        color: #222;
+    }
+    .drop-title {
+        color: #140101;
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        transition: color .2s ease-in-out;
+    }
+    input::file-selector-button {
+        font-weight: bold;
+        color: dodgerblue;
+        padding: 0.5em;
+        border: thin solid #fff;
+        border-radius: 3px;
+        background-color: #fff;
+    }
+
+    /* Estilos para a tela no mobile */
+    @media (max-width: 576px) {
+        .trash-mob{
+            margin-bottom: 10px !important;
+        }
+        .cam-mobile {
+            margin-bottom: 10px;
+        }
+        .card-footer {
+            padding-left: 7px !important;
+        }
+        .info-container {
+            order: 1;
+        }
+        .file-upload-container {
+        order: -1;
+        }
+        .container {
+            flex-direction: column;
+        }
+        .test-top {
+            margin-top: 40px;
+            order: -1;
+            align-self: center;
+        }
+        .drop-title-mobile {
+        display: block;
+        }
+        .drop-title-desktop {
+            display: none;
+        }
+        .text-mob {
+            text-align: center;
+        }
+        .card-photo {
+            width: 100%;
+            padding: 0 15px;
+        }
+        .foto-paciente {
+            width: 100%;
+            height: auto;
+        }
+        .br-upload {
+            margin-top: 0;
+        }
+        #accountUploadedAvatar {
+            width: 100%;
+            height: auto;
+            max-width: 200px;
+        }
+        #video {
+            width: 100%;
+            height: auto;
+        }
+        #canvas {
+            width: 100%;
+            height: auto;
+        }
+        .btn-mobile {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            margin-bottom: 20px;
+        }
+        .col-btn-justificativa-ringth {
+            text-align: right !important;
+        }
+        .close{
+            text-align: center;
+        }
+        .table-tb{
+        overflow-x: auto;
+        width: 100%;
+        }
+    }
+    /* Tablet */
+    @media (min-width: 577px) {
+
+        .drop-title-mobile {
+            display: none;
+        }
+        .drop-title-desktop {
+            display: block;
+        }
+        #video {
+            width: 100%;
+            height: auto;
+            max-width: 400px;
+        }
+        .upload-label{
+            width: 400px;
+            height: auto;
+        }
+        #accountUploadedAvatar {
+            width: 100%;
+            height: auto;
+            max-width: 400px;
+        }
+        .col-btn-justificativa-ringth {
+            text-align: right !important;
+        }
+        .close{
+            text-align: center;
+        }
+    }
+    /* Ipad Mini */
+    @media (min-width: 768px) and (max-width: 834px) and (orientation: portrait), 
+       (min-width: 1024px) and (max-width: 1112px) and (orientation: landscape) {
+    .card-photo {
+        width: 100%;
+        max-width: 300px;
+    }
+    #video {
+        width: 100%;
+        height: auto;
+        max-width: 400px;
+    }
+    .upload-label {
+        width: 400px;
+        height: auto;
+    }
+    #accountUploadedAvatar {
+        width: 100%;
+        height: auto;
+        max-width: 400px;
+    }
+    .btn-mobile {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    .table-tb{
+        overflow-x: auto !important;
+        width: 100% !important;
+        -webkit-overflow-scrolling: touch !important; 
+    }
+    .col-btn-justificativa-ringth {
+        text-align: right !important;
+    }
+    .close{
+        text-align: center;
+    }
+}
+
+/*FIX BTN*/
+@media only screen and (min-width: 1500px) and (max-width: 1600px){
+    .btn-save {
+        margin-left: 30px;
+    }
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<template>
+    <div class="container-lg">
+        <div class="br-card pl-4 pr-4">
+            <div class="card-header">
+                <div class="d-flex">
+                   <h5 class="color-title fontsize20-w"> ADMINISTRAÇÃO DE MEDICAÇÃO</h5> 
+                </div>
+            </div>
+
+            <div class="card-content">
+                <div class="card-body">
+
+                    <div class="container title-hr box-card-border mt-4" style="border: 0.26px solid #d9d9d9; border-radius: 4px; display: flex; justify-content: space-between;">
+                        <div class="col-lg-7 col-sm-12 ml-3" style="flex: 1; margin-right: 20px;">
+                            <div class="row mt-4">
+                                <div class="col-6">
+                                    <span style="color: #1351B4; font-size: 16px;">Nome:</span> 
+                                    <span style="font-size: 16px;">{{solicitacao.boletim.paciente.nome_paciente}}</span>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-6">
+                                    <span style="color: #1351B4; font-size: 16px">Data Entrada:</span> 
+                                    <span style="font-size: 16px;">{{solicitacao.boletim.created_at|date:'d/m/Y H:i'}}</span>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-6">
+                                    <span style="color: #1351B4; font-size: 16px">CNS:</span> 
+                                    <span style="font-size: 16px;">{{solicitacao.boletim.paciente.cartao_sus|default:'----------'}}</span>
+                                </div>
+                            </div>
+                            <div class="row mt-4 mb-4">
+                                <div class="col-12">
+                                    <span style="color: #1351B4; font-size: 16px">Tipo:</span> 
+                                    <span style="font-size: 16px;">{{solicitacao.boletim.get_tipo_display}}</span>
+                                </div>
+                            </div>
+                            <div v-if="!verificacaoAnexo" class="row mt-4 mb-4">
+                                <div class="col-12">
+                                    <div class="br-message warning">
+                                        <div class="icon"><i class="fas fa-exclamation-triangle fa-lg" aria-hidden="true"></i></div>
+                                        <div class="content" aria-label="Em caso de dúvida, não compartilhe sua senha com terceiros. Ligue para a Central de atendimento." role="alert">
+                                            <span class="message-title">Atenção: </span>
+                                            <span class="message-body">O anexo da foto do arquivo é Obrigatório</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mt-3 file-upload-container">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12" style="text-align: center;">
+                                <!-- Criação da foto via webcan -->
+                                <span class="sub-page-title color-title"><i class="fas fa-paperclip" style="margin-bottom: 20px;"></i> Foto da receita </span>
+                                <div class="card-photo mb-3">
+                                    <div class="br-upload text-center" style="margin-top: -12px;">
+                                        <label class="upload-label" for="single-file">
+                                            {% if paciente.foto_paciente %}
+                                            <img class="mt-4 mb-6 foto-paciente" src="{{ paciente.foto_paciente.url }}" alt="Foto paciente" style="height:215px; width:100%;" id="accountUploadedAvatar">
+                                            {% else %}
+                                            <img src="{% static 'img/saude_undraw/undraw_add_files.png' %}" alt="user-avatar" class="d-block w-px-200 h-px-200 rounded mx-auto" id="accountUploadedAvatar" style="height:140px; width:100%;" />
+                                            {% endif %}
+                        
+                                            <video id="video" autoplay style="margin-left: 15px;"></video>
+                                            <canvas id="canvas" style="display: none;"></canvas>
+                                        </label>
+                                        <div class="upload-list" style="display: none;"></div>
+                                        <input type="file" name="{{ form.foto_paciente.name }}" class="upload-input account-file-input" id="{{ form.foto_paciente.id_for_label }}">
+                        
+                                        <span id="feedback" class="feedback warning mt-1" role="alert" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>O arquivo enviado anteriormente foi substituído
+                                        </span>
+                                    </div>
+                        
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <button id="camera-btn" class="br-button primary mt-2 cam-mobile" type="button" aria-label="Ícone ilustrativo"><i class="fas fa-camera mr-1" aria-hidden="true"></i> <span>Câmera</span></button>
+                                            <button class="br-button circle warning small account-image-reset trash-mob" type="button" aria-label="Ícone ilustrativo" style="border-radius: 10% !important; display: none; width: 50px; height: 40px; margin-top: 10px;margin-left: 20px;"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                                        </div>
+                                        <div class="col-12 d-flex justify-content-center mt-2">
+                                            <button class="br-button primary mr-3 btn-mobile" type="button" id="capture-btn" style="display: none;"><i class="fas fa-object-group mr-1"></i> <span>Capturar Foto</span></button>
+                                            <button id="switch-camera-btn" class="br-button primary btn-mobile" type="button" aria-label="Ícone ilustrativo"><i class="fas fa-sync-alt mr-1" aria-hidden="true"></i> <span>Trocar Câmera</span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container divider-text divider-text-justificativa box-card-border mt-4" style="border: 0.26px solid #d9d9d9; border-radius: 4px;">
+                        <div class="form-group row mt-3">
+                            <div class="col-12 col-md-6">
+                                <label class="color-title mt-2">Medicação:</label>
+                                <select id="medicacao-select" name="medicacao" class="form-control campo-select" style="width: 100%"></select>
+                            </div>
+                        
+                            <div class="col-12 col-md-6">
+                                <label class="color-title mt-2">Dosagem:</label>
+                                <div class="br-input">
+                                    <input type="text" class="form-control" v-model="formulario.dosagem">
+                                </div>
+                            </div>
+                        
+                            <div class="col-12 col-md-6 mt-2">
+                                <label class="color-title mt-2">Via de Administação Medicamentosa:</label>
+                                <select class="mt-2" v-model="formulario.medicamentosa" style="width: 100%; height: 40px; background-color:white; border-radius:5px; color:black; border:1px solid #0459A1; padding-left: var(--spacing-scale-2x);">
+                                    <option value="" selected>Selecione uma opção</option>
+                                    <option value="0" style="font-size:16px !important;">Oral</option>
+                                    <option value="1" style="font-size:16px !important;">Parental</option>
+                                    <option value="2" style="font-size:16px !important;">Subcutânea</option>
+                                    <option value="3" style="font-size:16px !important;">Nasal</option>
+                                    <option value="4" style="font-size:16px !important;">Retal</option>
+                                    <option value="5" style="font-size:16px !important;">Intravesical</option>
+                                    <option value="6" style="font-size:16px !important;">Nebolização</option>
+                                    <option value="7" style="font-size:16px !important;">Ocular</option>
+                                    <option value="8" style="font-size:16px !important;">Sublingual</option>
+                                </select>
+                            </div>
+                        
+                            <div class="col-12 col-md-6 mt-2">
+                                <label class="color-title mt-2">Tipo Parental:</label>
+                                <select class="parental mt-2" v-model="formulario.parental" style="width: 100%; height: 40px; background-color:white; border-radius:5px; color:black; border:1px solid #0459A1; padding-left: var(--spacing-scale-2x);">
+                                    <option value="" selected>Selecione uma opção</option>
+                                    <option value="0" style="font-size:16px !important;">Intravenosa</option>
+                                    <option value="1" style="font-size:16px !important;">Intramuscular</option>
+                                    <option value="2" style="font-size:16px !important;">Subcutânea</option>
+                                    <option value="3" style="font-size:16px !important;">Intratecal</option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-6 col-xl-6 col-sm-12 col-md-12 mt-2">
+                                <label class="color-title mt-2">Período:</label>
+                                <select class="mt-2" v-model="formulario.periodo" style="width: 100%; height: 40px; background-color:white; border-radius:5px; color:black; border:1px solid #0459A1; padding-left: var(--spacing-scale-2x);">
+                                    <option value="" selected>Selecione uma opção</option>
+                                    <option value="0" style="font-size:16px !important;">Dose Unica</option>
+                                    <option value="1" style="font-size:16px !important;">Semanal</option>
+                                    <option value="2" style="font-size:16px !important;">Mensal</option>
+                                    <option value="3" style="font-size:16px !important;">Diária</option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-6 col-xl-6 col-sm-12 col-md-12 mt-2">
+                                <label class="color-title">Duração do Tratamento:</label>
+                                <div class="br-input">
+                                    <input type="number" :disabled="formulario.periodo === '0'" class="form-control mt-2" v-model="formulario.quantidade">
+                                </div>
+                                <span v-if="formulario.periodo === '1'" style="color: #1250b2;">(${formulario.quantidade} <span v-if="formulario.quantidade == '1'">Semana</span><span v-else>Semanas</span>) 1 dose por semana</span>
+                                <span v-if="formulario.periodo === '2'" style="color: #1250b2;">(${formulario.quantidade} <span v-if="formulario.quantidade == '1'">Mês</span><span v-else>Meses</span>) 1 dose por mês</span>
+                                <span v-if="formulario.periodo === '3'" style="color: var(--interactive);">${calcularMeses(formulario.quantidade) ? '('+calcularMeses(formulario.quantidade)+')' : ''}</span>
+                            </div>
+
+                            <template v-if="formulario.periodo === '3'">
+                                <div class="col-lg-6 col-xl-6 col-sm-12 col-md-12 br-input mt-2">
+                                    <label class="color-title mt-2">Posologia:</label>
+                                    <input v-model="formulario.posologia" class="form-control capslock mt-2" type="number">
+                                    <span style="color: var(--interactive);">${calcularHoras(formulario.posologia) ? '('+calcularHoras(formulario.posologia)+')' : ''}</span>
+                                </div>
+                            </template>
+
+                            <div class="col-lg-6 col-xl-6 col-sm-12 col-md-12 mt-2" v-if="formulario.periodo === '3'">
+                                <div class="row mt-3">
+                                    <div class="col-12 m-1">
+                                        <i class="fa-solid fa-prescription-bottle-medical" style="color: var(--interactive);"></i><span style="font-size: 15px; color: var(--interactive);">&nbsp; Total de aplicações: <span id="chamado-1" class="badge" style="margin-left: 10px; background-color: var(--interactive-light); padding: 0.35em 0.65em; font-size: 0.75em; font-weight: 700; border-radius: 0.25rem; color: rgb(255, 255, 255);">${calcularAplicacoes(formulario.quantidade, formulario.posologia).totalAplicacoes}</span></span>
+                                    </div>
+                                    <div class="col-12 m-1">
+                                        <i class="fa-solid fa-pills" style="color: var(--interactive);"></i><span style="font-size: 15px; color: var(--interactive); margin-top: 5px;">&nbsp; Aplicações por dia: <span id="chamado-1" class="badge" style="margin-left: 10px; background-color: var(--interactive-light); padding: 0.35em 0.65em; font-size: 0.75em; font-weight: 700; border-radius: 0.25rem; color: rgb(255, 255, 255);">${calcularAplicacoes(formulario.quantidade, formulario.posologia).aplicacoesPorDia}</span></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-2">
+                                <label class="color-title mb-3">Observações:</label>
+                                <div class="br-input">
+                                    <textarea type="text" class="form-control w100 mt-2" v-model="formulario.observacao" style="height:120px; border-radius:6px;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card-footer mt-5 mb-2 text-mob">
+                            <button type="button" :disabled="desabilitarAddMedicacao" @click="adicionarMedicacao()" class="br-button primary mx-auto">Adicionar Medicação</button>
+                        </div>
+                        <div class="mt-4" style="color:white;">.</div>
+                        <div class="table-tb">
+                            <table class="table table-hover mb-3">
+                                <thead>
+                                    <tr>
+                                        <th scope="col font-table-collapse-med" style="width:5%;"></th>
+                                        <th class="visible-xs" scope="col font-table-collapse-med" style="width:5%;"></th>
+                                        <th class="color-title font-table-collapse-med" scope="col" style="text-align: center;" ><b>Medicamento</b></th>
+                                        <th class="color-title font-table-collapse-med hidden-xs" scope="col"><b>Dosagem</b></th>
+                                        <th class="color-title font-table-collapse-med hidden-xs" scope="col"><b>Via</b></th>
+                                        <th class="color-title font-table-collapse-med hidden-xs" scope="col"><b>Tipo Parental</b></th>
+                                        <th class="color-title font-table-collapse-med hidden-xs" scope="col"><b>Período</b></th>
+                                        <th class="color-title font-table-collapse-med hidden-xs" scope="col"><b>Quantidade</b></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="medicacoes-lista">
+                                    <template v-if="listagemMedicamentos.length > 0">
+                                        <tr v-for="lista in listagemMedicamentos">
+                                            <td><i class="far fa-trash-alt" @click="removerMedicacao(lista.id)" style="cursor: pointer;"></i></td>
+                                            <td class="visible-xs">
+                                                <button class="mostra-columns br-button circle" @click="modalInfo(lista.medicacaoNome, lista.dosagem, lista.quantidade, lista.medicamentosa, lista.parental, lista.posologia, lista.observacao)"><i class="fa-solid fa-circle-plus font-size18"></i></button>
+                                            </td>
+                                            <td style="text-align: center;">${lista.medicacaoNome}</td>
+                                            <td class="hidden-xs" style="text-align: center;">${lista.dosagem}</td>
+                                            <td class="hidden-xs" style="text-align: center;">
+                                                <span v-if="lista.medicamentosa == 0">ORAL</span>
+                                                <span v-else-if="lista.medicamentosa == 1">PARENTAL</span>
+                                                <span v-else-if="lista.medicamentosa == 2">SUBCUTÂNEA</span>
+                                                <span v-else-if="lista.medicamentosa == 3">NASAL</span>
+                                                <span v-else-if="lista.medicamentosa == 4">RETAL</span>
+                                                <span v-else-if="lista.medicamentosa == 5">INTRAVESICAL</span>
+                                                <span v-else-if="lista.medicamentosa == 6">NEBOLIZAÇÃO</span>
+                                                <span v-else-if="lista.medicamentosa == 7">OCULAR</span>
+                                                <span v-else-if="lista.medicamentosa == 8">SUBLINGUAL</span>
+                                            </td>
+                                            <td class="hidden-xs" style="text-align: center;">
+                                                <span v-if="lista.parental == 0">INTRAVENOSA</span>
+                                                <span v-else-if="lista.parental == 1">INTRAMUSCULAR</span>
+                                                <span v-else-if="lista.parental == 2">SUBCUTÂNEA</span>
+                                                <span v-else-if="lista.parental == 3">INTRATECAL</span>
+                                            </td>
+                                            <td class="hidden-xs" style="text-align: center;">
+                                                <span v-if="lista.periodo == 0">DOSE UNICA</span>
+                                                <span v-else-if="lista.periodo == 1">SEMANAL</span>
+                                                <span v-else-if="lista.periodo == 2">MENSAL</span>
+                                                <span v-else-if="lista.periodo == 3">DIÁRIA</span>
+                                            </td>
+                                            <td class="hidden-xs" style="text-align: center;">${lista.quantidade}</td>
+                                        </tr>
+                                    </template>
+                                    <template v-else>
+                                        <tr>
+                                            <td colspan="7" style="text-align: center;">
+                                                <span>Ainda não existe nenhuma medicação vinculada a esse paciente!</span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer mt-4 ml-2">
+                    <div class="row">
+                        <div class="col-btn-justificativa-left">
+                            <a href="{% url 'saude_enfermagem:administracao_medicacao_list' %}" class="br-button secondary mr-3"><i class="fas fa-arrow-left"></i> Voltar</a>
+                        </div>
+                        <div class="col-btn-justificativa-ringth">
+                            <button type="button" class="br-button primary mr-3 btn-save" :disabled="desabilitarSubmit" @click="criarReceitaMedicacoes()"><i class="fas fa-save"></i> Salvar</button>
+                        </div>
+                    <div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/moment.locale.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script>
+    moment.locale('pt-br');
+
+    var app = new Vue({
+        delimiters: ['${', '}'],
+        el: '#base-vue',
+        data: {
+            formulario: {
+                posologia: '',
+                parental: '',
+                medicamentosa: '',
+                observacao: '',
+                quantidade: 1,
+                dosagem: '',
+                medicacaoNome: '',
+                medicacaoId: '',
+                aplicacao: '1',
+                periodo: '',
+            },
+            listagemMedicamentos: [],
+            unidadeSaudeSessionId: '{{unidade_saude_session_id}}',
+            solicitacaoId: '{{solicitacao.id}}',
+            pacienteId: '{{solicitacao.boletim.paciente.id}}',
+            enfermeiroId: '{{enfermeiro.id}}',
+            verificacaoAnexo: false,
+            totalAplicacoes: 1,
+        },
+         watch: {
+            'formulario.periodo': {
+                handler(novoValor) {
+                    if (novoValor === '0') {
+                        this.formulario.quantidade = 1;
+
+                    }else if(novoValor === '1' || novoValor === '2'){
+                        this.totalAplicacoes = this.formulario.quantidade;
+                    }
+                }
+            },
+            'formulario.quantidade': {
+                handler(novoValor) {
+                    if (this.formulario.periodo === '0') {
+                        this.totalAplicacoes = 1;
+                        novoValor = 1;
+                    }else if(this.formulario.periodo === '1' || this.formulario.periodo === '2'){
+                        this.totalAplicacoes = novoValor;
+                    }
+                }
+            },
+         },
+        computed: {
+            desabilitarSubmit() {
+                if(this.listagemMedicamentos.length > 0 && this.verificacaoAnexo === true){
+                    return false
+                }else{
+                    return true
+                }
+            },
+            desabilitarAddMedicacao() {
+                const { parental, medicamentosa, quantidade, dosagem, medicacaoId, periodo, posologia } = this.formulario;
+                return !parental || !medicamentosa || !quantidade || !dosagem || !medicacaoId || !periodo || (periodo === '3' && !posologia);
+            }
+        },
+        methods: {
+            criarReceitaMedicacoes(){
+                const formData = new FormData();
+                formData.append('solicitacao_id', this.solicitacaoId);
+                formData.append('paciente_id', this.pacienteId);
+                formData.append('enfermeiro_id', this.enfermeiroId);
+                formData.append('unidade_saude_id', this.unidadeSaudeSessionId);
+                formData.append('listagem_medicamentos', JSON.stringify(this.listagemMedicamentos));
+                
+                const fileInput = document.querySelector('.upload-input.account-file-input');
+                if (fileInput && fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    formData.append('file', file);
+                }
+
+                if (!fileInput || fileInput.files.length === 0) {
+                    Swal.fire({
+                        title: "Formulário sem anexo?",
+                        text: "Deseja realmente salvar o formulário sem anexo",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Sim, Salvar!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Aguarde...',
+                                html: 'Aguarde enquanto estamos salvando o formulário.',
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                }
+                            });
+                            axios.post("{% url 'saude_enfermagem:api_receita_medicamento_create'%}", formData, {
+                                headers: {'Content-Type': 'multipart/form-data'}
+                            }).then((response) => {
+                                let url  = "{% url 'saude_enfermagem:administracao_medicacao_vacina_detail' pk='00000000-0000-0000-0000-000000000000' %}"
+                                window.location.href = url.replace('00000000-0000-0000-0000-000000000000', this.solicitacaoId);
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Aguarde...',
+                        html: 'Aguarde enquanto estamos salvando o formulário.',
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading()
+                        }
+                    });
+                    axios.post("{% url 'saude_enfermagem:api_receita_medicamento_create'%}", formData, {
+                        headers: {'Content-Type': 'multipart/form-data'}
+                    }).then((response) => {
+                        let url  = "{% url 'saude_enfermagem:administracao_medicacao_vacina_detail' pk='00000000-0000-0000-0000-000000000000' %}"
+                        window.location.href = url.replace('00000000-0000-0000-0000-000000000000', this.solicitacaoId);
+                    });
+                }   
+            },
+            adicionarMedicacao(){
+                this.listagemMedicamentos.push({
+                    id: this.obterProximoId(),
+                    posologia: this.formulario.posologia,
+                    parental: this.formulario.parental,
+                    medicamentosa: this.formulario.medicamentosa,
+                    medicacaoId: this.formulario.medicacaoId,
+                    medicacaoNome: this.formulario.medicacaoNome,
+                    dosagem: this.formulario.dosagem,
+                    quantidade: this.formulario.quantidade,
+                    observacao: this.formulario.observacao,
+                    periodo: this.formulario.periodo,
+                    aplicacao: this.formulario.aplicacao,
+                    total_aplicacoes: this.totalAplicacoes,
+                });
+
+                this.totalAplicacoes = 1
+
+                this.formulario = {
+                    posologia: null,
+                    parental: null,
+                    medicamentosa: null,
+                    observacao: '',
+                    quantidade: 1,
+                    dosagem: '',
+                    medicacaoNome: '',
+                    medicacaoId: '',
+                    aplicacao: '1',
+                    periodo: '',
+                },
+                $('#medicacao-select').val(null).trigger('change');
+            },
+            obterProximoId() {
+                if (this.listagemMedicamentos.length === 0) {
+                    return 1;
+                }
+                
+                const maiorId = Math.max(...this.listagemMedicamentos.map(item => item.id));
+                return maiorId + 1;
+            },
+            removerMedicacao(id){
+                this.listagemMedicamentos = this.listagemMedicamentos.filter(item => item.id !== id);
+            },
+            modalInfo(nome, dosagem, quantidade, medicamentosa, parental, posologia, observacao){
+                this. getMedicamentosaDescription(medicamentosa)
+                this.getParentalDescription(parental), 
+                this.getPosologiaDescription(posologia)
+                if (observacao === ''){
+                    observacao = 'Sem observação'
+                }
+                Swal.fire({
+                    html: `
+                    <div class="swal2-title swal2-title-custom text-left" id="swal2-title">
+                        <div class="row">
+                            <div class="col-9">
+                                <h2 class="ml-3 mt-n1"><label class="text-color-blue-1gov custom-text font-size20">Detalhes do Medicamento</label></h2>
+                            </div>
+                            <div class="col-3">
+                                <button type="button" class="close" style="background-color:#0459A1; border:none; color:white; font-size:15px; width:30px; height:30px;" aria-label="Close" onclick="Swal.close()">X</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container">
+
+                        <div class="row font-size16">
+                            <div class="col-3 color-title">
+                                <span class="">Medicamento:</span>
+                            </div>
+                            <div class="col-9">
+                                <span>${nome}<span/>
+                            </div>
+                        </div><hr/>
+
+                        <div class="row font-size16 mt-2">
+                            <div class="col-3 color-title">
+                                <span>Dosagem:</span>
+                            </div>
+                            <div class="col-9">
+                                <span>${dosagem}</span>
+                            </div>
+                        </div><hr/>
+
+                        <div class="row font-size16 mt-2">
+                            <div class="col-3 color-title">
+                                <span>Quantidade:</span>
+                            </div>
+                            <div class="col-9">
+                                <span>${quantidade}</span>
+                            </div>
+                        </div><hr/>
+
+                        <div class="row font-size16 mt-2">
+                            <div class="col-3 color-title">
+                                <span>Via de Administração Medicamentosa:</span>
+                            </div>
+                            <div class="col-9">
+                                <span>${this.getMedicamentosaDescription(medicamentosa)}</span>
+                            </div>
+                        </div><hr/>
+
+                        <div class="row font-size16 mt-2">
+                            <div class="col-3 color-title">
+                                <span>Tipo Parental:</span>
+                            </div>
+                            <div class="col-9">
+                                <span>${this.getParentalDescription(parental)}</span>
+                            </div>
+                        </div><hr/>
+
+                        <div class="row font-size16 mt-2">
+                            <div class="col-3 color-title">
+                                <span>Posologia:</span>
+                            </div>
+                            <div class="col-9">
+                                <span>${this.getPosologiaDescription(posologia)}</span>
+                            </div>
+                        </div><hr/>   
+
+                        <div class="row font-size16 mt-2">
+                            <div class="col-3 color-title">
+                                <span>Observação:</span>
+                            </div>
+                            <div class="col-9">
+                                <span>${observacao}</span>
+                            </div>
+                        </div><hr/>   
+                        
+                    </div>
+                    `,
+                    confirmButtonColor: "#1250b4",
+                    confirmButtonText: '<i class="fa-regular fa-floppy-disk mr-2"></i>Salvar',
+                    cancelButtonText: '<i class="fa-solid fa-xmark mr-2"></i> Fechar',
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    //reverseButtons: true,
+                    allowOutsideClick: true,
+                });
+
+            },
+            getMedicamentosaDescription(value) {
+                switch (parseInt(value)) {
+                    case 0: return 'ORAL';
+                    case 1: return 'PARENTAL';
+                    case 2: return 'SUBCUTÂNEA';
+                    case 3: return 'NASAL';
+                    case 4: return 'RETAL';
+                    case 5: return 'INTRAVESICAL';
+                    case 6: return 'NEBOLIZAÇÃO';
+                    case 7: return 'OCULAR';
+                    case 8: return 'SUBLINGUAL';
+                    default: return 'DESCONHECIDO';
+                }
+            },
+            getParentalDescription(value) {
+                switch (parseInt(value)) {
+                    case 0: return 'INTRAVENOSA';
+                    case 1: return 'INTRAMUSCULAR';
+                    case 2: return 'SUBCUTÂNEA';
+                    case 3: return 'INTRATECAL';
+                    default: return 'DESCONHECIDO';
+                }
+            },
+            getPosologiaDescription(value) {
+                switch (parseInt(value)) {
+                    case 0: return 'DOSE ÚNICA';
+                    case 1: return 'SEMANAL';
+                    case 2: return 'MENSAL';
+                    default: return 'DESCONHECIDO';
+                }
+            },
+            calcularMeses(duracaoTratamento) {
+                const meses = Math.floor(duracaoTratamento / 30);
+                const diasRestantes = duracaoTratamento % 30;
+                
+                if (meses > 0 && diasRestantes > 0) {
+                    return `${meses} mês${meses > 1 ? 'es' : ''} e ${diasRestantes} dia${diasRestantes > 1 ? 's' : ''}`;
+                } else if (meses > 0) {
+                    return `${meses} mês${meses > 1 ? 'es' : ''}`;
+                } else if(duracaoTratamento){
+                    return `${duracaoTratamento} dia${duracaoTratamento > 1 ? 's' : ''}`;
+                }
+            },
+            calcularHoras(duracaoEmHoras) {
+                const dias = Math.floor(duracaoEmHoras / 24);
+                const horasRestantes = duracaoEmHoras % 24;
+                
+                if (dias > 0 && horasRestantes > 0) {
+                    return `${dias} dia${dias > 1 ? 's' : ''} e ${horasRestantes} hora${horasRestantes > 1 ? 's' : ''}`;
+                } else if (dias > 0) {
+                    return `${dias} dia${dias > 1 ? 's' : ''}`;
+                } else if (duracaoEmHoras) {
+                    return `${duracaoEmHoras} hora${duracaoEmHoras > 1 ? 's' : ''}`;
+                }
+            },
+            calcularAplicacoes(duracaoEmDias, posologiaEmHoras) {
+                if(duracaoEmDias && posologiaEmHoras && this.formulario.periodo === '3'){
+                    const aplicacoesPorDia = Math.floor(24 / posologiaEmHoras);
+
+                    const aplicacoesPorDiaAjustado = aplicacoesPorDia > 0 ? aplicacoesPorDia : 1;
+
+                    const totalAplicacoes = duracaoEmDias * aplicacoesPorDiaAjustado;
+
+                    this.totalAplicacoes = totalAplicacoes
+                    return {
+                        totalAplicacoes: totalAplicacoes,
+                        aplicacoesPorDia: aplicacoesPorDiaAjustado,
+                    };
+                }else{
+                    return {
+                        totalAplicacoes: 0,
+                        aplicacoesPorDia: 0,
+                    };
+                }
+            },
+        },
+        mounted(){
+            self = this;
+
+            $('#medicacao-select').select2({
+                placeholder: "Selecione uma Medicação",
+                width: '100%',
+                ajax: {
+                    url: '{% url "saude_farmacia:api_lista_medicamentos" %}',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            unidade_saude_id: self.unidadeSaudeSessionId,
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.map(med => ({
+                                id: med.value,
+                                text: med.text
+                            }))
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0
+            }).on('change', function(e) {
+                const selectedValue = e.target.value;
+                const selectedText = $(this).find('option:selected').text();
+
+                self.formulario.medicacaoNome = selectedText;
+                self.formulario.medicacaoId = selectedValue;
+            });
+
+            var video = document.getElementById('video');
+            var canvas = document.getElementById('canvas');
+            var captureBtn = document.getElementById('capture-btn');
+            var switchCameraBtn = document.getElementById('switch-camera-btn');
+            var photoInput = document.querySelector('.upload-input.account-file-input');
+            var accountUserImage = document.getElementById('accountUploadedAvatar');
+            var fileInput = document.querySelector('.account-image-reset');
+            var btnCamera = document.getElementById('camera-btn');
+
+            video.addEventListener('loadeddata', function() {
+                if (video.readyState >= 2) {
+                    video.style.display = 'block';
+                }
+            });
+
+            let currentStream;
+            let useFrontCamera = true;
+
+            document.getElementById('camera-btn').addEventListener('click', function(event) {
+                const constraints = { video: { facingMode: useFrontCamera ? 'user' : 'environment' } };
+
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then((mediaStream) => {
+                        currentStream = mediaStream;
+                        accountUserImage.style.setProperty('display', 'none', 'important');
+                        fileInput.style.display = 'none';
+                        btnCamera.style.display = 'none';
+                        switchCameraBtn.style.display = 'inline';
+
+                        video.style.display = 'inline';
+                        captureBtn.style.removeProperty('display');
+                        video.srcObject = mediaStream;
+                        video.play();
+                    })
+                    .catch((err) => {
+                        console.log('Erro ao acessar a webcam: ', err);
+                    });
+            });
+
+            captureBtn.addEventListener('click', function capturePhoto() {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                self.verificacaoAnexo = true;
+
+                canvas.toBlob(function(blob) {
+                    const file = new File([blob], "photo.png", { type: 'image/png' });
+
+                    const fileURL = URL.createObjectURL(file);
+                    fileInput.style.removeProperty('display');
+                    btnCamera.style.removeProperty('display');
+                    switchCameraBtn.style.display = 'none';
+                    accountUserImage.style.display = 'inline';
+
+                    if (accountUserImage) {
+                        accountUserImage.src = fileURL;
+                        accountUserImage.alt = "Foto do paciente";
+                    }
+
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    if (photoInput) {
+                        photoInput.files = dataTransfer.files;
+                    } else {
+                        console.error('Elemento photoInput não encontrado.');
+                    }
+                });
+
+                currentStream.getTracks().forEach(track => track.stop());
+                video.style.display = 'none';
+                captureBtn.style.display = 'none';
+            });
+
+            switchCameraBtn.addEventListener('click', function() {
+                useFrontCamera = !useFrontCamera;
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                }
+                document.getElementById('camera-btn').click();
+            });
+
+            let resetFileInput = document.querySelector('.account-image-reset');
+
+            resetFileInput.addEventListener('click', function() {
+                resetFileInput.style.display = 'none';
+                self.verificacaoAnexo = false;
+            });
+
+            if (accountUserImage) {
+                const resetImage = accountUserImage.src;
+                fileInput.onchange = () => {
+                    if (fileInput.files[0]) {
+                        resetFileInput.style.removeProperty('display');
+                        accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
+                    }
+                };
+                resetFileInput.onclick = () => {
+                    fileInput.value = '';
+                    accountUserImage.src = resetImage;
+                };
+            }
+        },
+    });
+</script>
+{% endblock %}

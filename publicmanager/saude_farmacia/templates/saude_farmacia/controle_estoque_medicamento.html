@@ -1,0 +1,184 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Controle de Estoque de Medicamento{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header pr-0 pl-0 pt-2">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                                <img src="{% static 'img/icons/icon-controle-estoque-medicamento.svg' %}" alt="Ícone de medicamento" title="Ícone de medicamento" style="display: block;"> 
+                                <span class="mt-1 ml-4" style="display: block;">CONTROLE DE ESTOQUE DE MEDICAMENTOS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="br-divider mt-1 divider-grid mb-3 col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                </div>
+
+                <div class="card-content">
+                    <form id="formSubmit" method="get" onsubmit="setDate()">
+                        <div class="card-body d-flex justify-content-center flex-column">
+                            <div class="form-group row d-flex justify-content-center col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                      <div class="br-input has-icon">
+                                        <label for="id_data_vencimento_filtro" class="text-color-blue-1gov">Data de Vencimento</label>
+                                        <input
+                                            id="id_data_vencimento_filtro"
+                                            name="data_vencimento_filtro"
+                                            class="input-busca-grid"
+                                            type="text"
+                                            data-input="data-input"
+                                            value="{{data_vencimento_filtro}}"
+                                        />
+                                        <button class="br-button circle small input-busca-grid" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn" tabindex="-1" aria-hidden="true"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                        </button>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 mt-3">
+                                    <div class="br-input">
+                                        <label for="id_nome_medicamento_filtro" class="text-color-blue-1gov">Nome do Medicamento</label>
+                                        <input
+                                            id="id_nome_medicamento_filtro"
+                                            class="input-busca-grid form-control"
+                                            name="nome_medicamento_filtro"
+                                            type="text"
+                                            maxlength="200"
+                                            value="{{nome_medicamento_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 mt-3">
+                                    <div class="br-input">
+                                        <label for="id_numero_lote_filtro" class="text-color-blue-1gov">N° do Lote</label>
+                                        <input
+                                            id="id_numero_lote_filtro"
+                                            class="input-busca-grid form-control"
+                                            name="numero_lote_filtro"
+                                            type="text"
+                                            maxlength="50"
+                                            value="{{numero_lote_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 mt-3">
+                                    <div class="br-input">
+                                        <label for="id_quantidade_em_estoque_filtro" class="text-color-blue-1gov">Quantidade em Estoque</label>
+                                        <input
+                                            id="id_quantidade_em_estoque_filtro"
+                                            class="input-busca-grid form-control"
+                                            name="quantidade_em_estoque_filtro"
+                                            type="number"
+                                            min="0"
+                                            value="{{quantidade_em_estoque_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-6 ml-6">
+                            <button type="submit" class="br-button primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+                
+                <div class="card-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row">
+        <div class="col-md">
+            <div class="d-flex justify-content-center br-card hover">
+                <div class="card-content d-flex justify-content-center col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                    <div class="br-table d-flex flex-column justify-content-center col-xl-12 col-lg-12 col-md-12 col-sm-12" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                        <div class="table-header">
+                            <div>
+                                <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                            </div>
+                            <div class="top-bar mt-2">
+                                <div class="d-flex table-title">
+                                    <img src="{% static 'img/icons/icon-controle-estoque-medicamento.svg' %}" alt="Ícone de medicamento" title="Ícone de medicamento" style="display: block; height: 30px;"> 
+                                    <span class="mt-1 ml-4" style="display: block;">Lista do Estoque de Medicamentos</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="mt-2">
+                            <thead>
+                                <tr>
+                                    {% comment %} <th></th>
+                                    <th></th> {% endcomment %}
+                                    <th><b class="text-color-blue-1gov">Nome</b></th>
+                                    <th><b class="text-color-blue-1gov">N° do Lote</b></th>
+                                    <th><b class="text-color-blue-1gov">Data de Vencimento</b></th>
+                                    <th><b class="text-color-blue-1gov">Qtd. em Estoque</b></th>
+                                    <th><b class="text-color-blue-1gov">Estoque Mínimo</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% if medicamentos %}
+                                {% for medicamento in medicamentos %}
+                                    <tr>
+                                        {% comment %} <td>
+                                            <a data-th="Editar" href="{% url 'saude_farmacia:insumo_update' pk=insumo.id %}" class="br-button circle "><i class="fas fa-edit" aria-hidden="true"></i></a>
+                                        </td>
+                                        <td data-th="Excluir">
+                                            <a href="javascript:void(0)" class="br-button circle" onclick="confirmCancel('{% url 'saude_farmacia:insumo_delete' insumo.id %}', 'insumo')">
+                                                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                            </a>
+                                        </td> {% endcomment %}
+                                        <td data-th="Nome do Medicamento" style="text-transform:uppercase;">{{ medicamento.medicamento.nome_medicamento }}</td>
+                                        <td data-th="Número do lote do medicamento">{{ medicamento.numero_lote_medicamento }}</td>
+                                        <td data-th="Data de vencimento do medicamento">{{ medicamento.data_vencimento_medicamento }}</td>
+                                        <td data-th="Quantidade em Estoque">{{ medicamento.medicamento.quantidade }}</td>
+                                        <td data-th="Estoque mínimo geral">{{ medicamento.medicamento.estoque_minimo_geral }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                        {% comment %} Paginação {% endcomment %}
+                        {% include 'dashboard/includes/paginacao.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block components-modal %}
+    {% comment %} {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %} {% endcomment %}
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

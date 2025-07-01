@@ -1,0 +1,15 @@
+nome,tipo
+Exame de sangue,0
+Bioquímica sanguínea,0
+Hemograma,0
+Exame de urina,0
+Testes de função hepática,0
+Teste de função renal,0
+Ressonância Magnética,1
+Tomografia por Emissão de Pósitrons,1
+Cintilografia,1
+Angiografia,1
+Ultrasonografia,1
+imagem médica (radiografia),1
+Morfológico fetal,1
+Densitometria Óssea,1

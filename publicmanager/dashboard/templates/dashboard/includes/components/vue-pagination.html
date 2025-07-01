@@ -1,0 +1,58 @@
+
+<nav class="br-pagination small mt-3" aria-label="Paginação de resultados" data-total="5" data-current="1">
+  <div class="col d-none d-sm-flex">
+      <span class="current">${currentPage}</span>&ndash;
+      <span class="per-page">${ totalPages }</span>&nbsp;de&nbsp;
+      <span class="total">${ resultsTotal }</span>&nbsp;itens
+  </div>
+  <ul>
+      <li>
+          <button class="br-button circle" type="button" :class="{ disabled: prevDisabled }" @click="prevPage" data-previous-page="data-previous-page" aria-label="Página anterior">
+              <i class="fas fa-angle-left" aria-hidden="true"></i>
+          </button>
+      </li>
+      <template v-if="totalPages <= 8">
+          <li v-for="page in totalPages" :class="{'active': page == currentPage, 'disabled': loadingTable}">
+              <a :class="currentPage === page ? 'active' : ''" class="page" style="cursor: pointer;" @click="page != currentPage ? goToPage(page):''">${page}</a>
+          </li>
+      </template>
+      <template v-else-if="currentPage >= 1 && currentPage <= 5">
+          <li v-for="page in 5" class="page-item" :class="{'active': page == currentPage, 'disabled': loadingTable}">
+              <a :class="currentPage === page ? 'active' : ''" class="page" style="cursor: pointer;" @click="page != currentPage ? goToPage(page):''">${page}</a>
+          </li>
+          <li class="page-item" v-if="currentPage == 5">
+              <a class="page" style="cursor: pointer;" @click="goToPage(currentPage + 1)">${currentPage + 1}</a>
+          </li>
+          <li class="page-item disabled">
+              <a class="page">...</a>
+          </li>
+          <li class="page-item">
+              <a class="page" style="cursor: pointer;" @click="goToPage(totalPages)">${totalPages}</a>
+          </li>
+      </template>
+
+      <template v-else-if="currentPage >= (totalPages - 5)">
+          <li>
+              <a class="page" :class="{'disabled': loadingTable}" style="cursor: pointer;" @click="goToPage(1)">
+                  1
+              </a>
+          </li>
+          <li>
+              <a class="page disabled">...</a>
+          </li>
+          <li class="page-item" v-if="currentPage == (totalPages - 5)" :class="{'disabled': loadingTable}">
+              <a class="page" @click="goToPage(currentPage - 1)" href="javascript:void(0)">
+                  ${currentPage - 1}
+              </a>
+          </li>
+          <li v-for="page in visiblePages" v-if="page >= (totalPages - 5)" class="page-item" :class="{'active': page == currentPage, 'disabled': loadingTable}">
+              <a class="page" :class="currentPage === page ? 'active' : ''" style="cursor: pointer;" @click="page != currentPage ? goToPage(page):''">${page}</a>
+          </li>
+      </template>
+      <li>
+          <button class="br-button circle" type="button" :class="{ disabled: nextDisabled }" @click="nextPage" data-next-page="data-next-page" aria-label="Página seguinte">
+              <i class="fas fa-angle-right" aria-hidden="true"></i>
+          </button>
+      </li>
+  </ul>
+</nav>

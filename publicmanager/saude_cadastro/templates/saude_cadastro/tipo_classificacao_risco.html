@@ -1,0 +1,436 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de Tipos de Classificação de Risco{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/estilizacao-grid.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes-mod-cadastro.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/sweetalert-custom-alta-hospitalar.css' %}">
+<link rel="stylesheet" href="{% static 'css/responsividade_tb.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade.css' %}"/>
+<style>
+    .br-breadcrumb .crumb-list .crumb a {
+        max-width: 220px !important;
+    }
+    .swal2-modal {
+        width: 700px;
+        height: 510px;
+    }
+    td[data-th="Editar"]{
+        padding: 16px 60px;
+    }
+    td[data-th="Ordem"],
+    td[data-th="Tempo para Atendimento"]{
+        text-align: center;
+    }
+    /* td[data-th="Situação"]{
+        width: 170px;
+    }
+    td[data-th="Tipo"]{
+        width: 210px;
+    } */
+    td[data-th="Tipo"] > span{
+        max-width: 170px;
+        margin: 0 17%;
+    }
+    td[data-th="Situação"] > span{
+        margin: 0 5%;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container-lg">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+    <div class="row mt-1">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="text-weight-semi-bold text-up-02 color-title font-size24">
+                                {% comment %} <img src="{% static 'img/icons/icone-tipo-classificacao-risco.svg' %}" alt="Ícone de classificação de risco" title="Ícone de classificação de risco" style="display: block;">
+                                <span class="mt-1 ml-4" style="display: block;">TIPOS DE CLASSIFICAÇÃO DE RISCO</span> {% endcomment %}
+                                <i class="fa-solid fa-clipboard-list font-size25 mr-2"></i> TIPOS DE CLASSIFICAÇÃO DE RISCO
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="card-content mt-n10-tb">
+                    <form class="box-wdth-search" id="tipoclassificacaorisco_form" method="get">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                    <div class="br-input">
+                                        <label for="id_ordem_filtro">Ordem</label>
+                                        <input
+                                            id="id_ordem_filtro"
+                                            name="ordem_filtro"
+                                            class="input-busca-grid"
+                                            type="number"
+                                            min="0"
+                                            value="{{ordem_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="id_tipo_filtro" class="text-color-blue-1gov">Tipo</label>
+                                        <select id="id_tipo_filtro" class="select-busca-grid campo-select" name="tipo_filtro"  style="width: 100%">
+                                            <option value="">TODOS</option>
+                                            {% for tipo in tipos %}
+                                                {% if tipo_filtro ==  forloop.counter0%}
+                                                    <option selected value="{{forloop.counter0}}">{{tipo}}</option>
+                                                {% else %}
+                                                    <option value="{{forloop.counter0}}">{{tipo}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 mt-3">
+                                    <div class="br-input">
+                                        <label for="id_situacao_filtro" class="text-color-blue-1gov">Situação</label>
+                                        <select
+                                            id="id_situacao_filtro"
+                                            class="select-busca-grid campo-select"
+                                            name="situacao_filtro" 
+                                            style="width: 100%"
+                                        >
+                                            <option value="">TODAS</option>
+                                            {% for situacao in situacoes %}
+                                                {% if situacao_filtro ==  forloop.counter0%}
+                                                    <option selected value="{{forloop.counter0}}">{{situacao}}</option>
+                                                {% else %}
+                                                    <option value="{{forloop.counter0}}">{{situacao}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-4 ml-6 buttonbusctb2">
+                            <button type="submit" class="br-button primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card hover">
+              <div class="card-content">
+                <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                    data-random="data-random">
+                    <div class="table-header">
+                        <div>
+                            <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                        </div>
+                        <div class="top-bar mt-2">
+                            <div class="table-title">
+                                {% comment %} <img src="{% static 'img/icons/icone-tipo-classificacao-risco.svg' %}" alt="Ícone de classificação de risco" title="Ícone de classificação de risco" style="display: block; height: 30px;"> 
+                                <span class="mt-1 ml-4" style="display: block;">Listagem de Tipos de Classificação de Risco</span> {% endcomment %}
+                                <i class="fa-solid fa-clipboard-list mr-2" style="font-size: 20.16px;"></i> <span>Listagem de Tipos de Classificação de Risco</span>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="mt-2">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th style="text-align: center;">Ordem</th>
+                            <th style="text-align: center;">Tempo para Atendimento</th>
+                            <th style="text-align: center;">Classificação de Risco</th>
+                            <th style="text-align: center;">Situação</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if tiposclassificacaorisco %}
+                            {% for tipoclassificacaorisco in tiposclassificacaorisco %}
+                                <tr>
+                                    <td data-th="Editar">
+                                        <a class="botao-editar" data-id="{{tipoclassificacaorisco.id}}">
+                                            <i
+                                            class="fas fa-edit" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td data-th="Ordem">{{ tipoclassificacaorisco.ordem }}</td>
+
+                                    {% if tipoclassificacaorisco.tempo_atendimento %}
+                                        <td data-th="Tempo para Atendimento">{{ tipoclassificacaorisco.tempo_atendimento|format_duration }}</td>
+                                    {% else %}
+                                        <td data-th="Tempo para Atendimento">Não informado</td>
+                                    {% endif %}
+
+                                    {% if tipoclassificacaorisco.get_tipo_display == "EMERGÊNCIA" %}
+                                        <td data-th="Tipo"><span class="situacao-grid" style="background-color: #E51010; color: #FFFFFF;">{{ tipoclassificacaorisco.get_tipo_display }}</span></td>
+                                    {% elif tipoclassificacaorisco.get_tipo_display == "MUITO URGENTE" %}
+                                        <td data-th="Tipo"><span class="situacao-grid" style="background-color: #FF9D29; color: #FFFFFF;">{{ tipoclassificacaorisco.get_tipo_display }}</span></td>
+                                    {% elif tipoclassificacaorisco.get_tipo_display == "URGENTE" %}
+                                        <td data-th="Tipo"><span class="situacao-grid" style="background-color: #EAE451; color: #FFFFFF;">{{ tipoclassificacaorisco.get_tipo_display }}</span></td>
+                                    {% elif tipoclassificacaorisco.get_tipo_display == "POUCO URGENTE" %}
+                                        <td data-th="Tipo"><span class="situacao-grid" style="background-color: #2B982B; color: #FFFFFF;">{{ tipoclassificacaorisco.get_tipo_display }}</span></td>
+                                    {% elif tipoclassificacaorisco.get_tipo_display == "NÃO URGENTE" %}
+                                        <td data-th="Tipo"><span class="situacao-grid" style="background-color: #2196F3; color: #FFFFFF;">{{ tipoclassificacaorisco.get_tipo_display }}</span></td>
+                                    {% endif %}
+
+                                    {% if tipoclassificacaorisco.get_situacao_display == 'ATIVO' %}
+                                        <td data-th="Situação">
+                                            <span class="bg-situacao-ativo situacao-grid">{{ tipoclassificacaorisco.get_situacao_display }}</span>
+                                        </td>
+                                    {% elif tipoclassificacaorisco.get_situacao_display == 'INATIVO' %}
+                                        <td data-th="Situação">
+                                            <span class="bg-situacao-inativo situacao-grid">{{ tipoclassificacaorisco.get_situacao_display }}</span>
+                                        </td>
+                                    {% endif %}
+
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                    {% comment %} Paginação {% endcomment %}
+                    {% include 'dashboard/includes/paginacao.html' %}
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+</div>
+{% endblock %}
+
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+<script src="{% static 'js/utils_forms.js' %}"></script>
+
+<script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+<script src="{% static 'js/html-duration-picker.min.js' %}"></script>
+<script src="{% static 'js/mask.js' %}"></script>
+
+<script>
+    let numReg = new RegExp(/^[0-9]/);
+    let colonPunctuationReg = new RegExp(":", 'g');
+
+    Array.from(document.querySelectorAll(".botao-editar")).forEach( element => {
+        element.addEventListener("click", function() {
+            const tipoClassificacaoRiscoID = this.getAttribute('data-id');
+
+            const trDoBotaoClicado = this.parentNode.parentNode;
+
+            const filhostrDoBotaoClicado = trDoBotaoClicado.children
+
+            const tipoClassificacaoRisco = {}
+
+            tipoClassificacaoRisco["ordem"] = filhostrDoBotaoClicado[1].innerHTML
+            tipoClassificacaoRisco["tempo_atendimento"] = filhostrDoBotaoClicado[2].innerHTML === "Não informado" ? '00:00:00' : filhostrDoBotaoClicado[2].innerHTML;
+            tipoClassificacaoRisco["classificao"] = filhostrDoBotaoClicado[3].children[0].innerHTML
+            tipoClassificacaoRisco["situacao"] = filhostrDoBotaoClicado[4].children[0].innerHTML
+
+            console.log("situacao", tipoClassificacaoRisco["situacao"])
+
+            let valorAnteriorInputTempoAtendimento = tipoClassificacaoRisco["tempo_atendimento"];
+            
+            Swal.fire({
+                html: `
+                <div class="swal2-title swal2-title-custom text-left" id="swal2-title">
+                    <h2 class="ml-3">
+                        <i class="fas fa-clipboard-list text-color-blue-1gov"></i>
+                        <label class="text-color-blue-1gov">Tipo de Classificação de Risco</label>
+                        <button type="button" class="close mr-2" aria-label="Close" onclick="Swal.close()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </h2>
+                </div>
+            
+                <div class="container">
+                    <div class="row br-input justify-content-center mt-2">
+                        <div class="col-11 br-input">
+                            <label class="text-color-blue-1gov">Ordem:</label>
+                            <input class="input-highlight-labeless input-tab capslock" type="text" value="${tipoClassificacaoRisco["ordem"]}" readonly/>
+                        </div>
+                    </div>
+                    <div class="row br-input justify-content-center mt-2">
+                        <div class="col-11 br-input">
+                            <label class="text-color-blue-1gov">Tempo para Atendimento:</label>
+                            <input id="tempo-atendimento" value="${tipoClassificacaoRisco["tempo_atendimento"]}">
+                        </div>
+                    </div>
+                    <div class="row br-input justify-content-center mt-2">
+                        <div class="col-11 br-input">
+                            <label class="text-color-blue-1gov">Classificação de Risco:</label>
+                            <input class="input-highlight-labeless input-tab capslock" type="text" value="${tipoClassificacaoRisco["classificao"]}" readonly/>
+                        </div>
+                    </div>
+                    <div class="row br-input justify-content-center mt-2">
+                        <div class="col-11">
+                            <label class="text-color-blue-1gov">Situação:</label>
+                            <div class="br-input mt-1">
+                                <select id="situacao" class="select-custom modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="swal2-container">
+                                    <option value="0">ATIVO</option>
+                                    ${(() => {
+                                        if (tipoClassificacaoRisco["situacao"] === "INATIVO") {
+                                            return `<option value="1" selected>INATIVO</option>`
+                                        }
+                                        
+                                        return `<option value="1">INATIVO</option>`
+                                    })()}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `,
+                confirmButtonColor: "#1250b4",
+                confirmButtonText: '<i class="fa-regular fa-floppy-disk mr-2"></i>Salvar',
+                cancelButtonText: '<i class="fa-solid fa-xmark mr-2"></i> Fechar',
+                showCancelButton: true,
+                showConfirmButton: true,
+                allowOutsideClick: false,
+                preConfirm: () => {
+                    const situacaoSelect = document.getElementById("situacao");
+                    const tempoAtendimentoInput = document.getElementById("tempo-atendimento");
+
+                    const situacaoSelectValue = situacaoSelect.value;
+                    const tempoAtendimentoInputValue = tempoAtendimentoInput.value;
+
+                    let url  = "{% url 'saude_cadastro:api_tipo_classificacao_risco_update' pk='00000000-0000-0000-0000-000000000000' %}"
+                    axios.put(url.replace('00000000-0000-0000-0000-000000000000', tipoClassificacaoRiscoID), {"situacao": situacaoSelectValue, "tempo_atendimento": tempoAtendimentoInputValue})
+                    .then((response)=>{
+                        location.reload();
+                    });
+                },
+            });
+
+            document.querySelector(".swal2-container").setAttribute('id', 'swal2-container');
+            ajustarSelectModal();
+
+            document.getElementById("tempo-atendimento").addEventListener("input", function(e) {
+                inputValue = e.target.value
+
+                const inputValueArrayOriginal = inputValue.split(":");
+                const inputValueArrayAjustado = []
+
+                const valorAnteriorInputTempoAtendimentoArray = valorAnteriorInputTempoAtendimento.split(":");
+
+                const cursorPointer = [e.target.selectionEnd, e.target.selectionEnd]
+
+
+                if(e.data !== null && !(numReg.test(e.data.toLowerCase()))){
+                    inputValueArrayOriginal[0] = valorAnteriorInputTempoAtendimentoArray[0];
+                    inputValueArrayOriginal[1] = valorAnteriorInputTempoAtendimentoArray[1];
+                    inputValueArrayOriginal[2] = valorAnteriorInputTempoAtendimentoArray[2];
+
+                    cursorPointer[0] = cursorPointer[0]-1;
+                    cursorPointer[1] = cursorPointer[1]-1;
+                } else if(inputValue === ''){
+                    inputValueArrayOriginal[0] = valorAnteriorInputTempoAtendimentoArray[0];
+                    inputValueArrayOriginal[1] = valorAnteriorInputTempoAtendimentoArray[1];
+                    inputValueArrayOriginal[2] = valorAnteriorInputTempoAtendimentoArray[2];
+
+                    cursorPointer[0] = [0];
+                    cursorPointer[1] = [8];
+                } else if(inputValue.match(colonPunctuationReg).length < 2){
+                    inputValueArrayOriginal[0] = valorAnteriorInputTempoAtendimentoArray[0];
+                    inputValueArrayOriginal[1] = valorAnteriorInputTempoAtendimentoArray[1];
+                    inputValueArrayOriginal[2] = valorAnteriorInputTempoAtendimentoArray[2];
+
+                    cursorPointer[0] = cursorPointer[0]+1;
+                    cursorPointer[1] = cursorPointer[1]+1;
+                } else{
+                    if(e.target.selectionStart === e.target.selectionEnd){
+                        if([0,1,2,3].includes(e.target.selectionEnd) && valorAnteriorInputTempoAtendimentoArray[0] != inputValueArrayOriginal[0]){
+                            if(
+                                valorAnteriorInputTempoAtendimentoArray[0].length === 2 && inputValueArrayOriginal[0].length > 0 &&
+                                !(e.data !== null && e.data === inputValueArrayOriginal[0])
+                            ){
+                                inputValueArrayOriginal[0] = valorAnteriorInputTempoAtendimentoArray[0];
+
+                                cursorPointer[0] = cursorPointer[0]+1;
+                                cursorPointer[1] = cursorPointer[1]+1;
+                            } else if(
+                                valorAnteriorInputTempoAtendimentoArray[0].length === 1 &&
+                                inputValueArrayOriginal[0].length === 2
+                            ){
+                                cursorPointer[0] = 3;
+                                cursorPointer[1] = 5;
+                            }
+                        }
+                        else if([3,4,5,6].includes(e.target.selectionEnd) && valorAnteriorInputTempoAtendimentoArray[1] != inputValueArrayOriginal[1]){
+                            if(
+                                valorAnteriorInputTempoAtendimentoArray[1].length === 2 && inputValueArrayOriginal[1].length > 0 &&
+                                !(e.data !== null && e.data === inputValueArrayOriginal[1])
+                            ){
+                                inputValueArrayOriginal[1] = valorAnteriorInputTempoAtendimentoArray[1];
+
+                                cursorPointer[0] = cursorPointer[0]+1;
+                                cursorPointer[1] = cursorPointer[1]+1;
+                            } else if(
+                                valorAnteriorInputTempoAtendimentoArray[1].length === 1 &&
+                                inputValueArrayOriginal[1].length === 2
+                            ){
+                                cursorPointer[0] = 6;
+                                cursorPointer[1] = 8;
+                            }
+                        }
+                        else {
+                            if(
+                                valorAnteriorInputTempoAtendimentoArray[2].length === 2 &&
+                                inputValueArrayOriginal[2].length > 0 &&
+                                !(e.data !== null && e.data === inputValueArrayOriginal[2])
+                            ){
+                                inputValueArrayOriginal[2] = valorAnteriorInputTempoAtendimentoArray[2];
+
+                                cursorPointer[0] = cursorPointer[0]+1;
+                                cursorPointer[1] = cursorPointer[1]+1;
+                            } else if(inputValueArrayOriginal[2].length > 2) {
+                                inputValueArrayOriginal[2] = valorAnteriorInputTempoAtendimentoArray[2];
+                                
+                                cursorPointer[0] = 8;
+                                cursorPointer[1] = 8;
+                            }else if(
+                                valorAnteriorInputTempoAtendimentoArray[2].length === 1 &&
+                                inputValueArrayOriginal[2].length === 2
+                            ){
+                                cursorPointer[0] = 6;
+                                cursorPointer[1] = 8;
+                            }
+                        }
+                    }
+                }
+
+                inputValue = inputValueArrayOriginal.join(":");
+
+                e.target.value = inputValue;
+                valorAnteriorInputTempoAtendimento = inputValue;
+
+                e.target.setSelectionRange(cursorPointer[0], cursorPointer[1]);
+            })
+        })
+    })
+</script>
+{% endblock %}

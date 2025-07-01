@@ -1,0 +1,221 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de Pacientes{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/saude/urgencia.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/datatables.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+    <style>
+        .br-tag {
+            font-size: 15px;
+            width: 46px !important;
+            height: 27px;
+        }
+        .tag-amarelo { background-color: #eae451; }
+        .tag-azul { background-color: #4c9fe4; }
+        .tag-verde { background-color: #3ec86d; }
+        .tag-laranja { background-color: #ff9d29; }
+        .tag-roxo { background-color: #5942D2; }
+        .tag-cinza { background-color: #999; }
+        .tag-vermelho { background-color: #e52207; }
+        .tag-preto { background-color: rgba(0, 0, 0, 0.9); }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-lg">
+
+        <div class="row">
+            <div class="col-md">
+                <div class="br-card">
+
+                    <div class="card-header">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="text-weight-semi-bold text-up-02 color-title font-size24"><i class="fa-solid fa-user-large mr-1"></i> PACIENTES</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="card-content">
+                        <form class="box-wdth-search" id="formSubmit" method="get" onsubmit="setDate()">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9">
+                                        <div class="br-input">
+                                            <label for="id_nome">Dados da Busca</label>
+                                            <input type="text" name="buscar_nome" maxlength="255" class="form-control input-com-alfanumericas" value="{{buscar_nome}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                        <div class="br-select">
+                                            <div class="br-input">
+                                                <label for="select-simple">Opção de Busca</label>
+                                                <input id="select-simple" type="text" placeholder="Selecione o item"/>
+                                                <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1" data-trigger="data-trigger">
+                                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                            <div class="br-list" tabindex="0">
+                                                <div class="br-item {% if opcao_filtro == 'paciente' %} selected {% endif %}" tabindex="0">
+                                                    <div class="br-radio">
+                                                    <input id="rb0" type="radio" name="opcao_filtro" value="paciente"/>
+                                                    <label for="rb0">Paciente</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item {% if opcao_filtro == 'cpf' %} selected {% endif %}" tabindex="0">
+                                                    <div class="br-radio">
+                                                    <input id="rb1" type="radio" name="opcao_filtro" value="cpf"/>
+                                                    <label for="rb1">CPF</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item {% if opcao_filtro == 'rg' %} selected {% endif %}" tabindex="0">
+                                                    <div class="br-radio">
+                                                    <input id="rb2" type="radio" name="opcao_filtro" value="rg"/>
+                                                    <label for="rb2">RG</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item {% if opcao_filtro == 'sus' %} selected {% endif %}" tabindex="0">
+                                                    <div class="br-radio">
+                                                    <input id="rb3" type="radio" name="opcao_filtro" value="sus"/>
+                                                    <label for="rb3">Cartão Sus</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer mt-4">
+                                <button class="br-button primary ml-n15" type="submit">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md">
+
+                <div class="br-card hover">
+                    <div class="card-content">
+                        <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                            
+                            <div class="table-header mt-n10 white"><h4 class="ml-2 color-title" style="font-size:16px;"><i class="fa-solid fa-list-ul"></i> PACIENTES AGUARDANDO ATENDIMENTO</h4></div>
+                            
+                            <table class="mt-3 myTable">
+                                <thead class="hgt-55">
+                                    <tr>
+                                        <th style="width:4%;"></th>
+                                        <th style="width:4%;"><b>Classificação</b></th>
+                                        <th><b>Paciente</b></th>
+                                        <th><b>Chegada</b></th>
+                                        <th><b>Queixa Principal</b></th>
+                                        <th><b>Médico</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if atendimentos_aguardando %}
+                                        {% for atendimento in atendimentos_aguardando %}
+                                            <tr>
+                                                <td class="hgt-75"></td>
+                                                <td data-th="Aguardando Atendimento">
+                                                    <span class="br-tag small
+                                                        {% if atendimento.classificacao_risco.tipo_classificacao_risco.tipo == 0 %}tag-azul{% endif %}
+                                                        {% if atendimento.classificacao_risco.tipo_classificacao_risco.tipo == 1 %}tag-verde {% endif %}
+                                                        {% if atendimento.classificacao_risco.tipo_classificacao_risco.tipo == 2 %}tag-amarelo {% endif %}
+                                                        {% if atendimento.classificacao_risco.tipo_classificacao_risco.tipo == 3 %}tag-laranja {% endif %}
+                                                        {% if atendimento.classificacao_risco.tipo_classificacao_risco.tipo == 4 %}tag-vermelho{% endif %}
+                                                    "></span>
+                                                </td>
+                                                <td class="capslock" data-th="Aguardando Atendimento">{{ atendimento.paciente.nome_paciente }}</td>
+                                                <td data-th="Aguardando Atendimento">
+                                                    {{ atendimento.classificacao_risco.boletim.created_at|date:'d/m/Y' }}
+                                                    {{ atendimento.classificacao_risco.boletim.created_at|time:'H:i' }}
+                                                </td>
+                                                <td data-th="Aguardando Atendimento">{{ atendimento.classificacao_risco.queixa_principal }}</td>
+                                                <td>{{ atendimento.medico.nome_profissional }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tbody>    
+                            </table>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <div class="br-card hover">
+                    <div class="card-content">
+                        <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+
+                            <div class="table-header mt-n10 white"><h4 class="ml-2 color-title" style="font-size:16px;"><i class="fa-solid fa-list-ul"></i> PACIENTES EM ATENDIMENTO</h4></div>
+                                <div class="responsive">
+                                    <table class="mt-3 myTable">
+                                        <thead class="hgt-55">
+                                            <tr>
+                                                <th style="width:4%;"></th>
+                                                <th style="width:4%;"><b>Classificação</b></th>
+                                                <th><b>Paciente</b></th>
+                                                <th><b>Chegada</b></th>
+                                                <th><b>Queixa Principal</b></th>
+                                                <th><b>Médico</b></th>
+                                            </tr>
+                                        </thead>
+                                            {% if sendo_atendidos %}
+                                                {% for atendido in sendo_atendidos %}
+                                                    <tr>
+                                                        <td class="hgt-75">
+                                                            <a href="{% url 'saude_atendimento:relatorio_paciente_atendimento_pdf' atendido.lista_chamada_atendimento_medico_set.pk %}" target="_blank" class="br-button circle">
+                                                                <i class="far fa-file-pdf" style="font-size:23px; text-transform:uppercase;"></i>
+                                                            </a>
+                                                        </td>
+                                                        <td data-th="Em Atendimento">
+                                                            <span class="br-tag small
+                                                                {% if atendido.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'AZUL' %}tag-azul {% endif %}
+                                                                {% if atendido.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'VERDE' %}tag-verde {% endif %}
+                                                                {% if atendido.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'AMARELO' %}tag-amarelo {% endif %}
+                                                                {% if atendido.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'LARANJA' %}tag-laranja{% endif %}
+                                                                {% if atendido.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'VERMELHO' %}tag-vermelho {% endif %}
+                                                                {% if atendido.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'PRETO' %}tag-preto {% endif %}
+                                                                {% if atendido.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'ROXO' %}tag-roxo {% endif %}
+                                                                {% if atendido.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'CINZA' %}tag-cinza {% endif %}
+                                                            "></span>
+                                                        </td>
+                                                        <td class="capslock">{{ atendido.paciente.nome_paciente }}</td>
+                                                        <td data-th="Em Atendimento">
+                                                            {{ atendido.classificacao_risco.boletim.created_at|date:'d/m/Y' }}
+                                                            {{ atendido.classificacao_risco.boletim.created_at|time:'H:i' }}
+                                                        </td>
+                                                        <td class="capslock" data-th="Em Atendimento">{{ atendido.classificacao_risco.queixa_principal }}</td>
+                                                        <td class="capslock" data-th="Aguardando Atendimento">{{atendido.lista_chamada_atendimento_medico_set.profissionais.last.nome_profissional}}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/mask.js' %}"></script>
+<script src="{% static 'js/datatables.min.js' %}"></script>
+<script src="{% static 'js/data_table.js' %}"></script>
+{% endblock %}

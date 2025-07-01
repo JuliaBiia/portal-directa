@@ -1,0 +1,1032 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Anamnese do Paciente{% endblock %}
+{% load static %}
+{% load widget_tweaks %}
+{% load custom_filters %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/paciente-create-update.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/vue-select.css' %}"/>
+<style>
+    .card{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .main-content{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    *::before, *::after {
+        box-sizing: content-box;
+    }
+
+    #anamnese_paciente_form{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #anamnese_paciente_form .card-body{
+        display: flex;
+        flex-direction: column;
+    }
+
+    #anamnese_paciente_form .card-body .container-parte .campos{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #anamnese_paciente_form > .card-body .coluna-esquerda{
+        padding-left: 0;
+    }
+    #anamnese_paciente_form > .card-body .coluna-direita{
+        padding-right: 0;
+    }
+
+    #anamnese_paciente_form > .card-body > #primeira-parte > .campos > .coluna-direita > .container-situacao-peso-paciente > div > fieldset,
+    #anamnese_paciente_form > .card-body > #terceira-parte > .campos > .coluna-esquerda > .container-tempo-situacao-de-rua > div > fieldset,
+    #anamnese_paciente_form > .card-body > #terceira-parte > .campos > .coluna-direita > .container-frequencia-diaria-alimentacao > div > fieldset,
+    #anamnese_paciente_form > .card-body > #terceira-parte > .campos > .coluna-direita > .container-origem-alimentacao > div > fieldset{
+        /* margin-bottom: 0; */
+        /* margin-bottom: var(--spacing-scale-half) !important; */
+    }
+
+    .br-checkbox input + label::before {
+        /* left: -40px; */
+    }
+
+    #container-alergias-medicamentosas{
+        /* margin-top: var(--spacing-scale-3x) !important; */
+    }
+
+    #container-alergias-medicamentosas + div{
+        /* margin-top: var(--spacing-scale-2x) !important; */
+        /* margin-bottom: var(--spacing-scale-2x) !important; */
+    }
+
+    legend{
+        font-size: var(--font-size-scale-base);
+        /* margin-bottom: 5px; */
+    }
+
+    .lista-opcoes-checkboxes{
+        display: flex;
+        padding: 0;
+        gap: 20px;
+    }
+
+    #opcoes-frequencia-diaria-alimentacao{
+        gap: 35px;
+    }
+
+    #opcoes-origem-alimentacao,
+    #opcoes-higiene-pessoal{
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    ul#id_situacao_peso{
+        gap: 10px;
+        margin-bottom: 0;
+    }
+    
+
+    ul#id_origem_alimentacao,
+    ul#id_opcoes_higiene_pessoal{
+        gap: 5px;
+    }
+
+    ul#id_origem_alimentacao{
+        margin-bottom: 0;
+    }
+
+    ul#id_tempo_situacao_de_rua{
+        gap: 10px;
+    }
+
+    ul#id_origem_alimentacao > li:nth-child(4){
+        padding-right: 46px;
+    }
+
+    ul#id_opcoes_higiene_pessoal > li:nth-child(1){
+        padding-right: 40px;
+    }
+
+    ul#id_opcoes_higiene_pessoal > li:last-child{
+        padding-right: 46px;
+    }
+
+    ul > li > label{
+        font-weight: var(--font-weight-medium);
+    }
+
+
+    .container-manytomany{
+        display: none;
+    }
+
+    overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+    .box-card-border{ border: 1px solid #d9d9d9; border-radius:10px; }
+    .white{color:white !important;}
+
+    .bloquear-formulario{pointer-events: none; opacity: 0.7;}
+
+    input[type=checkbox]{
+        opacity: 0;
+        position: absolute;
+    }
+
+    input[type=checkbox] + label {
+        align-items: flex-start;
+        cursor: pointer;
+        display: inline-block;
+        font-size: var(--font-size-scale-base);
+        font-weight: var(--font-weight-medium);
+        min-height: var(--spacing-scale-3x);
+        position: relative;
+        font-family: var(--font-family-base);
+        color: var(--color);
+        line-height: 1.6em;
+        padding-left: 32px;
+    }
+
+    input[type=checkbox] + label::before{
+        background: #fff;
+        border-color: #ccc;
+        border-radius: 4px;
+        border-style: solid;
+        border-width: 1px;
+        content: "";
+        height: 24px;
+        left: 0;
+        position: absolute;
+        width: 24px;
+    }
+
+    input[type=checkbox]:checked + label::after {
+        border: solid var(--selected);
+        border-width: 0 3px 3px 0;
+        content: "";
+        height: var(--icon-size-sm);
+        left: 8px;
+        position: absolute;
+        top: 4px;
+        transform: rotate(45deg);
+        width: 8px;
+    }
+
+</style>
+{% endblock %}
+{% block content %}
+    <div class="container box-card-border" style="margin-top:-20px;">
+        {% include 'dashboard/includes/saude/breadcrumb.html' %}
+        <div class="">
+
+            <div class="card-header col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <h5 class=" color-title"><i class="fas fa-heartbeat"></i> ANAMNESE RESPOSTAS HUMANAS DOS PROCEDIMENTOS VITAIS DO PACIENTE</h5><br/>
+                <span class="br-divider col-xl-12 col-lg-12 col-md-12 col-sm-12" style="margin-top:-20px;"></span>
+            </div>
+
+            <form class="mt-5" id="formulario-anamnese" method="post" id="anamnese_paciente_form" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.media.js }}
+                
+                {% comment %} .01.line/left+right {% endcomment %}
+                <div class="row bloquear" style="background-color:; width:100%; margin:0 auto;">
+
+                    {% comment %} left {% endcomment %}
+                    <div class="col-6">
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox">
+                                    {% render_field form.tem_doenca_neurologica type="checkbox" aria-label="Tem Doença Neurológica?" %}
+                                    <label for="id_tem_doenca_neurologica">Tem Doença Neurológica?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.tem_doenca_psicologica type="checkbox" aria-label="Tem Doença Psicológica?" %}
+                                    <label for="id_tem_doenca_psicologica">Tem Doença Psicológica?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.tem_hipertensao_arterial type="checkbox" aria-label="Tem Hipertensão Arterial?" %}
+                                    <label for="id_tem_hipertensao_arterial">Tem Hipertensão Arterial?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.tem_doenca_do_sangue type="checkbox" aria-label="Tem Doença do Sangue?" %}
+                                    <label for="id_tem_doenca_do_sangue">Tem Doença do Sangue?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.fez_recebeu_transfusao_ultimos_3_meses type="checkbox" aria-label="Fez ou recebeu transfusão nos últimos 3 meses?" %}
+                                    <label for="id_fez_recebeu_transfusao_ultimos_3_meses">Fez ou recebeu transfusão nos últimos 3 meses?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.teve_avc_derrame type="checkbox" aria-label="Teve AVC / derrame?" %}
+                                    <label for="id_teve_avc_derrame">Teve AVC / derrame?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.estar_com_tuberculose type="checkbox" aria-label="Está com Tuberculose?" %}
+                                    <label for="id_estar_com_tuberculose">Está com Tuberculose?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.estar_com_hanseniase type="checkbox" aria-label="Está com Hanseníase?" %}
+                                    <label for="id_estar_com_hanseniase">Está com Hanseníase?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.estar_fumante type="checkbox" aria-label="Está Fumante?" %}
+                                    <label for="id_estar_fumante">Está Fumante?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.faz_uso_alcool type="checkbox" aria-label="Faz uso de Álcool?" %}
+                                    <label for="id_faz_uso_alcool">Faz uso de Álcool?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.faz_uso_drogas type="checkbox" aria-label="Faz uso de Drogas?" %}
+                                    <label for="id_faz_uso_drogas">Faz uso de Drogas?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.faz_exercicio_fisicos type="checkbox" aria-label="Faz Exercícios Físicos?" %}
+                                    <label for="id_faz_exercicio_fisicos">Faz Exercícios Físicos?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.ja_sofreu_infarto type="checkbox" aria-label="Já sofreu infarto?" %}
+                                    <label for="id_ja_sofreu_infarto">Já sofreu infarto?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-4 container-manytomany">
+                            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                <div class="br-input">
+                                    <label for="id_alergias_medicamentosas">Possuí Alergias Medicamentosas?</label>
+                                    {% render_field form.alergias_medicamentosas name="alergias[]" style="width: 100%" multiple="multiple" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-3 container-manytomany">
+                            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                <div class="br-input">
+                                    <label for="id_antecedentes_patologicos_pessoais">Antecedentes Patológicos Pessoais</label>
+                                    {% render_field form.antecedentes_patologicos_pessoais name="antecedentes_patologicos_pessoais[]" style="width: 100%" multiple="multiple" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-3 container-manytomany">
+                            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                <div class="br-input">
+                                    <label for="id_antecedentes_patologicos_familiares">Antecedentes Patológicos Familiares</label>
+                                    {% render_field form.antecedentes_patologicos_familiares name="antecedentes_patologicos_familiares[]" style="width: 100%" multiple="multiple" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-4" id="container-alergias-medicamentosas">
+                            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                <div class="br-input">
+                                    <custom-select
+                                        ref="customSelect"
+                                        label="Possuí Alergias Medicamentosas?"
+                                        placeholder="Digite o valor da busca..."
+                                        :options="principioOptions"
+                                        v-model="selectedPrincipioValues"
+                                        :load-options="getPrincipioAtivo"
+                                    ></custom-select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-4">
+                            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                <custom-select
+                                    ref="customAntecedentesPatologicos"
+                                    label="Antecedentes Patológicos Pessoais?"
+                                    placeholder="Digite o valor da busca..."
+                                    :options="pessoaisOptions"
+                                    v-model="selectedPessoaisValues"
+                                    :load-options="getCids"
+                                ></custom-select>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-3">
+                            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                <div class="br-input">
+                                    <custom-select
+                                        ref="customPatologicosFaliliares"
+                                        label="Antecedentes Patológicos Familiares?"
+                                        placeholder="Digite o valor da busca..."
+                                        :options="familiaresOptions"
+                                        v-model="selectedFamiliaresValues"
+                                        :load-options="getCids"
+                                    ></custom-select>
+                                </div>
+                            </div>
+                        </div>
+                     </div>
+
+                    {% comment %} right {% endcomment %}
+                    <div class="col-6">
+                        <div class="form-group row container-situacao-peso-paciente">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <fieldset class="mb-1">
+                                    <legend>Sobre seu peso, você se considera?</legend>
+                                    <div class="lista-opcoes-checkboxes selecao-unica d-flex flex-wrap" id="opcoes-situacao-peso">
+                                        {% for choice in form.situacao_peso.field.choices %}
+                                            {% if forloop.counter0 != 0 %}
+                                                <div class="container-checkbox-situacao-peso-{{forloop.counter0}} d-flex">
+                                                    <input class="checkbox-situacao-peso" type="checkbox" id="checkbox-situacao-peso-{{forloop.counter0}}" @click="selecionaCheckbox(this, '{{forloop.counter0}}', '{{choice.1}}', 'peso')">
+                                                    <label for="checkbox-situacao-peso-{{forloop.counter0}}" class="mr-3">{{ choice.1 }}</label>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.tem_alguma_deficiencia type="checkbox" class="checkboxRelacionado" aria-label="Tem alguma deficiência?" %}
+                                    <label for="id_tem_alguma_deficiencia">Tem alguma deficiência?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_tem_alguma_deficiencia" class="br-input disabled">
+                                    <label for="id_descricao_deficiencia">Se sim, qual?</label>
+                                    {% render_field form.descricao_deficiencia class="input-com-alfanumericas" data-id-checkbox-relacionado="id_tem_alguma_deficiencia" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.estar_gestante type="checkbox" class="checkboxRelacionado" aria-label="Está gestante?" %}
+                                    <label for="id_estar_gestante">Está gestante?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_estar_gestante" class="br-input disabled">
+                                    <label for="id_periodo_gestacao">Se sim, qual o período de gestação?</label>
+                                    {% render_field form.periodo_gestacao class="input-com-alfanumericas" data-id-checkbox-relacionado="id_estar_gestante" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.tem_diabetes type="checkbox" class="checkboxRelacionado" aria-label="Tem diabetes?" %}
+                                    <label for="id_tem_diabetes">Tem diabetes?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_tem_diabetes" class="br-input disabled">
+                                    <label for="id_tipo_diabetes">Se sim, qual?</label>
+                                    {% render_field form.tipo_diabetes class="input-com-alfanumericas" data-id-checkbox-relacionado="id_tem_diabetes" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.tem_doenca_respiratoria_cronica_pulmao type="checkbox" class="checkboxRelacionado" aria-label="Tem doença respiratória crônica / no pulmão?" %}
+                                    <label for="id_tem_doenca_respiratoria_cronica_pulmao">Tem doença respiratória crônica / no pulmão?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_tem_doenca_respiratoria_cronica_pulmao" class="br-input disabled">
+                                    <label for="id_tem_doenca_respiratoria_cronica_pulmao">Se sim, qual?</label>
+                                    {% render_field form.nome_doenca_respiratoria_cronica_pulmao class="input-com-alfanumericas" data-id-checkbox-relacionado="nome_doenca_respiratoria_cronica_pulmao" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.tem_doenca_cardiaca_do_coracao type="checkbox" class="checkboxRelacionado" aria-label="Tem doença cardíaca / do coração?" %}
+                                    <label for="id_tem_doenca_cardiaca_do_coracao">Tem doença cardíaca / do coração?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_tem_doenca_cardiaca_do_coracao" class="br-input disabled">
+                                    <label for="id_nome_doenca_cardiaca_do_coracao">Se sim, qual?</label>
+                                    {% render_field form.nome_doenca_cardiaca_do_coracao class="input-com-alfanumericas" data-id-checkbox-relacionado="id_nome_doenca_cardiaca_do_coracao" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.tem_doenca_rins type="checkbox" class="checkboxRelacionado" aria-label="Tem doença nos rins?" %}
+                                    <label for="id_tem_doenca_rins">Tem doença nos rins?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_tem_doenca_rins" class="br-input disabled">
+                                    <label for="id_nome_doenca_rins">Se sim, qual?</label>
+                                    {% render_field form.nome_doenca_rins class="input-com-alfanumericas" data-id-checkbox-relacionado="id_tem_doenca_rins" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.tem_teve_cancer type="checkbox" class="checkboxRelacionado" aria-label="Tem ou teve Câncer?" %}
+                                    <label for="id_tem_teve_cancer">Tem ou teve Câncer?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_tem_teve_cancer" class="br-input disabled">
+                                    <label for="id_tipo_cancer">Se sim, qual é a causa?</label>
+                                    {% render_field form.tipo_cancer class="input-com-alfanumericas" data-id-checkbox-relacionado="id_tem_teve_cancer" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.teve_alguma_internacao_ultimos_12_meses type="checkbox" class="checkboxRelacionado" aria-label="Teve alguma internação nos últimos 12 meses?" %}
+                                    <label for="id_teve_alguma_internacao_ultimos_12_meses">Teve alguma internação nos últimos 12 meses?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_teve_alguma_internacao_ultimos_12_meses" class="br-input disabled">
+                                    <label for="id_causa_internacao_ultimos_12_meses">Se sim, qual é a causa?</label>
+                                    {% render_field form.causa_internacao_ultimos_12_meses class="input-com-alfanumericas" data-id-checkbox-relacionado="id_teve_alguma_internacao_ultimos_12_meses" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.usa_plantas_medicinais type="checkbox" class="checkboxRelacionado" aria-label="Usa plantas medicinais?" %}
+                                    <label for="id_usa_plantas_medicinais">Usa plantas medicinais?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_usa_plantas_medicinais" class="br-input disabled">
+                                    <label for="id_nome_planta_medicinal">Se sim, qual?</label>
+                                    {% render_field form.nome_planta_medicinal class="input-com-alfanumericas" data-id-checkbox-relacionado="id_usa_plantas_medicinais" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {% comment %} 02.line {% endcomment %}
+                <div class="row bloquear">
+
+                    <div class="col-12">
+                        <legend>ANAMNESE RESPOSTAS HUMANAS SOCIAIS</legend>
+                        <span class="br-divider col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                    </div>
+
+                    <div class="col-6 mt-3">
+                        
+                        <div class="form-group row mt-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox">
+                                    {% render_field form.frequenta_cuidador_tradicional type="checkbox" aria-label="Frequenta cuidador tradicional?" %}
+                                    <label for="id_frequenta_cuidador_tradicional">Frequenta cuidador tradicional?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.participa_de_algum_grupo_comunitario type="checkbox" aria-label="Participa de algum grupo comunitário?" %}
+                                    <label for="id_participa_de_algum_grupo_comunitario">Participa de algum grupo comunitário?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.possui_plano_saude_privado type="checkbox" aria-label="Possui plano de saúde privado?" %}
+                                    <label for="id_possui_plano_saude_privado">Possui plano de saúde privado?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.recebe_algum_beneficio type="checkbox" class="checkboxRelacionado" aria-label="Recebe algum benefício?" %}
+                                    <label for="id_recebe_algum_beneficio">Recebe algum benefício?</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 mt-3">
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-3">
+                                    {% render_field form.eh_membro_povo_comunidade_tradicional type="checkbox" class="checkboxRelacionado" aria-label="É membro de povo ou comunidade tradicional?" %}
+                                    <label for="id_eh_membro_povo_comunidade_tradicional">É membro de povo ou comunidade tradicional?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                <div type-bloquear="id_eh_membro_povo_comunidade_tradicional" class="br-input disabled">
+                                    <label for="id_nome_povo_comunidade_tradicional">Se sim, qual?</label>
+                                    {% render_field form.nome_povo_comunidade_tradicional class="input-com-alfanumericas" data-id-checkbox-relacionado="id_eh_membro_povo_comunidade_tradicional" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% comment %} 03.line {% endcomment %}
+                <div class="row mt-4 bloquear">
+                    <div class="col-12">
+                        <legend>ANAMNESE RESPOSTAS HUMANAS SOCIAIS EM SITUAÇÃO DE RUA</legend>
+                        <span class="br-divider col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group row mt-4">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <fieldset class="mb-1">
+                                    <legend>Quanto tempo em situação de rua?</legend>
+                                    <div class="container-checkboxes-tempo-situacao-de-rua d-flex flex-wrap">
+                                        {% for choice in form.tempo_situacao_de_rua.field.choices %}
+                                            {% if forloop.counter0 != 0 %}
+                                                <div class="container-checkbox-tempo-situacao-rua-{{forloop.counter0}} d-flex">
+                                                    <input class="checkbox-situacao-rua" type="checkbox" id="checkbox-situacao-rua-{{forloop.counter0}}" @click="selecionaCheckbox(this, '{{forloop.counter0}}', '{{choice.1}}', 'situacaoRua')">
+                                                    <label for="checkbox-situacao-rua-{{forloop.counter0}}" class="mr-3">{{ choice.1 }}</label>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.eh_acompanhado_por_outra_instituicao type="checkbox" class="checkboxRelacionado" aria-label="É acompanhado por outra instituição?" %}
+                                    <label for="id_eh_acompanhado_por_outra_instituicao">É acompanhado por outra instituição?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_eh_acompanhado_por_outra_instituicao" class="br-input disabled">
+                                    <label for="id_nome_instituicao">Se sim, qual?</label>
+                                    {% render_field form.nome_instituicao class="input-com-alfanumericas" data-id-checkbox-relacionado="id_eh_acompanhado_por_outra_instituicao" %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4 mb-1">
+                                    {% render_field form.possui_referencia_familiar type="checkbox" aria-label="Possui referência familiar?" %}
+                                    <label for="id_possui_referencia_familiar">Possui referência familiar?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4">
+                                    {% render_field form.visita_algum_familiar_com_frequencia type="checkbox" class="checkboxRelacionado" aria-label="Visita algum familiar com frequência?" %}
+                                    <label for="id_visita_algum_familiar_com_frequencia">Visita algum familiar com frequência?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2 mt-md-3">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div type-bloquear="id_visita_algum_familiar_com_frequencia" class="br-input disabled">
+                                    <label for="id_grau_parentesco">Se sim, qual o grau de parentesco?</label>
+                                    {% render_field form.grau_parentesco class="input-com-alfanumericas" data-id-checkbox-relacionado="id_visita_algum_familiar_com_frequencia" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group row mt-4">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <fieldset class="mb-1">
+                                    <legend>Quantas vezes se alimenta ao dia?</legend>
+                                    <div class="container-checkboxes-alimentacao d-flex flex-wrap">
+                                        {% for choice in form.frequencia_diaria_alimentacao.field.choices %}
+                                            {% if forloop.counter0 != 0 %}
+                                                <div class="container-checkbox-alimentacao-{{forloop.counter0}} d-flex">
+                                                    <input class="checkbox-alimentacao" type="checkbox" id="checkbox-alimentacao-{{forloop.counter0}}" @click="selecionaCheckbox(this, '{{forloop.counter0}}', '{{choice.1}}', 'alimentacao')">
+                                                    <label for="checkbox-alimentacao-{{forloop.counter0}}" class="mr-3">{{ choice.1 }}</label>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12">
+                                <legend>Qual a origem da alimentação?</legend>
+                            </div>
+                            <div class="d-flex flex-wrap">
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 br-checkbox mt-2 mb-1">
+                                    {% render_field form.restaurante_popular type="checkbox" aria-label="Restaurante popular?" %}
+                                    <label for="id_restaurante_popular">Restaurante popular</label>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 br-checkbox mt-2 mb-1">
+                                    {% render_field form.doacao_restaurante type="checkbox" %}
+                                    <label for="id_doacao_restaurante">Doação restaurante</label>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 br-checkbox mt-2 mb-1">
+                                    {% render_field form.doacao_grupo_religioso type="checkbox" %}
+                                    <label for="id_doacao_grupo_religioso">Doação grupo religioso</label>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 br-checkbox mt-2 mb-1">
+                                    {% render_field form.doacao_popular type="checkbox" %}
+                                    <label for="id_doacao_popular">Doação de população</label>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 br-checkbox mt-2 mb-1">
+                                    {% render_field form.doacao_outros type="checkbox" %}
+                                    <label for="id_doacao_outros">Outros</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="br-checkbox mt-4 mb-1">
+                                    {% render_field form.tem_acesso_a_higiene_pessoal type="checkbox"  class="checkboxRelacionado" aria-label="Tem acesso a higiene pessoal?" %}
+                                    <label for="id_tem_acesso_a_higiene_pessoal">Tem acesso a higiene pessoal?</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12">
+                                <legend type-bloquear="id_tem_acesso_a_higiene_pessoal" class="disabled">Se sim, qual?</legend>
+                            </div>
+                            <div class="d-flex flex-wrap">
+                                <div type-bloquear="id_tem_acesso_a_higiene_pessoal" class="col-6 br-checkbox mt-2 mb-1 disabled">
+                                    {% render_field form.higiene_pessoal_banho type="checkbox" aria-label="Banho" data-id-checkbox-relacionado="id_tem_acesso_a_higiene_pessoal" %}
+                                    <label for="id_higiene_pessoal_banho">Banho</label>
+                                </div>
+                                <div type-bloquear="id_tem_acesso_a_higiene_pessoal" class="col-6 br-checkbox mt-2 mb-1 disabled">
+                                    {% render_field form.higiene_pessoal_higiene_bocal type="checkbox" aria-label="Higiene Bucal" data-id-checkbox-relacionado="id_tem_acesso_a_higiene_pessoal" %}
+                                    <label for="id_higiene_pessoal_higiene_bocal">Higiene Bucal</label>
+                                </div>
+                                <div type-bloquear="id_tem_acesso_a_higiene_pessoal" class="col-6 br-checkbox mt-2 mb-1 disabled">
+                                    {% render_field form.higiene_pessoal_acesso_sanitario type="checkbox" aria-label="Acesso sanitário" data-id-checkbox-relacionado="id_tem_acesso_a_higiene_pessoal" %}
+                                    <label for="id_higiene_pessoal_acesso_sanitario">Acesso sanitário</label>
+                                </div>
+                                <div type-bloquear="id_tem_acesso_a_higiene_pessoal" class="col-6 br-checkbox mt-2 mb-1 disabled">
+                                    {% render_field form.higiene_outros type="checkbox" aria-label="Outros" data-id-checkbox-relacionado="id_tem_acesso_a_higiene_pessoal" %}
+                                    <label for="id_higiene_outros">Outros</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- /.card-body -->
+                <div class="card-footer col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 d-flex justify-content-center align-items-center flex-wrap">
+                    {% if form.errors %}
+                        {% for error in  form|join_to_error_messages%}
+                            <div class="br-message danger" role="alert">
+                                <div class="icon">
+                                    <i class="fas fa-times-circle fa-lg" aria-hidden="true"></i>
+                                </div>
+                                <div class="content">
+                                    {% if error|get_element_dict:"field_label" %}
+                                        <span class="message-title">Erro no campo {{ error|get_element_dict:"field_label" }}: </span><span class="message-body"> {{ error|get_element_dict:"error"  }}</span>
+                                    {% else %}
+                                        <span class="message-title">Erro: </span><span class="message-body"> {{ error|get_element_dict:"error"  }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="close">
+                                    <button class="br-button circle small" type="button" aria-label="content"><i class="fas fa-times" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <input type="hidden" id="id_tempo_situacao_de_rua" name="tempo_situacao_de_rua" value="">
+                    <input type="hidden" id="id_frequencia_diaria_alimentacao" name="frequencia_diaria_alimentacao" value="">
+                    <input type="hidden" id="id_situacao_peso" name="situacao_peso" value="">
+
+                    <input type="hidden" id="id_alergias_medicamentosas" name="alergias_medicamentosas" v-model="principioPks">
+                    <input type="hidden" id="id_antecedentes_patologicos_pessoais" name="antecedentes_patologicos_pessoais" v-model="pessoaisPks">
+                    <input type="hidden" id="id_antecedentes_patologicos_familiares" name="antecedentes_patologicos_familiares" v-model="familiaresPks">
+                    <input type="hidden" name="modulo" value="{{modulo}}">
+                    
+                   <a href="{{url_redirect}}" class="br-button secondary mt-6 mr-3">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                    <button type="submit" class="br-button primary mt-6 mr-3">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                    <a class="br-button secondary mt-6" id="habilitar-edicao">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                </div>
+            </form>
+            <div class="mt-3 white">.</div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/moment.locale.min.js' %}"></script>
+
+<script>
+    moment.locale('pt-br');
+
+	var app = new Vue({
+		delimiters: ['${', '}'],
+		el: '#base-vue',
+        components: {
+            {% include 'dashboard/includes/components/vue-custom-select-multiple.html' %},
+        },
+        data: {
+            //Component Select patologia pessoais
+            pessoaisOptions: [],
+            selectedPessoaisValues: [],
+            pessoaisPks: [],
+            //Component Select patologia familiares
+            selectedFamiliaresValues: [],
+            familiaresOptions: [],
+            familiaresPks: [],
+            //Component Select customizado
+            principioOptions: [],
+            selectedPrincipioValues: [],
+            principioPks: [],
+            alergiaMedicamentosas: [
+                {% for alergia in object.alergias_medicamentosas.all %}
+                    {value: '{{alergia.id}}', text: '{{alergia.nome}}', codigo: null},
+                {% endfor %}
+            ],
+            patologicosPessoais: [
+                {% for pessoais in object.antecedentes_patologicos_pessoais.all %}
+                    {value: '{{pessoais.id}}', text: '{{pessoais.nome}}', codigo: '{{pessoais.codigo}}'},
+                {% endfor %}
+            ],
+            patologicosFamiliares: [
+                {% for familiar in object.antecedentes_patologicos_familiares.all %}
+                    {value: '{{familiar.id}}', text: '{{familiar.nome}}', codigo: '{{familiar.codigo}}'},
+                {% endfor %}
+            ],
+        },
+        watch: {
+            selectedPrincipioValues: function(object) {
+                this.principioPks = object.map(item => item.value);
+            },
+            selectedPessoaisValues: function(object) {
+                this.pessoaisPks = object.map(item => item.value);
+            },
+            selectedFamiliaresValues: function(object) {
+                this.familiaresPks = object.map(item => item.value);
+            },
+          },
+        methods: {
+            getCids(search) {
+                var apiUrl = "{% url 'saude_cadastro:api_cid_list' %}";
+                return axios.get(apiUrl, { params: { search } });
+            },
+            getPrincipioAtivo(search) {
+                var apiUrl = "{% url 'saude_farmacia:api_principio_ativo' %}";
+                return axios.get(apiUrl, { params: { search } });
+            },
+            verificarCamposPreenchidos() {
+                var form = $('#formulario-anamnese');
+                var peloMenosUmCampoPreenchido = false;
+        
+                form.find('input[type="text"]').each(function() {
+                    if ($(this).val().trim() !== '') {
+                        peloMenosUmCampoPreenchido = true;
+                    }
+                });
+        
+                form.find('input[type="checkbox"]').each(function() {
+                    if ($(this).is(':checked')) {
+                        peloMenosUmCampoPreenchido = true;
+                    }
+                });
+        
+                /*form.find('select[multiple]').each(function() {
+                    if ($(this).val() && $(this).val().length > 0) {
+                        peloMenosUmCampoPreenchido = true;
+                    }
+                });*/
+                /*Array.from(
+                    document.querySelectorAll(".custom-selected-options")
+                ).forEach(function(element){
+                    if(element.children.length > 0){
+                        peloMenosUmCampoPreenchido = true;
+                    }
+                })*/
+        
+                if (peloMenosUmCampoPreenchido) {
+                    $('.bloquear').addClass('bloquear-formulario');
+        
+                    $('#habilitar-edicao').on('click', function() {
+                        $('.bloquear').removeClass('bloquear-formulario');
+                        $(this).hide();
+                    });
+                } 
+            },
+            selecionaCheckbox(button, index, choice, type) {
+                
+                if(type === 'situacaoRua'){
+                    var isChecked = $('#checkbox-situacao-rua-' + index).prop('checked');
+                    $('.checkbox-situacao-rua').prop('checked', false);
+                    
+                    if (!isChecked) {
+                        $('#checkbox-situacao-rua-' + index).prop('checked', false);
+                        $('#id_tempo_situacao_de_rua').val('');
+                    } else {
+                        $('#id_tempo_situacao_de_rua').val(parseInt(index)-1);
+                        $('#checkbox-situacao-rua-' + index).prop('checked', true);
+                    }
+        
+                }else if(type === 'alimentacao'){
+                    var isChecked = $('#checkbox-alimentacao-' + index).prop('checked');
+                    $('.checkbox-alimentacao').prop('checked', false);
+                    
+                    if (!isChecked) {
+                        $('#checkbox-alimentacao-' + index).prop('checked', false);
+                        $('#id_frequencia_diaria_alimentacao').val('');
+                    } else {
+                        $('#id_frequencia_diaria_alimentacao').val(parseInt(index)-1);
+                        $('#checkbox-alimentacao-' + index).prop('checked', true);
+                    }
+        
+                }else if(type === 'peso'){
+                    var isChecked = $('#checkbox-situacao-peso-' + index).prop('checked');
+                    $('.checkbox-situacao-peso').prop('checked', false);
+                    
+                    if (!isChecked) {
+                        $('#checkbox-situacao-peso-' + index).prop('checked', false);
+                        $('#id_situacao_peso').val('');
+                    } else {
+                        $('#id_situacao_peso').val(parseInt(index)-1);
+                        $('#checkbox-situacao-peso-' + index).prop('checked', true);
+                    }
+        
+                }
+            },
+        },
+        mounted(){
+            // this.verificarCamposPreenchidos()
+
+            this.alergiaMedicamentosas.forEach((alergia) => {
+                this.$nextTick(() => {this.$refs.customSelect.selectOption(alergia)});
+            })
+
+            this.patologicosPessoais.forEach((pessoal) => {
+                this.$nextTick(() => {this.$refs.customAntecedentesPatologicos.selectOption(pessoal)});
+            })
+
+            this.patologicosFamiliares.forEach((familiar) => {
+                this.$nextTick(() => {this.$refs.customPatologicosFaliliares.selectOption(familiar)});
+            })
+
+            $(document).ready(function() {
+                var checkboxesMarcados = $('.checkboxRelacionado:checked');
+              
+                checkboxesMarcados.each(function() {
+                  var id = $(this).attr('id');
+                  $(`[type-bloquear="${id}"]`).removeClass('disabled')
+                });
+            });
+        
+            {% if object %}
+                let situacao_de_rua = parseInt('{{form.tempo_situacao_de_rua.value}}') + 1
+                let frequencia_diaria = parseInt('{{form.frequencia_diaria_alimentacao.value}}') + 1
+                let situacao_peso = parseInt('{{form.situacao_peso.value}}') + 1
+        
+                if(situacao_de_rua){
+                    $('#id_tempo_situacao_de_rua').val('{{form.tempo_situacao_de_rua.value}}')
+                }else{
+                    $('#id_tempo_situacao_de_rua').val('')
+                }
+                if(frequencia_diaria){
+                    $('#id_frequencia_diaria_alimentacao').val('{{form.frequencia_diaria_alimentacao.value}}')
+                }else{
+                    $('#id_frequencia_diaria_alimentacao').val('')
+                }
+                if(situacao_peso){
+                    $('#id_situacao_peso').val('{{form.situacao_peso.value}}')
+                }else{
+                    $('#id_situacao_peso').val('')
+                }
+                
+                $('#checkbox-situacao-rua-' + situacao_de_rua).prop('checked', true);
+                $('#checkbox-alimentacao-' + frequencia_diaria).prop('checked', true);
+                $('#checkbox-situacao-peso-' + situacao_peso).prop('checked', true);
+        
+            {% endif %}
+        
+            $('.checkboxRelacionado').on('click', function() {
+                var id = $(this).attr('id');
+        
+                if ($(this).prop('checked')) {
+                    $(`[type-bloquear="${id}"]`).removeClass('disabled')
+                    if(id === "id_tem_acesso_a_higiene_pessoal"){
+                        /*Array.from(
+                            document.querySelectorAll("div[type-bloquear=id_tem_acesso_a_higiene_pessoal]")
+                        ).forEach(element => element.children[0].required=true);*/
+                    } else{
+                        $(`[type-bloquear="${id}"]`)[0].children[1].setAttribute("required","required")
+                    }
+                } else {
+                    $(`[type-bloquear="${id}"]`).addClass('disabled')
+                    if(id === "id_tem_acesso_a_higiene_pessoal"){
+                        /*Array.from(
+                            document.querySelectorAll("div[type-bloquear=id_tem_acesso_a_higiene_pessoal]")
+                        ).forEach(element => element.children[0].required=false);*/
+                    } else{
+                        $(`[type-bloquear="${id}"]`)[0].children[1].removeAttribute("required")
+                    }
+                }
+
+                if(id === "id_tem_acesso_a_higiene_pessoal"){
+                    console.log("entrou", id, "id_tem_acesso_a_higiene_pessoal");
+                    Array.from(
+                        document.querySelectorAll("div[type-bloquear=id_tem_acesso_a_higiene_pessoal]")
+                    ).forEach(element => element.children[0].checked = false);
+                } else{
+                    $(`[type-bloquear="${id}"]`)[0].children[1].value = "";
+                }
+            });
+
+            this.verificarCamposPreenchidos();
+        },
+    })
+</script>
+{% endblock %}

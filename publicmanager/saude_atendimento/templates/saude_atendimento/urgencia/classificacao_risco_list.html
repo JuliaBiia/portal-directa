@@ -1,0 +1,380 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load static %}
+{% block title %}Classificação de Risco{% endblock %}
+
+{% load atendimento_filters %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/saude/classificacao-risco.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/datatables.min.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade_tb.css' %}"/>
+
+<style>
+    .br-tag {font-size: 15px; width: 46px !important; height: 27px;}
+    .tag-amarelo { background-color: #eae451; }
+    .tag-azul { background-color: #4c9fe4; }
+    .tag-verde { background-color: #3ec86d; }
+    .tag-laranja { background-color: #ff9d29; }
+    .tag-roxo { background-color: #5942D2; }
+    .tag-cinza { background-color: #999; }
+    .tag-vermelho { background-color: #e52207; }
+    .tag-preto { background-color: rgba(0, 0, 0, 0.9); }
+
+    a[disabled="disabled"] {pointer-events: none; color: #888; text-decoration: none; cursor: not-allowed; opacity: 0.6;}
+    .badge {
+        display: inline-block;
+        padding: 0.35em 0.65em;
+        font-size: .75em;
+        font-weight: 700;
+        line-height: 1;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-lg">
+
+        {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+        <div class="row mt-1">
+            <div class="col-md">
+                <div class="br-card">
+                    <div class="card-header">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="text-weight-semi-bold text-up-02 color-title font-size24 fontsize15-w"><i class="fa-solid fa-clipboard-list font-size25 mr-2"></i> CLASSIFICAÇÃO DE RISCO</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="card-content mt-10-nmb mt-n10-tb">
+                        <form class="box-wdth-search" id="formSubmit" method="get" onsubmit="setDate()">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-left-search">
+                                        <div class="br-input">
+                                            <label for="id_nome">Dados da Busca</label>
+                                            <input type="text" name="buscar_nome" maxlength="255" class="form-control capslock mt-2" value="{{buscar_nome}}" style="height:44px !important;">
+                                        </div>
+                                    </div>
+                                    <div class="col-right-search mt-10-w mt-10-tb">
+                                        <div class="br-select">
+                                            <div class="br-input">
+                                                <label for="select-simple">Opção de Busca</label>
+                                                <input class="mt-2" id="select-simple" type="text" placeholder="Selecione o item" style="height:44px !important;"/>
+                                                <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1" data-trigger="data-trigger">
+                                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                            <div class="br-list" tabindex="0">
+                                                <div class="br-item capslock {% if opcao_filtro == 'paciente' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                        <input id="rb0" type="radio" name="opcao_filtro" value="paciente"/>
+                                                        <label for="rb0">Paciente</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item capslock {% if opcao_filtro == 'cpf' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                        <input id="rb1" type="radio" name="opcao_filtro" value="cpf"/>
+                                                        <label for="rb1">CPF</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item capslock {% if opcao_filtro == 'rg' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                        <input id="rb2" type="radio" name="opcao_filtro" value="rg"/>
+                                                        <label for="rb2">RG</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item capslock {% if opcao_filtro == 'sus' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                        <input id="rb3" type="radio" name="opcao_filtro" value="sus"/>
+                                                        <label for="rb3">Cartão Sus</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer mt-3">
+                                <button class="br-button primary ml-n15" type="submit">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        {% include 'dashboard/includes/mensagens.html' %}
+
+        <div class="br-card hover">
+            <div class="card-content">
+                <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                    
+                    <div class="table-header mt-n10 white"><h4 class="ml-2 color-title fontsize15-w" style="font-size:16px;"><i class="fa-solid fa-list-ul"></i> PACIENTES AGUARDANDO CLASSIFICAÇÃO</h4></div>
+                
+                    <table class="mt-3 myTable" style="width:100%;">
+                        <thead class="hgt-55">
+                            <tr>
+                                <th class="hidden-xs w-th-mb"></th>
+                                <th class="w-th-mb"></th>
+                                <th class="hidden-xs"></th>
+                                <th class="width100-w"><b>Nome do Paciente</b></th>
+                                <th class="hidden-xs"><b>Idade do Paciente</b></th>
+                                <th class="hidden-xs"><b>Entrada</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if boletins_pacientes_abertos %}
+                                {% for aberto in boletins_pacientes_abertos %}
+                                    <tr>
+                                        <td class="hidden-xs hgt-75"></td>
+                                        <td class="hgt-75" style="width:10%; padding: 10px;">
+                                            <a href="{% url 'saude_atendimento:lista_chamada_classificacao_risco_create' boletim_id=aberto.id %}" class="br-button primary small" type="button" style="width:115px; font-size:15px; margin-top:2px;">CHAMAR</a>
+                                        </td>
+                                        <td class="hidden-xs" data-th="Classificação"></td>
+                                        <td class="capslock" data-th="Classificação">{{ aberto.paciente.nome_paciente }}</td>
+                                        <td class="hidden-xs capslock" data-th="Classificação">{{ aberto.paciente.calcular_idade }}</td>
+                                        <td class="hidden-xs" data-th="Classificação">{{ aberto.data_entrada|date:'d/m/Y' }}<br/>ÁS {{ aberto.data_entrada|time:'H:i' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>        
+
+        <div class="br-card hover mt-4">
+            <div class="card-content">
+                <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                    
+                    <div class="table-header mt-n10 white"><h4 class="ml-2 color-title" style="font-size:16px;"><i class="fa-solid fa-list-ul"></i> PACIENTES CLASSIFICADOS E AGUARDANDO ATENDIMENTO</h4></div>
+
+                    <table class="mt-3 myTable" style="width:100% !important;">
+                        <thead class="hgt-55">
+                            <tr>
+                                <th class="visible-xs" style="width:5%;"></th>
+                                <th class="hidden-xs w-th-mb dp-xs"></th>
+                                <th class="hidden-xs w-th-mb"></th>
+                                <th style="width:4%;"></th>
+                                <th class="width100-w" style="width:40%;"><b>Nome do Paciente</b></th>
+                                <th class="hidden-xs hidden-tb" style="width:30% !important;"><b>Idade do Paciente</b></th>
+                                <th class="hidden-xs" style="width:30% !important;"><b>Entrada</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if lista_chamada_classificacao %}
+                                {% for lista in lista_chamada_classificacao %}
+                                    <tr>
+                                        <td class="visible-xs hgt-75">
+                                            <button class="mostra-columns br-button circle" onclick="modalInfo('{{lista.boletim.boletim_classificacao_risco_set.last.pk}}', '{{lista.boletim.paciente.pk}}', '{{lista.boletim.paciente.nome_paciente}}', '{{lista.boletim.paciente.calcular_idade}}', '{{lista.boletim.data_entrada|date:'d/m/Y'}}', '{{lista.boletim.boletim_classificacao_risco_set.last.pk}}', '{{lista.boletim.paciente.pk}}', '{{lista.boletim.boletim_classificacao_risco_set.last.tipo_classificacao_risco.get_cor_display}}')"><i class="fa-solid fa-circle-plus font-size18"></i></button>
+                                        </td>
+                                        
+                                        <td class="hidden-xs hgt-75 text-center" style="width:30px;">
+                                            <button onclick="atualizarChamado('{{lista.boletim.listachamadaclassificacaorisco_set.last.pk}}', {{ forloop.counter }})" class="br-button primary small" type="button" style="font-size:15px; margin-top:2px; padding: 10px;">
+                                                <i class="fa-solid fa-volume-high mr-2"></i> CHAMAR <span id="chamado-{{ forloop.counter }}" class="badge" style="margin-left: 10px; background-color: #888;">{{lista.boletim.listachamadaclassificacaorisco_set.last.contagem}}</span>
+                                            </button>
+                                        </td>
+                                        <td class="hidden-xs text-center" style="width:10%;">
+                                            <a href="{% url 'saude_atendimento:classificacao_risco_create' pk=lista.boletim.pk %}?paciente={{lista.boletim.paciente.pk}}" class="br-button primary small" type="button" style="width:115px; font-size:15px;">CLASSIFICAR</a>
+                                        </td>
+                                        <td class="hidden-xs text-center" style="width:10%;">----</td>
+                                        <td class="capslock">{{ lista.boletim.paciente.nome_paciente }}</td>
+                                        <td class="hidden-xs hidden-tb capslock" data-th="Classificação">{{ lista.boletim.paciente.calcular_idade }}</td>
+                                        <td class="hidden-xs" data-th="Classificação">{{ lista.boletim.data_entrada|date:'d/m/Y' }}<br/>ÁS {{ lista.boletim.data_entrada|time:'H:i' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if boletins_pacientes_classificados %}
+                                {% for classificado in boletins_pacientes_classificados %}
+                                    <tr>
+                                        <td class="visible-xs hgt-75">
+                                            <button class="mostra-columns br-button circle" onclick="modalInfo('{{classificado.pk}}', '{{classificado.boletim.paciente.pk}}', '{{classificado.boletim.paciente.nome_paciente}}', '{{classificado.boletim.paciente.calcular_idade}}', '{{classificado.boletim.data_entrada|date:'d/m/Y'}}', '{{classificado.pk}}', '{{classificado.boletim.paciente.pk}}', '{{classificado.tipo_classificacao_risco.get_cor_display}}')"><i class="fa-solid fa-circle-plus font-size18"></i></button>
+                                        </td>
+                                        <td class="hidden-xs hgt-75 text-center" style="width:30px;">
+                                            <a href="{% url 'saude_atendimento:relatorio_classificacao_paciente_pdf' pk=classificado.pk %}" target="_blank" class="br-button circle"><i class="far fa-file-pdf" style="font-size:23px; text-transform:uppercase;"></i></a>
+                                        </td>
+                                        <td class="hidden-xs text-center" style="width:10%;">
+                                            <a href="{% url 'saude_atendimento:classificacao_risco_update' pk=classificado.pk %}?paciente={{classificado.paciente.pk}}" class="br-button primary small" type="button" style="width:115px; font-size:15px;">EDITAR</a>
+                                        </td>
+                                        <td class="text-center" data-th="Classificação">
+                                            {% if classificado.boletim_classificacao_risco_set.exists %}
+                                                <span class="br-tag small
+                                                    {% if classificado.boletim_classificacao_risco_set|filtrar_classificacao_display_ativa == 'AZUL' %}tag-azul {% endif %}
+                                                    {% if classificado.boletim_classificacao_risco_set|filtrar_classificacao_display_ativa == 'VERDE' %}tag-verde {% endif %}
+                                                    {% if classificado.boletim_classificacao_risco_set|filtrar_classificacao_display_ativa == 'AMARELO' %}tag-amarelo {% endif %}
+                                                    {% if classificado.boletim_classificacao_risco_set|filtrar_classificacao_display_ativa == 'VERMELHO' %}tag-vermelho{% endif %}
+                                                    {% if classificado.boletim_classificacao_risco_set|filtrar_classificacao_display_ativa == 'LARANJA' %}tag-laranja{% endif %}
+                                                    {% if classificado.boletim_classificacao_risco_set|filtrar_classificacao_display_ativa == 'PRETO' %}tag-preto{% endif %}
+                                                    {% if classificado.boletim_classificacao_risco_set|filtrar_classificacao_display_ativa == 'ROXO' %}tag-roxo{% endif %}
+                                                    {% if classificado.boletim_classificacao_risco_set|filtrar_classificacao_display_ativa == 'CINZA' %}tag-cinza{% endif %}
+                                                "></span>
+                                            {% else %}
+                                                -----
+                                            {% endif %}
+                                        </td>
+                                        <td class="capslock">{{ classificado.boletim.paciente.nome_paciente }}</td>
+                                        <td class="hidden-xs hidden-tb capslock" data-th="Classificação">{{ classificado.boletim.paciente.calcular_idade }}</td>
+                                        <td class="hidden-xs" data-th="Classificação">{{ classificado.boletim.data_entrada|date:'d/m/Y' }}<br/>ÁS {{ classificado.boletim.data_entrada|time:'H:i' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>   
+     
+    </div>
+
+{% endblock %}
+{% block script %}
+{% comment %} <script>
+    $(document).ready(function() {
+        let url = {% if DEVELOPMENT %}'ws://'{% else %}'wss://'{% endif %}
+
+        var websocket_url = url + '{{SITE_URL}}/atualizar/listagem/classificacao/';
+
+        setTimeout(function () {
+            console.log("################", websocket_url)
+            var socket = new WebSocket(websocket_url);
+
+            socket.onmessage = function(e) {
+                var data = JSON.parse(e.data);
+
+                if(data.type === 'update_listagem'){
+                    window.location.reload();
+                }
+            };
+        }, 2000); 
+    });
+</script> {% endcomment %}
+<script src="{% static 'js/datatables.min.js' %}"></script>
+<script src="{% static 'js/data_table.js' %}"></script>
+
+<script>
+    function atualizarChamado(id, index){
+        url = "{% url 'saude_atendimento:api_atualizar_classificacao_risco_chamado' pk='00000000-0000-0000-0000-000000000000' %}"
+        axios.put(url.replace("00000000-0000-0000-0000-000000000000", id))
+        .then((response) =>  {
+            $('#chamado-'+index).html(response.data.contagem)
+
+        }).catch((error) => {
+            console.error("Erro na requisição:", error);
+        });
+    }
+    function modalInfo(id_classificao_risco, id_paciente, nome, idade, entrada, editar, idPaciente, color){
+        let urlEditar  = `{% url 'saude_atendimento:classificacao_risco_update' pk='00000000-0000-0000-0000-000000000000' %}?paciente=${id_paciente}`
+        let urlPdf  = `{% url 'saude_atendimento:relatorio_classificacao_paciente_pdf' pk='00000000-0000-0000-0000-000000000000' %}`
+        
+        let status;
+        switch (color) {
+            case 'AZUL':
+                status = '<span class="br-tag small tag-azul"></span>';
+                break;
+            case 'VERDE':
+                status = '<span class="br-tag small tag-verde"></span>';
+                break;
+            case 'AMARELO':
+                status = '<span class="br-tag small tag-amarelo"></span>';
+                break;
+            case 'VERMELHO':
+                status = '<span class="br-tag small tag-vermelho"></span>';
+                break;
+            case 'LARANJA':
+                status = '<span class="br-tag small tag-laranja"></span>';
+                break;
+            case 'PRETO':
+                status = '<span class="br-tag small tag-preto"></span>';
+                break;
+            case 'ROXO':
+                status = '<span class="br-tag small tag-roxo"></span>';
+                break;
+            case 'CINZA':
+                status = '<span class="br-tag small tag-cinza"></span>';
+                break;
+            default:
+                status = 'UNKNOWN';
+        }
+
+        Swal.fire({
+            html: `
+            <div class="container" style="width:90%;">
+
+                <div class="swal2-title swal2-title-custom text-left mt-6" id="swal2-title">
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="button" class="close" style="background-color:#0459A1; border:none; color:white; font-size:15px; width:30px; height:30px;" aria-label="Close" onclick="Swal.close()">X</button>
+                            <h2 class="mt-n1"><label class="text-color-blue-1gov custom-text ft-sz14">Detalhes do Paciente</label></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row font-size16 mt-1">
+                    <div class="col-4 color-title">
+                        <span class="">Paciente:</span>
+                    </div>
+                    <div class="col-8">
+                        ${status}
+                        <span>${nome}<span/>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-4 color-title">
+                        <span>Idade:</span>
+                    </div>
+                    <div class="col-6">
+                        <span>${idade}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-4 color-title">
+                        <span>Chegada:</span>
+                    </div>
+                    <div class="col-6">
+                        <span>${entrada}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-10 mb-3">
+                    <div class="col-6 text-center color-title">
+                        <span><a href="${urlPdf.replace('00000000-0000-0000-0000-000000000000', id_classificao_risco)}"><button class="br-button primary small" type="button" style="width:125px; font-size:15px;">Pdf</button></a></span>
+                    </div>
+                    <div class="col-6 text-center">
+                        <span><a href="${urlEditar.replace('00000000-0000-0000-0000-000000000000', id_classificao_risco)}"><button class="br-button primary small" type="button" style="width:125px; font-size:15px;">Editar</button></a></span>
+                    </div>
+                </div><hr style="border:1px solid #a6a6a6;">
+
+            </div>
+            `,
+            confirmButtonColor: "#1250b4",
+            confirmButtonText: '<i class="fa-regular fa-floppy-disk mr-2"></i>Salvar',
+            cancelButtonText: '<i class="fa-solid fa-xmark mr-2"></i> Fechar',
+            showCancelButton: false,
+            showConfirmButton: false,
+            //reverseButtons: true,
+            allowOutsideClick: true,
+        });
+    }
+</script>
+{% endblock %}

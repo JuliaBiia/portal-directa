@@ -1,0 +1,328 @@
+{% extends 'dashboard/base/base-pdf.html' %}
+{% load static %}
+
+{% block title %}Ficha de referência médica{% endblock %}
+
+{% load widget_tweaks %}
+{% load custom_filters %}
+
+{% block css-extra-pdf %}
+    <style>
+        @media print {
+            .linha-secao{
+                border-color: var(--interactive);
+                border-top-width: 0.9px !important;
+            }   
+            .remove-top{
+                margin-top: 4px !important;
+            }
+            .info{
+                padding: 0px;
+            }
+        }
+        
+        .titulo-secao{
+            font-size: 18px;
+            color: var(--interactive);
+        }
+        .linha-secao{
+            border-color: var(--interactive);
+            border-top-width: 0.9px;
+        }
+        .identificacao-dado{
+            color: #4F4C4C;
+        }
+    </style>
+{% endblock %}
+
+{% block contentpdf %}
+
+        <div class="" style=" font-size:18px; width:100%;">
+        
+            <div class="secoes">
+                <div class="d-flex mt-0 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                    <div class="container-campos ml-2 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6" style="padding: 0px !important;">
+                        <div class="row mt-3 justify-content-center">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span class="identificacao-dado" style="text-align: end;">Estabelecimento de Saúde Solicitante:</span>
+                            </div>
+                            <div class="d-flex pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.atendimento.unidade_saude.nome %}{{object.atendimento.unidade_saude.nome}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 mt-md-1 justify-content-center">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span class="identificacao-dado">CNES:</span>
+                            </div>
+                            <div class="d-flex pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.profissional.cns %}{{object.profissional.cns}}{% else %}{{object.profissional.cpf}}{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 mt-md-1 justify-content-center">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span class="identificacao-dado">Data Solicitação:</span>
+                            </div>
+                            <div class="d-flex pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.created_at %}{{object.created_at|date:'d/m/Y H:i'}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="container-campos col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6" style="padding: 0px;">
+                        <div class="row mt-3 justify-content-center">
+                            <div class="d-flex justify-content-center col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5" style="padding: 0px !important;">
+                                <span class="identificacao-dado">Profissional Solicitante:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5" style="text-transform: capitalize;">
+                                <b>{% if object.profissional.nome_profissional %}{{object.profissional.nome_profissional.0}}<span style="text-transform: lowercase;">{{object.profissional.nome_profissional|slice:"1:"}}</span>{% else %}SEM INFORMAÇÃO{% endif %}</b>
+                            </div>
+                        </div>
+                        <div class="row mt-3 mt-md-1 justify-content-center">
+                            <div class="d-flex justify-content-center col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5" style="padding: 0px !important;">
+                                <span class="identificacao-dado">Documento(CNS/CPF):</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.profissional.cns %}CNS{% else %}CPF{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 mt-md-1 justify-content-center">
+                            <div class="d-flex col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5 mr-3" style="padding: 0px !important;">
+                                <span class="identificacao-dado mr-2" style="text-align: right;">Nº Documento (CNS/CPF) do Solicitante:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5 mr-3" style="padding-top: 10px;">
+                                <span><b>{% if object.profissional.cns %}{{object.profissional.cns}}{% else %}{{object.profissional.cpf}}{% endif %}</b></span>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="mt-3 remove-top">
+                    <div class="row">
+                        <div class="col-3 mt-2 mb-1 ml-4 titulo-secao remove-top" style="text-align: right;">
+                            <span><b>Identificação do Paciente</b></span>
+                        </div>
+                        <div class="col-8 mt-1">
+                            <hr class="ml-3" style="border: 1px solid #adb5bd;">
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex mt-0 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                    <div class="container-campos mr-2 col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8">
+                        <div class="row mt-3 remove-top">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">Nome do Paciente:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5 capslock">
+                                <span><b>{% if object.atendimento.paciente.nome_paciente %}{{object.atendimento.paciente.nome_paciente}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 mt-md-1 remove-top">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">Cartão Nacional de Saúde:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.atendimento.paciente.cartao_sus %}{{object.atendimento.paciente.cartao_sus}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 mt-md-1 remove-top">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">Data de Nascimento:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.atendimento.paciente.data_nascimento %}{{object.atendimento.paciente.data_nascimento|date:'d/m/Y'}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 remove-top mt-md-1">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">Sexo:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.atendimento.paciente.sexo %}{{object.atendimento.paciente.get_sexo_display}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 remove-top mt-md-1">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">Raça/Cor:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5" style="text-transform: capitalize;">
+                                <b>{% if object.atendimento.paciente.raca %}{{object.atendimento.paciente.get_raca_display.0}}<span style="text-transform: lowercase;">{{object.atendimento.paciente.get_raca_display|slice:"1:"}}</span>{% else %}SEM INFORMAÇÃO{% endif %}</b>
+                            </div>
+                        </div>
+                        <div class="row mt-3 remove-top mt-md-1">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">Nome da Mãe:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.atendimento.paciente.nome_mae %}{{object.atendimento.paciente.nome_mae}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 remove-top mt-md-1">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">Telefone de Contato:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.atendimento.paciente.celular %}{{object.atendimento.paciente.celular}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 remove-top mt-md-1">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">Município:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5" style="text-transform: capitalize;">
+                                <b>{% if object.atendimento.paciente.municipio.nome %}{{object.atendimento.paciente.municipio.nome.0}}<span style="text-transform: lowercase;">{{object.atendimento.paciente.municipio.nome|slice:"1:"}}</span>{% else %}SEM INFORMAÇÃO{% endif %}</b>
+                            </div>
+                        </div>
+                        <div class="row mt-3 remove-top mt-md-1">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">UF:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.atendimento.paciente.estado.sigla %}{{object.atendimento.paciente.estado.sigla}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 remove-top mt-md-1">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">CÓDIGO IBGE:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.atendimento.paciente.municipio.ibge %}{{object.atendimento.paciente.municipio.ibge}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                        <div class="row mt-3 remove-top mt-md-1">
+                            <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                                <span class="identificacao-dado">CEP:</span>
+                            </div>
+                            <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                <span><b>{% if object.atendimento.paciente.cep %}{{object.atendimento.paciente.cep}}{% else %}SEM INFORMAÇÃO{% endif %}</b></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-foto-paciente d-flex justify-content-end align-items-start mr-6 col-xl-4 col-lg-4 col-md-4 col-sm-4 col-4">
+                        <div class="row">
+                            <div class="d-flex justify-content-start col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 pr-6">
+                                {% if object.atendimento.paciente.foto_paciente %}
+                                    <img class="mt-2 mb-0 foto-paciente" src="{{ object.atendimento.paciente.foto_paciente.url }}" alt="Foto paciente" style="width: 250px; height: 220px; border: 1px solid gray;">
+                                {% else %}
+                                    <img class="mt-4 mb-5 sem-foto-paciente" src="/media/imagens/pessoa-icone.svg" alt="Ícone de pessoa" style="max-width: 80%;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="row">
+                        <div class="col-3 mt-2 mb-1 ml-4 titulo-secao" style="text-align: right;">
+                            <span><b>Resumo Clínico</b></span>
+                        </div>
+                        <div class="col-8 mt-1">
+                            <hr class="ml-3" style="border: 1px solid #adb5bd;">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mt-2">
+                    <div class="row mt-3 remove-top mt-md-1">
+                        <div class="d-flex justify-content-end col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                            <span class="identificacao-dado"></span>
+                        </div>
+                        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 ml-4">
+                            <b><span>{% if object.resumo_clinico %}{{object.resumo_clinico}}{% else %}SEM INFORMAÇÃO{% endif %}</span></b>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="row">
+                        <div class="col-3 mt-2 mb-1 ml-4 titulo-secao" style="text-align: right;">
+                            <span><b>Resultado dos Exames</b></span>
+                        </div>
+                        <div class="col-8 mt-1">
+                            <hr class="ml-3" style="border: 1px solid #adb5bd;">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                    <div class="row mt-2 remove-top mt-md-1">
+                        <div class="d-flex justify-content-end col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                            <span class="identificacao-dado"></span>
+                        </div>
+                        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 ml-4">
+                            {% if object.exames %}
+                                {% for object in object.exames.all %}
+                                    <b>{{object.exame.nome.0}}<span  style="text-transform: lowercase;">{{ object.exame.nome|slice:"1:" }}</span></b><br/>
+                                {% endfor %}
+                            {% else %}
+                                <b>SEM INFORMAÇÃO</b>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <div class="row">
+                        <div class="col-3 mt-2 mb-1 ml-4 titulo-secao" style="text-align: right;">
+                            <span><b>Tratamento Realizado</b></span>
+                        </div>
+                        <div class="col-8 mt-1">
+                            <hr class="ml-3" style="border: 1px solid #adb5bd;">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                    <div class="row mt-2 remove-top mt-md-1 ml-6">
+                        <div class="d-flex justify-content-end col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                            <span class="identificacao-dado"></span>
+                        </div>
+                        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 ml-4">
+                            <span style="text-transform: capitalize;">
+                                {% if object.medicacoes %}
+                                    {% for object in object.medicacoes.all %}
+                                        <b>{{object.medicacao.nome_medicamento}}</b><br/>
+                                    {% endfor %}
+                                {% else %}
+                                    <b>SEM INFORMAÇÃO</b>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="row">
+                        <div class="col-3 mt-2 mb-1 ml-4 titulo-secao" style="text-align: right;">
+                            <span><b>Impressão Diagnóstico</b></span>
+                        </div>
+                        <div class="col-8 mt-1">
+                            <hr class="ml-3" style="border: 1px solid #adb5bd;">
+                        </div>
+                    </div>
+                </div>
+                <div class="container-campos col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8">
+                    <div class="row mt-2 mt-md-3">
+                        {% if object.diagnosticos %}
+                            {% for object in object.diagnosticos.all %}
+                                <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5 ml-1">
+                                    <span class="identificacao-dado">Descrição do Diagnóstico:</span>
+                                </div>
+                                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                    <b>{{object.descricao}}</b>
+                                </div>
+                                <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5 ml-1">
+                                    <span class="identificacao-dado">CID:</span>
+                                </div>
+                                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                    <b>{{object.cid.codigo}}{{object.cid.nome}}</b>
+                                </div>
+                                <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5 ml-1">
+                                    <span class="identificacao-dado">Observações:</span>
+                                </div>
+                                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                    <b>{{object.descricao}}</b>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <b>SEM INFORMAÇÃO</b>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

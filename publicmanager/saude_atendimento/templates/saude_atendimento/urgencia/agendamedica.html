@@ -1,0 +1,1351 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Agenda Médica{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/fullcalendar.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/modal-agendamento.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/agendamedica.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header pr-0 pl-0 pt-2">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                                <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da agenda médica" title="Ícone da agenda médica" style="display: block;"> 
+                                <span class="mt-1 ml-4" style="display: block;">AGENDA MÉDICA</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="br-divider mt-1 divider-grid mb-3 col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                </div>
+                <div class="card-content">
+                    <form method="get" action="{% url 'saude_atendimento:agenda_medica_view' %}" id="id_agendamentos_filtro_form">{% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group row d-flex justify-content-center col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input select-medico ">
+                                        <label for="id_medico">Médico(a)</label>
+                                        {% render_field agenda_medica_filtro_form.medico_filtragem_agendamentos class="campo-select" style="width: 100%" %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-6">
+                            {{ form.errors }}
+                            {% if medico_id %}
+                                <a id="buscar-agendamentos" href="{% url 'saude_atendimento:buscar_agendamentos_view' %}?medico_filtro={{medico_id}}" class="br-button primary mr-3 mt-3">
+                                    <i class="fas fa-search" aria-hidden="true" hidden></i>
+                                    <span>Buscar</span>
+                                </a>
+                            {% else %}
+                                <a id="buscar-agendamentos" href="{% url 'saude_atendimento:buscar_agendamentos_view' %}" class="br-button primary mr-3 mt-3">
+                                    <i class="fas fa-search" aria-hidden="true" hidden></i>
+                                    <span>Buscar</span>
+                                </a>
+                            {% endif %}
+                            <button class="br-button secondary mr-3 mt-3" type="button" id="abrir-modal-inserir-feriado" aria-label="Cadastrar feriado">
+                                {% comment %} <i class="fas fa-angle-double-right" aria-hidden="true" hidden></i> Cadastrar Feriado {% endcomment %}
+                                <i>
+                                    <img src="{% static 'img/icons/icone_inserir_feriado.svg' %}" alt="Ícone de inserção de feriado" title="Ícone de inserção de feriado">
+                                </i>
+                                <span>Inserir Feriado</span>
+                            </button>
+                            <button class="br-button secondary mr-3 mt-3 {% if medico_id %}habilitado{% endif %}" type="button" id="abrir-modal-inserir-bloqueio-agenda" aria-label="Inserir Bloqueio Agenda">
+                                <!-- <i class="fas fa-angle-double-right" aria-hidden="true" hidden></i> Inserir bloqueio de agenda -->
+                                <i>
+                                    <img
+                                        {% if medico_id %}src="{% static 'img/icons/icone_inserir_bloqueio_agenda.svg' %}"{% else %}src="{% static 'img/icons/icone_inserir_bloqueio_agenda_desabilitado.svg' %}"{% endif %} 
+                                        alt="Ícone de inserção de bloqueio da agenda"
+                                        title="Ícone de inserção de bloqueio da agenda"
+                                    >
+                                </i>
+                                <span>Inserir Bloqueio</span>
+                            </button>
+                            <button class="br-button secondary mr-3 mt-3" type="button" id="abrir-modal-relatorio-agendamento" aria-label="Imprimir">
+                                {% comment %} <i class="fas fa-file" aria-hidden="true" hidden></i>
+                                <span>Relatório Agendamento</span> {% endcomment %}
+                                <i>
+                                    <img src="{% static 'img/icons/icone_impressora.svg' %}" alt="Ícone de impressora" title="Ícone de impressora">
+                                </i>
+                                <span>Imprimir</span>
+                            </button>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+                <div class="card-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row container-calendario">
+        <div class="col-md">
+            <div class="br-card hover">
+                <div class="card-header">
+                    <div>
+                        <!-- <div>
+                            <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                        </div> -->
+                        <div class="mt-2">
+                            <div class="d-flex">
+                                <img src="{% static 'img/icons/icone-agendamedica-calendario.svg' %}" alt="Ícone da agenda médica" title="Ícone da agenda médica" style="display: block;" class="ml-3"> 
+                                <span class="ml-2 text-color-blue-1gov" style="display: block;">Agendamento</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-content pt-0">
+                    <div id='calendar'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="br-scrim-util foco modal-notificao-usuario" id="modal-mensagem-sucesso" data-scrim="true">
+        <div class="br-modal">
+            <div class="br-modal-header"></div>
+            <div class="br-modal-body">
+                <div class="container-icone-atencao">
+                    <img src="{% static 'img/icons/icone_sucesso.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                    <p>Informação!</p>
+                </div>
+                <p></p>
+                <button class="br-button primary" type="button" id="" data-dismiss="scrimexample">OK
+                </button>
+            </div>
+          <div class="br-modal-footer justify-content-center">
+          </div>
+        </div>
+    </div>
+    <div class="br-scrim-util foco modal-notificao-usuario" id="modal-mensagem-erro" data-scrim="true">
+        <div class="br-modal">
+            <div class="br-modal-header"></div>
+            <div class="br-modal-body">
+                <div class="container-icone-atencao">
+                    <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                    <p>Atenção!</p>
+                </div>
+                <p></p>
+                <button class="br-button primary" type="button" id="fechar-modal-mensagem-erro" data-dismiss="scrimexample">OK
+                </button>
+            </div>
+          <div class="br-modal-footer justify-content-center">
+          </div>
+        </div>
+    </div>
+    <div class="br-scrim-util foco modal-notificao-usuario" id="modal-confirmacao-operacao" data-scrim="true">
+        <div class="br-modal">
+          <div class="br-modal-header"></div>
+          <div class="br-modal-body">
+            <div class="container-icone-atencao">
+                <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                <p></p>
+            </div>
+            <p></p>
+            <div class="justify-content-center">
+                <button class="br-button primary" id="confirmacao-operacao" type="button" data-dismiss="scrimexample">Sim
+                </button>
+                <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" id="negacao-operacao" type="button">Não
+                </button>
+            </div>
+          </div>
+          <div class="br-modal-footer justify-content-center">
+          </div>
+        </div>
+    </div> -->
+    <div class="br-scrim-util foco modal-notificao-usuario" id="modal-confirmacao-dragging" data-scrim="true">
+        <div class="br-modal">
+          <div class="br-modal-header"></div>
+          <div class="br-modal-body">
+            <div class="container-icone-atencao">
+                <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                <p>Remarcação</p>
+            </div>
+            <p></p>
+            <div class="justify-content-center">
+                <button class="br-button primary" id="confirmacao-dragging" type="button" data-dismiss="scrimexample">Sim
+                </button>
+                <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" id="negacao-dragging" type="button">Não
+                </button>
+            </div>
+          </div>
+          <div class="br-modal-footer justify-content-center">
+          </div>
+        </div>
+    </div>
+    <!-- <div class="br-scrim-util foco modal-notificao-usuario" id="modal-confirmacao-remocao" data-scrim="true">
+        <div class="br-modal">
+          <div class="br-modal-header"></div>
+          <div class="br-modal-body">
+            <div class="container-icone-atencao">
+                <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                <p>Atenção!</p>
+            </div>
+            <p></p>
+            <div class="justify-content-center">
+                <button class="br-button primary" id="confirmacao-remocao" type="button" data-dismiss="scrimexample">Sim
+                </button>
+                <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" id="negacao-remocao" type="button">Não
+                </button>
+            </div>
+          </div>
+          <div class="br-modal-footer justify-content-center">
+          </div>
+        </div>
+    </div>
+    <div class="br-scrim-util foco modal-notificao-usuario" id="modal-mensagem-impossibilidade" data-scrim="true">
+        <div class="br-modal">
+            <div class="br-modal-header"></div>
+            <div class="br-modal-body">
+                <div class="container-icone-atencao">
+                    <img src="{% static 'img/icons/icone_impossibilidade.svg' %}" alt="Ícone de impossibilidade" title="Ícone de impossibilidade">
+                </div>
+                <p></p>
+                <button class="br-button primary" type="button" id="fechar-modal-mensagem-impossibilidade" data-dismiss="scrimexample">OK
+                </button>
+            </div>
+          <div class="br-modal-footer justify-content-center">
+          </div>
+        </div>
+    </div> -->
+    {% comment %} <div class="br-scrim-util foco" id="modal-agendamento-atendimento" data-scrim="true">
+        <div class="br-modal">
+            <div class="header">
+                <div class="text-up-02 text-color-blue-1gov titulo-modal-agendamento-atendimento">
+                    <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da farmácia" title="Ícone da farmácia" style="display: block;"> 
+                    <span class="ml-3">AGENDAMENTO</span>
+                </div>
+                <a class="fechar-modal" id="fechar-modal-agendamento-atendimento"><i class="fas fa-times" aria-hidden="true" hidden></i></a>
+            </div>
+            <form method="post" id="agendamento_form">
+                {% csrf_token %}
+                {{ form.media.js }}
+                <div class="br-modal-body">
+                    <div class="form-group row campo-paciente">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-input">
+                                <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                    <label for="id_paciente" class="text-color-blue-1gov">Paciente:</label>
+                                </div>
+                                <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                    {% render_field form.paciente type="text" class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-1">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-input">
+                                <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                    <label for="id_nome_paciente" class="text-color-blue-1gov">
+                                        <span>Nome do paciente:</span>
+                                    </label>
+                                </div>
+                                <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                    {% render_field form.nome_paciente class="input-com-alfanumericas" type="text" placeholder="Ex.: Paulo Santos da Silva" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-1">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-input">
+                                <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                    <label for="id_cpf" class="text-color-blue-1gov">
+                                        CPF:
+                                    </label>
+                                </div>
+                                <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                    {% render_field form.cpf_paciente class="mask-cpf" type="text" placeholder="Ex.: 458.952.584-41" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-1">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-input">
+                                <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                    <label for="id_celular" class="text-color-blue-1gov">Celular:</label>
+                                </div>
+                                <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                    {% render_field form.celular_paciente type="text" placeholder="Ex.: (85) 99904-9695" class="mask-telefone" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-1">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-input">
+                                <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                    <label for="id_telefone_fixo" class="text-color-blue-1gov">
+                                        Telefone fixo:
+                                    </label>
+                                </div>
+                                <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                    {% render_field form.telefone_fixo_paciente type="text" placeholder="Ex.: (85) 3656-2104" class="mask-telefoneresidencial" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-1">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-input">
+                                <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                    <label for="id_medico" class="text-color-blue-1gov">Médico:</label>
+                                </div>
+                                <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                    {% render_field form.medico class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento" disabled="True"%}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <div class="d-flex col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                <label class="d-flex justify-content-end text-color-blue-1gov">Neste dia, este médico atende:</label>
+                            </div>
+                            <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                <div id="container-primeiro-atendimento">
+                                    <span id="label-primeiro-atendimento" class="text-color-blue-1gov" style="font-weight: 700;">PRIMEIRO ATENDIMENTO: </span>
+                                    <span id="valor-primeiro-atendimento"></span>
+                                </div>
+                                <div id="container-retorno">
+                                    <span id="label-retorno" class="text-color-blue-1gov" style="font-weight: 700;">RETORNO: </span>
+                                    <span id="valor-retorno"></span>
+                                </div>
+                                <div id="container-extra-encaixe">
+                                    <span id="label-extra-encaixe" class="text-color-blue-1gov" style="font-weight: 700;">EXTRA ENCAIXE: </span>
+                                    <span id="valor-extra-encaixe"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-input">
+                                <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                    <label for="id_agendado_por" class="text-color-blue-1gov">Agendado por:</label>
+                                </div>
+                                <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                    {% render_field form.agendado_por class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento" disabled="True"%}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-tipo form-group row mt-3">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                <label class="d-flex justify-content-end text-color-blue-1gov">Tipo:</label>
+                            </div>
+                            <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                {% render_field form.tipo_atendimento type="radio" %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-2 container-data">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                <div class="br-input has-icon">
+                                    <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                        <label for="id_data_atendimento" class="text-color-blue-1gov"><span>Data:</span></label>
+                                    </div>
+                                    <div class="pl-0 pr-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                        {% render_field form.data_atendimento type="text" placeholder="dd/mm/aaaa" data-input="data-input" %}
+                                        <button class="br-button circle small" type="button" aria-label="Abrir Timepicker"
+                                                data-toggle="data-toggle" id="simples-input-btn"><i
+                                                class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-2 container-horario">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2 label">
+                                <label for="" class="d-flex justify-content-end text-color-blue-1gov">Início:</label>
+                            </div>
+                            <div class="container-selects col-xl-8 col-lg-8 col-md-8 col-sm-9 col-9">
+                                <div class="container-hora">
+                                    <select id="inicio_hora" name="inicio_hora" class="select-horario modal-campo-select" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento">
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                    </select>
+                                </div>
+                                <div class="minuto">
+                                    <select id="inicio_minuto" name="inicio_minuto" class="select-horario modal-campo-select" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento">
+                                        <option value="00">00</option>
+                                        <option value="20">20</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-2 container-horario">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2 label">
+                                <label for="id_hora_termino_atendimento" class="d-flex justify-content-end text-color-blue-1gov">Término:</label>
+                            </div>
+                            <div class="container-selects col-xl-8 col-lg-8 col-md-8 col-sm-9 col-9">
+                                <div class="container-hora">
+                                    <select id="termino_hora" name="termino_hora" class="select-horario modal-campo-select" disabled>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                    </select>
+                                </div>
+                                <div class="minuto">
+                                    <select id="termino_minuto" name="termino_minuto" class="select-horario modal-campo-select" disabled>
+                                        <option value="00">00</option>
+                                        <option value="20">20</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-2">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-textarea small">
+                                <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                    <label for="id_observacoes" class="text-color-blue-1gov">Observações:</label>
+                                </div>
+                                <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                    {% render_field form.observacoes class="input-com-alfanumericas" type="text" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex justify-content-center">
+                        <div class="d-flex justify-content-end col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <span class="text-color-blue-1gov explicacao-indicacao-obrigatoriedade d-flex col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">Campos Obrigatórios</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="br-modal-footer justify-content-center">
+                    {% if form.errors %}
+                        {% for field_errors in form.errors.values %}
+                            {% for error in field_errors %}
+                                <div class="br-message danger" role="alert">
+                                    <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                         aria-hidden="true"></i>
+                                    </div>
+                                    <div class="content"><span
+                                            class="message-title">Erro: </span><span
+                                            class="message-body"> {{ error }}</span>
+                                    </div>
+                                    <div class="close">
+                                        <button class="br-button circle small" type="button"
+                                                aria-label="content"><i
+                                                class="fas fa-times" aria-hidden="true"></i></button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div class="br-message danger" role="alert">
+                                    <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                         aria-hidden="true"></i>
+                                    </div>
+                                    <div class="content"><span
+                                            class="message-title">Erro no campo {{ field.label }}.</span><span
+                                            class="message-body"> {{ error }}</span>
+                                    </div>
+                                    <div class="close">
+                                        <button class="br-button circle small" type="button"
+                                                aria-label="content"><i
+                                                class="fas fa-times" aria-hidden="true"></i></button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+                    <div class="botoes pl-0 pr-0 col-xl-11 col-lg-11 col-md-11 col-sm-11 col-11">
+                        <div class="container-botoes-principais">
+                            <button type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="agendar-atendimento" name="agendar-atendimento">
+                                <i class="fas fa-save"></i> Salvar
+                            </button>
+                            <button type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="editar-agendamento" name="editar-agendamento">
+                                <i class="fas fa-save"></i> Salvar
+                            </button>
+
+                            <a class="br-button secondary" id="cancelar-agendamento-atendimento">
+                                Cancelar
+                            </a>
+                            <a class="br-button secondary" id="remover-agendamento">
+                                <i
+                                class="fas fa-trash-alt" aria-hidden="true"></i> Remover
+                            </a>
+                        </div>
+                        <div class="container-botao-pre-atendimento">
+                            <a href="" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="pre-atendimento">
+                                <img src="{% static "img/icons/preatendimento_icone.svg" %}" alt=""> Pré-Atendimento
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-footer -->
+            </form>
+            <input type="hidden" id="id_remocao_agendamento" name="id_remocao_agendamento" value=""/>
+        </div>
+    </div> {% endcomment %}
+
+    {% comment %} Modal de agendamento de atendimento {% endcomment %}
+    {% include 'saude_atendimento/atendimento/includes/modal-agendamento-atendimento.html' %}
+
+    
+    <div class="br-scrim-util foco" id="modal-relatorio-agendamento" data-scrim="true">
+        <div class="br-modal">
+            <div class="header">
+                <div class="text-up-02 text-color-blue-1gov titulo-modal-relatorio-agendamento">
+                    <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da farmácia" title="Ícone da farmácia" style="display: block;"> 
+                    <span class="ml-3">IMPRIMIR AGENDAMENTOS</span>
+                </div>
+                <a class="fechar-modal" id="fechar-modal-relatorio-agendamento">
+                    <span aria-hidden="true">&times;</span>
+                    {% comment %} <i class="fas fa-times" aria-hidden="true" hidden></i> {% endcomment %}
+                </a>
+            </div>
+            <form action="{% url 'saude_atendimento:pdf_relatorio_agendamento' %}" method="get" id="id_relatorio_agendamento_form">
+                {% csrf_token %}
+                {{ form.media.js }}
+                <div class="br-modal-body">
+                    <div class="form-group row mb-3">
+                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                            <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                <div class="br-input has-icon">
+                                    <label for="id_data_inicial_relatorio" class="text-color-blue-1gov">
+                                        Data inicial:
+                                    </label>
+                                    {% render_field relatorio_agendamento_form.data_inicial_relatorio type="text" placeholder="dd/mm/aaaa" data-input="data-input" %}
+                                    <button
+                                        id="simples-input-btn"
+                                        class="br-button circle small"
+                                        type="button"
+                                        aria-label="Abrir Timepicker"
+                                        data-toggle="data-toggle"
+                                    >
+                                        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                            <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                <div class="br-input has-icon">
+                                    <label for="id_data_final_relatorio" class="text-color-blue-1gov">
+                                        Data final:
+                                    </label>
+                                    {% render_field relatorio_agendamento_form.data_final_relatorio type="text" placeholder="dd/mm/aaaa" data-input="data-input" %}
+                                    <button
+                                        class="br-button circle small"
+                                        type="button"
+                                        aria-label="Abrir Timepicker"
+                                        data-toggle="data-toggle" id="simples-input-btn"
+                                    >
+                                        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-input">
+                                <label for="id_paciente_relatorio" class="text-color-blue-1gov">
+                                    Paciente:
+                                </label>
+                                {% render_field relatorio_agendamento_form.paciente_relatorio type="text" class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-relatorio-agendamento" %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-input">
+                                <label for="id_cpf_paciente_relatorio" class="text-color-blue-1gov">
+                                    CPF:
+                                </label>
+                                {% render_field relatorio_agendamento_form.cpf_paciente_relatorio type="text" class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-relatorio-agendamento" %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div class="br-input">
+                                <label for="id_paciente" class="text-color-blue-1gov">
+                                    Médico:
+                                </label>
+                                {% if medico_id %}
+                                    {% render_field relatorio_agendamento_form.medico_relatorio type="text" class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-relatorio-agendamento" disabled="True" %}
+                                {% else %}
+                                    {% render_field relatorio_agendamento_form.medico_relatorio type="text" class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-relatorio-agendamento" %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="br-modal-footer justify-content-center">
+                    {% if form.errors %}
+                        {% for field_errors in form.errors.values %}
+                            {% for error in field_errors %}
+                                <div class="br-message danger" role="alert">
+                                    <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                         aria-hidden="true"></i>
+                                    </div>
+                                    <div class="content"><span
+                                            class="message-title">Erro: </span><span
+                                            class="message-body"> {{ error }}</span>
+                                    </div>
+                                    <div class="close">
+                                        <button class="br-button circle small" type="button"
+                                                aria-label="content"><i
+                                                class="fas fa-times" aria-hidden="true"></i></button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div class="br-message danger" role="alert">
+                                    <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                         aria-hidden="true"></i>
+                                    </div>
+                                    <div class="content"><span
+                                            class="message-title">Erro no campo {{ field.label }}.</span><span
+                                            class="message-body"> {{ error }}</span>
+                                    </div>
+                                    <div class="close">
+                                        <button class="br-button circle small" type="button"
+                                                aria-label="content"><i
+                                                class="fas fa-times" aria-hidden="true"></i></button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+                    {% comment %} <!-- <input type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="gerar-relatorio-agendamento" name="gerar-relatorio-agendamento" value="Gerar"> --> {% endcomment %}
+                    <button type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="gerar-relatorio-agendamento" name="gerar-relatorio-agendamento">
+                        <i class="fas fa-table"></i> Gerar
+                    </button>
+                    {% comment %} <!-- <a href="{% url 'saude_atendimento:pdf_relatorio_agendamento' %}" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="gerar-relatorio-agendamento">
+                        <i class="fas fa-table"></i> <input type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="gerar-relatorio-agendamento" name="gerar-relatorio-agendamento" value="Gerar">
+                    </a> -->
+                    <!-- <a href="{% url 'saude_atendimento:pdf_relatorio_agendamento' %}" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="gerar-relatorio-agendamento">Gerar</a> --> {% endcomment %}
+                    <a class="br-button secondary" id="voltar-relatorio-agendamento"><i class="fas fa-arrow-left"></i> Voltar</a>
+                </div>
+                <!-- /.card-footer -->
+            </form>
+        </div>
+    </div>
+    {% comment %} <!-- <div class="br-scrim-util foco" id="modal-remover-feriado" data-scrim="true">
+        <div class="br-modal">
+          <div class="br-modal-header">Remoção de feriado</div>
+          <div class="br-modal-body">
+            <p>Deseja realmente remover este feriado?</p>
+          </div>
+          <div class="br-modal-footer justify-content-center">
+            <button class="br-button primary" id="confirmacao-remocao-feriado" type="button" data-dismiss="scrimexample">Sim
+            </button>
+            <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" id="negacao-remocao-feriado" type="button">Não
+            </button>
+          </div>
+        </div>
+    </div> --> {% endcomment %}
+    <div class="br-scrim-util foco" id="modal-feriado" data-scrim="true">
+        <div class="br-modal">
+            <div class="header">
+                <div class="text-up-02 text-color-blue-1gov titulo-modal-feriado">
+                    <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da farmácia" title="Ícone da farmácia" style="display: block;"> 
+                    <span class="ml-3">INSERIR FERIADO</span>
+                </div>
+                <a class="fechar-modal" id="fechar-modal-cadastrar-feriado">
+                    <span aria-hidden="true">&times;</span>
+                    {% comment %} <i class="fas fa-times" aria-hidden="true" hidden></i> {% endcomment %}
+                </a>
+            </div>
+            <div class="row">
+                <div class="col-md">
+                    <div class="br-card hover">
+                        <div class="card-content mb-3">
+                            <form method="get" action="{% url 'saude_atendimento:agenda_medica_view' %}" id="id_feriado_form">
+                                {% csrf_token %}
+                                <div class="br-modal-body mt-0">
+                                    <div class="form-group row">
+                                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+                                            <div class="br-input mt-3">
+                                                <div class="br-input">
+                                                    <label for="id_nome_feriado" class="text-color-blue-1gov">Nome do feriado:<span class="text-danger">(Obrigatório)</span></label>
+                                                    {% render_field feriado_form.nome_feriado class="input-busca-grid input-com-alfanumericas" type="text" %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-3">
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                                <div class="br-input has-icon">
+                                                <label for="id_rg_data" class="text-color-blue-1gov">Data inicial:<span class="text-danger">(Obrigatório)</span></label>
+                                                {% render_field feriado_form.data_inicial type="text" placeholder="dd/mm/aaaa" data-input="data-input" class="input-busca-grid" %}
+                                                <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                                </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                                <div class="br-input has-icon">
+                                                <label for="id_rg_data" class="text-color-blue-1gov">Data final:<span class="text-danger">(Obrigatório)</span></label>
+                                                {% render_field feriado_form.data_final type="text" placeholder="dd/mm/aaaa" data-input="data-input"  class="input-busca-grid" %}
+                                                <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                                </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="operacao_dados_feriado" name="operacao_dados_feriado" value=""/>
+                                <input type="hidden" id="id_remocao_feriado" name="id_remocao_feriado" value=""/>
+                                <!-- /.card-body -->
+                                <div class="br-modal-footer">
+                                    {% if form.errors %}
+                                        {% for field_errors in form.errors.values %}
+                                            {% for error in field_errors %}
+                                                <div class="br-message danger" role="alert">
+                                                    <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                                        aria-hidden="true"></i>
+                                                    </div>
+                                                    <div class="content"><span
+                                                            class="message-title">Erro: </span><span
+                                                            class="message-body"> {{ error }}</span>
+                                                    </div>
+                                                    <div class="close">
+                                                        <button class="br-button circle small" type="button"
+                                                                aria-label="content"><i
+                                                                class="fas fa-times" aria-hidden="true"></i></button>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endfor %}
+                
+                                        {% for field in form %}
+                                            {% for error in field.errors %}
+                                                <div class="br-message danger" role="alert">
+                                                    <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                                        aria-hidden="true"></i>
+                                                    </div>
+                                                    <div class="content"><span
+                                                            class="message-title">Erro no campo {{ field.label }}.</span><span
+                                                            class="message-body"> {{ error }}</span>
+                                                    </div>
+                                                    <div class="close">
+                                                        <button class="br-button circle small" type="button"
+                                                                aria-label="content"><i
+                                                                class="fas fa-times" aria-hidden="true"></i></button>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% comment %} <a href="{% url 'saude_atendimento:agenda_medica_view' %}" class="br-button secondary mr-3" id="limpar-form-feriado"><i class="fas fa-eraser" aria-hidden="true" hidden></i> Limpar</a> {% endcomment %}
+                                    <a class="br-button secondary mr-3" id="pesquisar-grid-feriado"><i class="fas fa-search" aria-hidden="true" hidden></i> Buscar</a>
+                                    {% comment %} <!-- <input type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="cadastrar-feriado" name="cadastrar-feriado" value="Salvar">
+                                    <input type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="editar-feriado" name="editar-feriado" value="Salvar"> -->
+                                    <!-- <input type="submit" class="br-button primary mr-3 mt-3 mt-sm-0" id="cadastrar-feriado" name="cadastrar-feriado" value="Salvar">
+                                    <input type="submit" class="br-button primary mr-3 mt-3 mt-sm-0" id="editar-feriado" name="editar-feriado" value="Salvar"> --> {% endcomment %}
+                
+                                    <button type="submit" class="br-button primary mr-3 mt-3 mt-sm-0" id="cadastrar-feriado" name="cadastrar-feriado">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                    <button type="submit" class="br-button primary mr-3 mt-3 mt-sm-0" id="editar-feriado" name="editar-feriado">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                    {% comment %} <!-- <a class="br-button secondary" id="fechar-modal-cadastrar-feriado">Fechar</a> --> {% endcomment %}
+                                </div>
+                                <!-- /.card-footer -->
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md">
+                    <div class="br-card hover">
+                        <div class="card-content">
+                            <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                                data-random="data-random">
+                                <div class="table-header">
+                                    <div>
+                                        <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                                    </div>
+                                    <div class="top-bar mt-2">
+                                        <div class="d-flex table-title">
+                                            <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da agenda médica" title="Ícone da agenda médica" style="display: block;"> 
+                                            <span class="mt-1 ml-4" style="display: block;">Feriados Inseridos</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table>
+                                    <caption>Título da Tabela</caption>
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th>
+                                            <b class="text-color-blue-1gov">Nome do Feriado</b>
+                                        </th>
+                                        <th>
+                                            <b class="text-color-blue-1gov">Data Inicial</b>
+                                        </th>
+                                        <th>
+                                            <b class="text-color-blue-1gov">Data Final</b>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% if feriados %}
+                                        {% for feriado in feriados %}
+                                                <td data-th="Editar">
+                                                    <a href="{% url 'saude_atendimento:update_feriado_bloqueio_agenda_view' 'feriado' feriado.id %}" id="link-editar-feriado"><i
+                                                            class="fas fa-edit" aria-hidden="true"></i></a>
+                                                </td>
+                                                <td data-th="Excluir">
+                                                    <a data-id-feriado="{{ feriado.id }}" id="link-remover-feriado"><i
+                                                        class="fas fa-trash-alt" aria-hidden="true"></i></a>
+                                                </td>
+                                                <td data-th="Código">{{ feriado.nome_feriado }}</td>
+                                                <td data-th="Nome Longo">{{ feriado.data_inicial}}</td>
+                                                <td data-th="Nome Longo">{{ feriado.data_final}}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                                    {% endif %}
+                                    </tbody>
+                                </table>
+                                <div class="table-footer">
+                                    <nav class="br-pagination" aria-label="Paginação de resultados" data-total="50" data-current="1"
+                                        data-per-page="20">
+                                        <div class="pagination-per-page">
+                                            <div class="br-select">
+                                                <div class="br-input">
+                                                    <label for="per-page-selection-random-77664">Exibir</label>
+                                                    <input id="per-page-selection-random-77664" type="text" placeholder=" "/>
+                                                    <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1"
+                                                            data-trigger="data-trigger"><i class="fas fa-angle-down" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="br-list" tabindex="0">
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="per-page-10-random-77664" type="radio" name="per-page-random-77664"
+                                                                value="per-page-10-random-77664" checked="checked"/>
+                                                            <label for="per-page-10-random-77664">10</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="per-page-20-random-77664" type="radio" name="per-page-random-77664"
+                                                                value="per-page-20-random-77664"/>
+                                                            <label for="per-page-20-random-77664">20</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="per-page-30-random-77664" type="radio" name="per-page-random-77664"
+                                                                value="per-page-30-random-77664"/>
+                                                            <label for="per-page-30-random-77664">30</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="br-divider d-none d-sm-block mx-3"></span>
+                                        <div class="pagination-information d-none d-sm-flex"><span class="current">1</span>&ndash;<span
+                                                class="per-page">20</span>&nbsp;de&nbsp;<span class="total">50</span>&nbsp;itens
+                                        </div>
+                                        <div class="pagination-go-to-page d-none d-sm-flex ml-auto">
+                                            <div class="br-select">
+                                                <div class="br-input">
+                                                    <label for="go-to-selection-random-13292">Página</label>
+                                                    <input id="go-to-selection-random-13292" type="text" placeholder=" "/>
+                                                    <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1"
+                                                            data-trigger="data-trigger"><i class="fas fa-angle-down" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="br-list" tabindex="0">
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="go-to-1-random-13292" type="radio" name="go-to-random-13292"
+                                                                value="go-to-1-random-13292" checked="checked"/>
+                                                            <label for="go-to-1-random-13292">1</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="go-to-2-random-13292" type="radio" name="go-to-random-13292"
+                                                                value="go-to-2-random-13292"/>
+                                                            <label for="go-to-2-random-13292">2</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="go-to-3-random-13292" type="radio" name="go-to-random-13292"
+                                                                value="go-to-3-random-13292"/>
+                                                            <label for="go-to-3-random-13292">3</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="br-divider d-none d-sm-block mx-3"></span>
+                                        <div class="pagination-arrows ml-auto ml-sm-0">
+                                            <button class="br-button circle" type="button" aria-label="Voltar página"><i
+                                                    class="fas fa-angle-left" aria-hidden="true"></i>
+                                            </button>
+                                            <button class="br-button circle" type="button" aria-label="Avançar página"><i
+                                                    class="fas fa-angle-right" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} <!-- <div class="br-scrim-util foco" id="modal-remover-bloqueio-agenda" data-scrim="true">
+        <div class="br-modal">
+          <div class="br-modal-header">Remoção de bloqueio de agenda</div>
+          <div class="br-modal-body">
+            <div class="container-icone-atencao">
+                <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                <p>Atenção!</p>
+            </div>
+            <p>Deseja realmente remover este bloqueio da agenda?</p>
+            <div class="justify-content-center">
+                <button class="br-button primary" id="confirmacao-remocao-bloqueio-agenda" type="button" data-dismiss="scrimexample">Sim
+                </button>
+                <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" id="negacao-remocao-bloqueio-agenda" type="button">Não
+                </button>
+            </div>
+          </div>
+          <div class="br-modal-footer justify-content-center">
+          </div>
+        </div>
+    </div> --> {% endcomment %}
+    <form id="gerar-relatorio-bloqueios-agenda-form" action="{% url 'saude_atendimento:pdf_relatorio_bloqueios_agenda' %}" method="POST">
+        {% csrf_token %}
+        <input id="id_medico" name="id_medico" type="hidden" value="1">
+    </form>
+    <div class="br-scrim-util foco" id="modal-bloqueio-agenda" data-scrim="true">
+        <div class="br-modal">
+            <div class="header">
+                {% comment %} <div class="br-modal-header">Inserir Bloqueio de Agenda</div> {% endcomment %}
+                <div class="text-up-02 text-color-blue-1gov  titulo-modal-bloqueio-agenda">
+                    <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da farmácia" title="Ícone da farmácia" style="display: block;"> 
+                    <span class="ml-3">INSERIR BLOQUEIO DE AGENDA</span>
+                </div>
+                <a class="fechar-modal" id="fechar-modal-cadastrar-bloqueio-agenda">
+                    <span aria-hidden="true">&times;</span>
+                    {% comment %} <i class="fas fa-times" aria-hidden="true" hidden></i> {% endcomment %}
+                </a>
+            </div>
+            <div class="row">
+                <div class="col-md">
+                    <div class="br-card hover">
+                        <div class="card-content mb-3">
+                            <form method="get" action="{% url 'saude_atendimento:agenda_medica_view' %}" id="id_bloqueio_agenda_form">
+                                {% csrf_token %}
+                                <div class="br-modal-body mt-0">
+                                    <div class="form-group row">
+                                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                            <div class="br-input mt-3">
+                                                <label for="id_medico_bloqueio_agenda" class="text-color-blue-1gov">Médico:<span class="text-danger">(Obrigatório)</span></label>
+                                                {% render_field bloqueio_agenda_form.medico_bloqueio_agenda class="modal-campo-select input-busca-grid" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-bloqueio-agenda" disabled="True"%}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-3">
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                                <div class="br-input has-icon">
+                                                <label for="id_data_inicial" class="text-color-blue-1gov">Data inicial:<span class="text-danger">(Obrigatório)</span></label>
+                                                {% render_field bloqueio_agenda_form.data_inicial type="text" placeholder="dd/mm/aaaa" data-input="data-input" class="input-busca-grid" %}
+                                                <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                                </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                                <div class="br-input has-icon">
+                                                <label for="id_data_final" class="text-color-blue-1gov">Data final:<span class="text-danger">(Obrigatório)</span></label>
+                                                {% render_field bloqueio_agenda_form.data_final type="text" placeholder="dd/mm/aaaa" data-input="data-input" class="input-busca-grid" %}
+                                                <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                                </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-2">
+                                        <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                            <div class="br-textarea small">
+                                                <label for="id_motivo" class="text-color-blue-1gov">Motivo:<span class="text-danger">(Obrigatório)</span></label>
+                                                {% render_field bloqueio_agenda_form.motivo class="input-com-alfanumericas input-busca-grid" type="text" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="operacao_dados_bloqueio_agenda" name="operacao_dados_bloqueio_agenda" value=""/>
+                                <input type="hidden" id="id_remocao_bloqueio_agenda" name="id_remocao_bloqueio_agenda" value=""/>
+                                <!-- /.card-body -->
+                                <div class="br-modal-footer">
+                                    {% if form.errors %}
+                                        {% for field_errors in form.errors.values %}
+                                            {% for error in field_errors %}
+                                                <div class="br-message danger" role="alert">
+                                                    <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                                         aria-hidden="true"></i>
+                                                    </div>
+                                                    <div class="content"><span
+                                                            class="message-title">Erro: </span><span
+                                                            class="message-body"> {{ error }}</span>
+                                                    </div>
+                                                    <div class="close">
+                                                        <button class="br-button circle small" type="button"
+                                                                aria-label="content"><i
+                                                                class="fas fa-times" aria-hidden="true"></i></button>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endfor %}
+                    
+                                        {% for field in form %}
+                                            {% for error in field.errors %}
+                                                <div class="br-message danger" role="alert">
+                                                    <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                                         aria-hidden="true"></i>
+                                                    </div>
+                                                    <div class="content"><span
+                                                            class="message-title">Erro no campo {{ field.label }}.</span><span
+                                                            class="message-body"> {{ error }}</span>
+                                                    </div>
+                                                    <div class="close">
+                                                        <button class="br-button circle small" type="button"
+                                                                aria-label="content"><i
+                                                                class="fas fa-times" aria-hidden="true"></i></button>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% comment %} {% if medico_id %}
+                                        <a href="{% url 'saude_atendimento:agenda_medica_medico_view' medico_id %}" class="br-button secondary mr-3" id="limpar-form-bloqueio-agenda"><i class="fas fa-eraser" aria-hidden="true" hidden></i> Limpar</a>
+                                    {% endif %} {% endcomment %}
+                                    <a class="br-button secondary mr-3" id="pesquisar-grid-bloqueio-agenda"><i class="fas fa-search" aria-hidden="true" hidden></i> Buscar</a>
+                                    {% comment %} <!-- <input type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="cadastrar-bloqueio-agenda" name="cadastrar-bloqueio-agenda" value="Salvar">
+                                    <input type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="editar-bloqueio-agenda" name="editar-bloqueio-agenda" value="Salvar"> -->
+                                    <!-- <input type="submit" class="br-button primary mr-3 mt-3 mt-sm-0" id="cadastrar-bloqueio-agenda" name="cadastrar-bloqueio-agenda" value="Salvar">
+                                    <input type="submit" class="br-button primary mr-3 mt-3 mt-sm-0" id="editar-bloqueio-agenda" name="editar-bloqueio-agenda" value="Salvar"> --> {% endcomment %}
+                                    <a class="br-button secondary mr-3" id="listar-bloqueios"><i class="fas fa-table" aria-hidden="true" hidden></i> Listar Bloqueios</a>
+                                    <button type="submit" class="br-button primary mr-3 mt-3 mt-sm-0" id="cadastrar-bloqueio-agenda" name="cadastrar-bloqueio-agenda">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                    <button type="submit" class="br-button primary mr-3 mt-3 mt-sm-0" id="editar-bloqueio-agenda" name="editar-bloqueio-agenda">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                    {% comment %} <!-- <a class="br-button secondary" id="fechar-modal-cadastrar-bloqueio-agenda">Fechar</a> --> {% endcomment %}
+                                </div>
+                                <!-- /.card-footer -->
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md">
+                    <div class="br-card hover">
+                        <div class="card-content">
+                            <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                                data-random="data-random">
+                                <div class="table-header">
+                                    <div>
+                                        <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                                    </div>
+                                    <div class="top-bar mt-2">
+                                        <div class="d-flex table-title">
+                                            <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da agenda médica" title="Ícone da agenda médica" style="display: block;"> 
+                                            <span class="mt-1 ml-4" style="display: block;">Bloqueios Inseridos</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-header">
+                                    
+                                </div>
+
+                                <table>
+                                    <caption>Título da Tabela</caption>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th>
+                                                <b class="text-color-blue-1gov">Médico</b>
+                                            </th>
+                                            <th>
+                                                <b class="text-color-blue-1gov">Data Inicial</b>
+                                            </th>
+                                            <th>
+                                                <b class="text-color-blue-1gov">Data Final</b>
+                                            </th>
+                                            <th>
+                                                <b class="text-color-blue-1gov">Qte Dias</b>
+                                            </th>
+                                            <th>
+                                                <b class="text-color-blue-1gov">Motivo</b>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% if bloqueios_agenda %}
+                                        {% for i, bloqueio_agenda in bloqueios_agenda|enumerate_queryset %}
+                                            <tr>
+                                                <td data-th="Editar">
+                                                    <a href="{% url 'saude_atendimento:update_feriado_bloqueio_agenda_view' 'bloqueioagenda' bloqueio_agenda.id %}" id="link-editar-bloqueio-agenda"><i
+                                                                class="fas fa-edit" aria-hidden="true"></i></a>
+                                                </td>
+                                                <td data-th="Excluir">
+                                                    <a data-id-bloqueio-agenda="{{ bloqueio_agenda.id }}" id="link-remover-bloqueio-agenda"><i
+                                                        class="fas fa-trash-alt" aria-hidden="true"></i></a>
+                                                </td>
+                                                <td data-th="Código">{{ bloqueio_agenda.medico }}</td>
+                                                <td data-th="Nome Longo">{{ bloqueio_agenda.data_inicial}}</td>
+                                                <td data-th="Nome Longo">{{ bloqueio_agenda.data_final}}</td>
+                                                <td data-th="Nome Longo">{{ matriz_bloqueios_agenda|list_element_by_index:i|list_element_by_index:2 }}</td>
+                                                <td data-th="Nome Longo">{{ bloqueio_agenda.motivo}}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                                    {% endif %}
+                                    </tbody>
+                                </table>
+                                <div class="table-footer">
+                                    <nav class="br-pagination" aria-label="Paginação de resultados" data-total="50" data-current="1"
+                                        data-per-page="20">
+                                        <div class="pagination-per-page">
+                                            <div class="br-select">
+                                                <div class="br-input">
+                                                    <label for="per-page-selection-random-77664">Exibir</label>
+                                                    <input id="per-page-selection-random-77664" type="text" placeholder=" "/>
+                                                    <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1"
+                                                            data-trigger="data-trigger"><i class="fas fa-angle-down" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="br-list" tabindex="0">
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="per-page-10-random-77664" type="radio" name="per-page-random-77664"
+                                                                value="per-page-10-random-77664" checked="checked"/>
+                                                            <label for="per-page-10-random-77664">10</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="per-page-20-random-77664" type="radio" name="per-page-random-77664"
+                                                                value="per-page-20-random-77664"/>
+                                                            <label for="per-page-20-random-77664">20</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="per-page-30-random-77664" type="radio" name="per-page-random-77664"
+                                                                value="per-page-30-random-77664"/>
+                                                            <label for="per-page-30-random-77664">30</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="br-divider d-none d-sm-block mx-3"></span>
+                                        <div class="pagination-information d-none d-sm-flex"><span class="current">1</span>&ndash;<span
+                                                class="per-page">20</span>&nbsp;de&nbsp;<span class="total">50</span>&nbsp;itens
+                                        </div>
+                                        <div class="pagination-go-to-page d-none d-sm-flex ml-auto">
+                                            <div class="br-select">
+                                                <div class="br-input">
+                                                    <label for="go-to-selection-random-13292">Página</label>
+                                                    <input id="go-to-selection-random-13292" type="text" placeholder=" "/>
+                                                    <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1"
+                                                            data-trigger="data-trigger"><i class="fas fa-angle-down" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="br-list" tabindex="0">
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="go-to-1-random-13292" type="radio" name="go-to-random-13292"
+                                                                value="go-to-1-random-13292" checked="checked"/>
+                                                            <label for="go-to-1-random-13292">1</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="go-to-2-random-13292" type="radio" name="go-to-random-13292"
+                                                                value="go-to-2-random-13292"/>
+                                                            <label for="go-to-2-random-13292">2</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="br-item" tabindex="-1">
+                                                        <div class="br-radio">
+                                                            <input id="go-to-3-random-13292" type="radio" name="go-to-random-13292"
+                                                                value="go-to-3-random-13292"/>
+                                                            <label for="go-to-3-random-13292">3</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="br-divider d-none d-sm-block mx-3"></span>
+                                        <div class="pagination-arrows ml-auto ml-sm-0">
+                                            <button class="br-button circle" type="button" aria-label="Voltar página"><i
+                                                    class="fas fa-angle-left" aria-hidden="true"></i>
+                                            </button>
+                                            <button class="br-button circle" type="button" aria-label="Avançar página"><i
+                                                    class="fas fa-angle-right" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{editar_feriado|json_script:"editar-feriado-data" }}
+{{editar_bloqueio_agenda|json_script:"editar-bloqueio-agenda-data"}}
+{{business_hours|json_script:"business-hours-data"}}
+{{business_hours_estrutura_fullcalendar|json_script:"business-hours-estrutura-fullcalendar-data"}}
+{{matriz_feriados|json_script:"matriz-feriados-data"}}
+{{matriz_bloqueios_agenda|json_script:"matriz-bloqueios-agenda-data"}}
+{{consultas|json_script:"agendamentos-data"}}
+
+
+<div class="br-scrim-util foco modal-notificao-usuario" id="modal-confirmacao-remocao" data-scrim="true">
+    <div class="br-modal">
+      <div class="br-modal-header"></div>
+      <div class="br-modal-body">
+        <div class="container-icone-atencao">
+            <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+            <p>Atenção!</p>
+        </div>
+        <p></p>
+        <div class="justify-content-center">
+            <button class="br-button primary" id="confirmacao-remocao" type="button" data-dismiss="scrimexample">Sim
+            </button>
+            <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" id="negacao-remocao" type="button">Não
+            </button>
+        </div>
+      </div>
+      <div class="br-modal-footer justify-content-center">
+      </div>
+    </div>
+</div>
+{% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+{% endblock %}
+{% block script %}
+    <script>
+        let url_agendamedica_medico_nao_selecionado = `{% url 'saude_atendimento:agenda_medica_view' %}`
+        let url_agendamedica_medico_selecionado = `{% url 'saude_atendimento:agenda_medica_medico_view' medico_id='00000000-0000-0000-0000-000000000000' %}`
+
+        let url_api_agendamento_add = `{% url 'saude_atendimento:api_agendamento_add' %}`
+
+        let url_api_detalhe_agendamento = `{% url 'saude_atendimento:api_detalhe_agendamento' id='123' %}`
+        let url_paciente_detalhes = `{% url 'saude_atendimento:agendaapi_detalhe' %}?paciente_id=00000000-0000-0000-0000-000000000000`
+        
+        let url_api_feriado_add = `{% url 'saude_atendimento:api_feriado_add' %}`
+        let url_api_feriado_update = `{% url 'saude_atendimento:api_feriado_update' id='123' %}`
+        let url_api_feriado_delete = `{% url 'saude_atendimento:api_feriado_delete' id='123' %}`
+
+        let url_api_bloqueio_agenda_add = `{% url 'saude_atendimento:api_bloqueio_agenda_add' %}`
+        let url_api_bloqueio_agenda_update = `{% url 'saude_atendimento:api_bloqueio_agenda_update' id='123' %}`
+        let url_api_bloqueio_agenda_delete = `{% url 'saude_atendimento:api_bloqueio_agenda_delete' id='123' %}`
+    </script>
+
+    <script src="{% static 'js/gerenciamento_modal_notificacao_usuarios.js' %}"></script>
+
+
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+    <script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+    <script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+
+    <script src="{% static 'js/jquery.mask.min.js' %}"></script>
+    <script src="{% static 'js/mask.js' %}"></script>
+
+    <script src="{% static 'js/utils_forms.js' %}"></script>
+
+
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_geral_modals.js' %}"></script>
+
+
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_modal_cadastrar_feriado.js' %}"></script>
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_modal_cadastrar_bloqueio_agenda.js' %}"></script>
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_modal_relatorio_agendamento.js' %}"></script>
+
+
+    <script src="{% static 'js/utils_requisoes.js' %}"></script>
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_requisicoes_agendamentos.js' %}"></script>
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_requisicoes_feriados.js' %}"></script>
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_requisicoes_bloqueios_agenda.js' %}"></script>
+
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_geral_agendamento.js' %}"></script>
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_agendar_atendimento.js' %}"></script>
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_edicao_agendamento.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_fullcalendario_agendamedica.js' %}"></script>
+{% endblock %}

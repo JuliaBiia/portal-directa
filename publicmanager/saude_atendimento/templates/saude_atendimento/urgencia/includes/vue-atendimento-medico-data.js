@@ -1,0 +1,150 @@
+{% load static %}
+
+paciente: {
+    id: '{{object.paciente.id}}',
+    nome: '{{object.paciente.nome_paciente}}',
+    idade: '{{object.paciente.calcular_idade}}',
+    cartao_sus: '{{object.paciente.cartao_sus}}',
+    cpf: '{{object.paciente.cpf}}',
+    situacao: '{{object.get_situacao_display}}',
+    situacao_numero: '{{object.situacao}}',
+    foto: '{% if object.paciente.foto_paciente %}{{object.paciente.foto_paciente.url}}{% endif %}',
+    sexo: '{% if object.paciente.sexo == "M" %} MASCULINO {% elif object.paciente.sexo == "F" %} FEMININO {% endif %} ',
+    atendimentoPK: '{{object.lista_chamada_atendimento_medico_set.pk}}',
+    boletimPk : '{{object.classificacao_risco.boletim.pk}}',
+    listaChamadoPk: '{{object.pk}}',
+},
+ultimoAtendimento: {
+    data: '{{ultimo_atendimento.created_at}}',
+    classificacaoTipo: '{% if ultimo_atendimento.boletim_classificacao_risco_set.tipo_classificacao_risco %}{{ultimo_atendimento.boletim_classificacao_risco_set.tipo_classificacao_risco.get_cor_display}}{% endif %}',
+    queixa: '{% if ultimo_atendimento.boletim_classificacao_risco_set %}{{ultimo_atendimento.boletim_classificacao_risco_set.queixa_principal}}{% endif %}',
+    boletimSituacao: '{{ultimo_atendimento.get_situacao_display}}',
+    profissionais: [
+        {% if ultimo_atendimento.boletim_classificacao_risco_set.classificacao_risco_atendimento_medico_set.first %}
+            {% for profissional in ultimo_atendimento.boletim_classificacao_risco_set.classificacao_risco_atendimento_medico_set.first.profissionais.all %}
+                {nome: '{{profissional.nome_profissional}}'},
+            {% endfor %}
+        {% endif %}
+    ],
+},
+baseUltimoAtendimentoUrl: '{% url "saude_atendimento:paciente_historico_time_line" pk='00000000-0000-0000-0000-000000000000' %}',
+baseUltimoAtendimentoFichaUrl: '{% url "saude_atendimento:paciente_historico_ficha" pk='00000000-0000-0000-0000-000000000000' %}',
+unidadeSaudePk: '{{object.unidade_saude.pk}}',
+unidadeSaudeSessionId: '{{unidade_saude_session_id}}',
+profissionalPk: '{{profissional_pk}}',
+dataAtual: moment().format('DD/MM/YYYY'),
+horaAtual: moment().format('H:mm'),
+informacoesPaciente: null,
+atendimentoMedico: null,
+//Historico Evolução
+formularioEvolucao: {
+    id: '',
+    registroEvolucao: '',
+    evolucaoRetorno: true,
+},
+historicoEvolucao: null,
+//Historico Diagnóstico
+formularioDiagnostico: {
+    cid: '',
+    arquivo: '',
+    descricao: '',
+    nomeArquivo: '',
+},
+listagemHistoricoAnteriores: [],
+//Historico patologico
+bloqueioPatologicoForm: false,
+listagemHistoricoPatologico: null,
+// Exames
+listagemExames: [],
+formularioExame: {
+    id: '',
+    observacao: '',
+    deleteExame: '',
+    arquivoAnexo: '',
+    nomeArquivoAnexo: '',
+},
+//Procedimentos
+listagemProcedimentos: [],
+selectedProcedimentoValue: [],
+formularioProcedimento: {
+    id: '',
+    tipoSolicitacao: 0,
+    procedimentoPk: null,
+    classificacao: 0,
+    procedimento: [],
+    quantidade: 1,
+    deleteProcedimento: '',
+    arquivoAnexo: '',
+    nomeArquivoAnexo: '',
+    realizadoPor: 0,
+},
+//Justificativa Procedimentos
+listagemJustificativaProcedimentos: null,
+formularioJustificativaProcedimento: {
+    id: '',
+    diagnostico: '',
+    cidPrincipal: '',
+    cidSecundario: '',
+    cidAssociada: '',
+    observacao: '',
+},
+urlProcedimentoSolicitacao: "{% url 'saude_atendimento:atendimento_procedimentos_relatorio' pk='00000000-0000-0000-0000-000000000000' %}",
+// Medicações Atendimento
+listagemMedicacoesAtendimentos: [],
+formularioMedicacao: {
+    id: '',
+    via: '',
+    parental: '',
+    medicacaoPk: '',
+    doseUnica: true,
+    medicamentoControlado: false,
+    posologia: '',
+    tipoPosologia: 0,
+    duracaoTratamento: 1,
+    observacao: '',
+    deleteMedicacao: '',
+    usoContinuo: false,
+    aplicacao: '0',
+    quantidade: 0,
+    estoque_zero: false,
+    dosagem: '',
+    carregando: false,
+},
+reclassification: false,
+formularioReclassificacao: {
+    tipoClassificacaoRiscoId: '',
+    presaoArterial: '',
+    frequenciaCardiaca: '',
+    frequenciaRespiratoria: '',
+    temperatura: '',
+    spo2: '',
+    hgt: '',
+},
+//Component Select customizado
+principioOptions: [],
+selectedPrincipioValues: [],
+//Component Select patologia pessoais
+pessoaisOptions: [],
+selectedPessoaisValues: [],
+//Component Select patologia familiares
+selectedFamiliaresValues: [],
+familiaresOptions: [],
+selectExame: '',
+//Component Select medicacoes atendimento
+selectedMedicacoesValues: [],
+medicacoesOptions: [],
+urlRedirect: "{% url 'saude_atendimento:atendimento_medico_list' %}",
+//Paginação
+pageSize: 8,
+currentPage: 1,
+totalPages: 5,
+maxVisiblePages: 5,
+resultsTotal: 0,
+loadingTable: false,
+deleteTitulo: '',
+abriModalDeletar: false,
+abrirModalFinalizar: false,
+abrirModalDocumentos: false,
+activeTabLine1: null,
+activeTabLine2: 'informacoesPessoais',
+activeTabLine3: 'evolucao'

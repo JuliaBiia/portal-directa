@@ -1,0 +1,209 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Solicitação{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'libs/select2/css/select2.min.css' %}" />
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<style>
+    .divider-text {position: relative; padding-top: 20px;}
+    .divider-text::before {content: ""; top: 0; left: 35px; right: 0; height: 2px; background: var(--divider-color, #1351B4);}
+    .divider-text::after {position: absolute; top: 0; left: 35px; background: white; padding: 0 20px; margin-top: -10px; color: var(--divider-color, #1351B4);}
+    .divider-text-solicitacoes::after {content: "Procedimentos Solicitados";}
+    .divider-text-justificativa::after {content: "Justificativa";}
+    .campo-select + .select2-container .select2-selection > .select2-selection__rendered {margin-top: 10px;}
+    .select2-container--default .select2-selection--single .select2-selection__clear {font-size: x-large;margin-top: 2px;}
+    .select2-selection__arrow {display: none;}
+    @media only screen and (min-width: 414px) and (max-width: 736px) {.text-custom {margin-left: 0px !important;}}
+    @media only screen and (min-width: 900px) and (max-width: 1190px) {.container, .container-sm {--grid-maxwidth: 100% !important;}.col-btn-justificativa-left {width: 19% !important;}.col-btn-justificativa-ringth {width: 19% !important;}}
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-lg">
+        {% include 'dashboard/includes/mensagens.html' %}
+        
+        <div class="br-card p-4">
+            <div class="card-header">
+                <div class="d-flex">
+                    <img class="mr-2" src="{% static 'img/icons/icon_solicitacoes.svg' %}" alt="Ícone de impressora"><h5 class="color-title fontsize20-w"> SOLICITAÇÃO / AUTORIZAÇÃO DE PROCEDIMENTOS</h5>
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.media }}
+            
+                <div class="card-content">
+                    <div class="card-body">
+
+                        <div class="container divider-text divider-text-solicitacoes title-hr box-card-border mt-4" style="border: 0.26px solid #d9d9d9; border-radius: 4px;">
+                            <div class="row mt-4" style="color: #1351B4;">
+                                <div class="col-8 col-sm-10">
+                                    Procedimento Principal
+                                </div>
+                                <div class="col-4 col-sm-2" style="text-align: center;">
+                                    Quantidade
+                                </div>
+                            </div>
+                            {% for proc in procedimentos %}
+                                {% if proc.classificacao == 0 %}
+                                <div class="row mt-2">
+                                    <div class="col-8 col-sm-10">
+                                        <span style="color: #1351B4; flex: 1 1 auto; min-width: 0;">{{proc.procedimento.codigo}}</span> <span class="text-custom" style="color: #000000; margin-left: 30px;"><b>{{proc.procedimento.nome}}</b></span>
+                                    </div>
+                                    <div class="col-4 col-sm-2" style="text-align: center;">
+                                        {{proc.quantidade}}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+
+                            <div class="row mt-4" style="color: #1351B4;">
+                                <div class="col-8 col-sm-10">
+                                    Procedimento Secundário
+                                </div>
+                                <div class="col-4 col-sm-2" style="text-align: center;">
+                                    Quantidade
+                                </div>
+                            </div>
+                            {% for proc in procedimentos %}
+                                {% if proc.classificacao == 1 %}
+                                <div class="row mt-2">
+                                    <div class="col-8 col-sm-10">
+                                        <span style="color: #1351B4;">{{proc.procedimento.codigo}}</span> <span class="text-custom" style="color: #000000; margin-left: 30px;">{{proc.procedimento.nome}}</span>
+                                    </div>
+                                    <div class="col-4 col-sm-2" style="text-align: center;">
+                                        {{proc.quantidade}}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            <div class="mt-4" style="color:white;">.</div>
+                        </div>
+
+                        <div class="container divider-text divider-text-justificativa box-card-border mt-4" style="border: 0.26px solid #d9d9d9; border-radius: 4px;">
+                            <div class="form-group row mt-3">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label class="color-title mt-2">Diagnóstico:</label>
+                                    <div class="br-input">
+                                        {% render_field form.diagnostico class="campo-select" style="width: 100%" required="required" data-placeholder="Selecione um Diagnóstico" %}
+                                        {% if form.diagnostico.errors %}
+                                            {% for error in form.diagnostico.errors %}
+                                            <p class="text-danger">
+                                                {{ error|escape }}
+                                            </p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="form-group row mt-3">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label class="color-title mt-2">CID 10 Principal:</label>
+                                        {% render_field form.cid_10_principal class="campo-select" style="width: 100%" data-placeholder="Selecione um CID 10 Principal" %}
+                                    <div class="br-input">
+                                        {% if form.cid_10_principal.errors %}
+                                            {% for error in form.cid_10_principal.errors %}
+                                            <p class="text-danger">
+                                                {{ error|escape }}
+                                            </p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="form-group row mt-3">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label class="color-title mt-2">CID 10 Secundário:</label>
+                                    <div class="br-input">
+                                        {% render_field form.cid_10_secundario class="campo-select" style="width: 100%" data-placeholder="Selecione um CID 10 Secundário" %}
+                                        {% if form.cid_10_secundario.errors %}
+                                            {% for error in form.cid_10_secundario.errors %}
+                                            <p class="text-danger">
+                                                {{ error|escape }}
+                                            </p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row mt-3">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label class="color-title mt-2">CID 10 Causas Associadas:</label>
+                                    <div class="br-input">
+                                        {% render_field form.cid_10_causa_associada class="campo-select" style="width: 100%" data-placeholder="Selecione um CID 10 Causas Associadas" %}
+                                        {% if form.cid_10_causa_associada.errors %}
+                                            {% for error in form.cid_10_causa_associada.errors %}
+                                            <p class="text-danger">
+                                                {{ error|escape }}
+                                            </p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="form-group row mt-3">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <label class="color-title mb-3">Observações:</label>
+                                    <div class="br-input">
+                                        {% render_field form.observacao type="text" style="height:180px; width: 100%; border-color: #1351B4;" required="required"%}
+                                        {% if form.observacao.errors %}
+                                            {% for error in form.observacao.errors %}
+                                            <p class="text-danger">
+                                                {{ error|escape }}
+                                            </p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4" style="color:white;">.</div>
+                        </div>
+                    </div>
+                    <div class="card-footer mt-4">
+                        <div class="row">
+                            <div class="col-btn-justificativa-left">
+                                <a href="{% url 'saude_atendimento:atendimento_medico_detail' atendimento.lista_chamada.id %}" class="br-button secondary mr-3"><i class="fas fa-arrow-left"></i> Voltar</a>
+                            </div>
+                            <div class="col-btn-justificativa-ringth">
+                                <button type="submit" class="br-button primary mr-3" id="saveButton"><i class="fas fa-save"></i> Salvar</button>
+                            </div>
+                        <div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'libs/select2/js/select2.min.js' %}"></script>
+<script src="{% static 'libs/select2/js/select2-pt-BR.js' %}"></script>
+<script>
+    localStorage.setItem('toggleCollapse', 'procedimentos');
+    
+    $("#saveButton").click(function() {
+        localStorage.setItem('buttonType', 'save');
+    });
+
+    $("#id_cid_10_secundario").select2({
+        language: "pt-BR",
+        placeholder: "Selecione um CID 10 Secundário",
+        allowClear: true
+    });
+
+    $("#id_cid_10_causa_associada").select2({
+        language: "pt-BR",
+        placeholder: "Selecione um CID 10 Causa Associada",
+        allowClear: true
+    });
+</script>
+{% endblock %}

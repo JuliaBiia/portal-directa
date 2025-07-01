@@ -1,0 +1,17 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load static %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+
+    <div class="container text-center" style="height:500px;">
+        <img src="{% static 'img/bg-logo-prefeitura-do-natal3.png' %}" style="width:600px; padding-top:40px;" alt="logo" />
+    </div>
+
+{% endblock %}
+{% block script %}
+{% endblock %}

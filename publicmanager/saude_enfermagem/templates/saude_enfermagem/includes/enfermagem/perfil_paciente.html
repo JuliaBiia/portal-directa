@@ -1,0 +1,140 @@
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{% static 'css/responsividade_tb.css' %}">
+{% endblock %}
+
+{% block content %}
+<template>
+    <div class="container br-card">
+        <div class="card-header">
+            <div class="d-flex">
+                <div class="ml-3">
+                    <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                        <img :src="iconeTitulo" alt="Ícone do insumo" title="Ícone do insumo" class="icone-titulo">
+                        <span class="mt-2 ml-4 titulo">${titulo}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <span class="br-divider mt-1 divider-grid mb-3"></span>
+        <div class="card-content mt-1">
+            <div class="row no-gutters mb-2">
+                <div class="col-12 col-md-2">
+                    <div class="content">
+                        {% if object.atendimento.paciente.foto_paciente %}
+                            <img src="{{object.atendimento.paciente.foto_paciente.url}}" class="avatar img-title" alt="Avatar"/>
+                        {% else %}
+                            <span class="br-avatar large" style="margin-top: 15px; width: 100%;"><span class="content"><i class="fas fa-user" aria-hidden="true"></i></span></span>
+                        {% endif %}
+                        <div id="progress" :class="paciente.classificacaoRisco === '0' ? 'btn-azul' : 
+                                paciente.classificacaoRisco === '1' ? 'btn-verde' :  
+                                paciente.classificacaoRisco === '2' ? 'btn-amarelo' : 
+                                paciente.classificacaoRisco === '3' ? 'btn-laranja' :
+                                paciente.classificacaoRisco === '4' ? 'btn-vermelho' : ''"
+                            class="progress-img"
+                        ></div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 info-paciente">
+                    <div class="row">
+                        <div class="col-4 col-md-2">
+                            <p class="color-title">Paciente:</p>
+                        </div>
+                        <div class="col-8 col-md-10">
+                            <p class="capslock">${paciente.nome}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-10">
+                        <div class="col-4 col-md-2">
+                            <p class="color-title">Idade:</p>
+                        </div>
+                        <div class="col-8 col-md-10">
+                            <p>${converterParaCapitalized(paciente.idade)}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-10">
+                        <div class="col-4 col-md-2">
+                            <p class="color-title">CNS:</p>
+                        </div>
+                        <div class="col-8 col-md-10">
+                            <p v-if="paciente.cartao_sus">${paciente.cartao_sus}</p>
+                            <p v-else>-----</p>
+                        </div>
+                    </div>
+                    <div class="row mt-10">
+                        <div class="col-4 col-md-2">
+                            <p class="color-title">CPF:</p>
+                        </div>
+                        <div class="col-8 col-md-10">
+                            <p v-if="paciente.cpf">${paciente.cpf}</p>
+                            <p v-else>-----</p>
+                        </div>
+                    </div>
+                    <div class="row mt-10">
+                        <div class="col-4 col-md-2">
+                            <p class="color-title">Sexo:</p>
+                        </div>
+                        <div class="col-8 col-md-10">
+                            <p>${converterParaCapitalized(paciente.sexo)}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-4 mt-25-nmb">
+                        <div class="col-4 col-md-2">
+                            <p class="color-title">Situação:</p>
+                        </div>
+                        <div class="col-8 col-md-10">
+                            <p><b>${converterParaCapitalized(paciente.situacao)}</b></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md mt-15-w">
+                    <p class="ultimo-atendimento"><i class="fa-solid fa-clock-rotate-left color-title"></i><b class="ml-2">Último Atendimento:</b></p>
+                    <div class="br-message warning atendimento-info" style="background-color:#ebebeb !important; border-radius:10px;">
+                        <div v-if="ultimoAtendimento.boletimSituacao && ultimoAtendimento.classificacaoTipo" class="container mt-4 mb-4">
+                            <div v-if="ultimoAtendimento.classificacaoTipo" class="row">
+                                <div class="col-md-auto">
+                                    <p class="data-atendimento"><b>${ultimoAtendimento.data}</b></p>
+                                </div>
+                                <div class="col">
+                                    <div :class="ultimoAtendimento.classificacaoTipo === '0' ? 'btn-azul' : 
+                                            ultimoAtendimento.classificacaoTipo === '1' ? 'btn-verde' :  
+                                            ultimoAtendimento.classificacaoTipo === '2' ? 'btn-amarelo' : 
+                                            ultimoAtendimento.classificacaoTipo === '3' ? 'btn-laranja' : 
+                                            ultimoAtendimento.classificacaoTipo === '4' ? 'btn-vermelho' : ''"
+                                        class="progress-img-sm"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <p class="capslock">${ultimoAtendimento.queixa}</p>
+                                <p v-if="ultimoAtendimento.classificacaoTipo && ultimoAtendimento.profissionais.length > 0"><b>Médico:</b>
+                                    <span class="capslock" v-for="profissional in ultimoAtendimento.profissionais"> ${profissional.nome}</span><br/>
+                                </p>
+                                <p v-if="ultimoAtendimento.classificacaoTipo && ultimoAtendimento.profissionais.length === 0"><b>Médico:</b>
+                                    NÃO HOUVE ATENDIMENTO <span class="situacao">${ultimoAtendimento.boletimSituacao}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div v-else-if="ultimoAtendimento.data && ultimoAtendimento.profissionais.length === 0 && !ultimoAtendimento.classificacaoTipo" class="container mt-4 mb-4">
+                            <div class="col">
+                                <span>Data entrada: ${ultimoAtendimento.data} </span>
+                            </div>
+                            <div class="text-center mt-4">
+                                <p class="capslock"><b>Não classificado.</b></p>
+                                Situação: ${ultimoAtendimento.boletimSituacao}
+                            </div>
+                        </div>
+                        <div v-else class="container mt-4 mb-4">
+                            <div class="text-center">
+                                <p><b>Não existe atendimentos.</b></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}

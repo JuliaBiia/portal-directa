@@ -1,0 +1,72 @@
+{% extends 'dashboard/base//base-pdf.html' %}
+{% load static %}
+{% block title %}Relatório Atendimento {% endblock %}
+{% load widget_tweaks %}
+{% block css-extra-pdf %}
+<style>
+    .col p{color:black;}
+    .row{ font-size:18px; }
+    .row .col-4 p{ font-size:18px;}
+    .row .col p{ font-size:18px;}
+    .title-span{ text-align:right; }
+    .title-span-clock{ text-align:right; }
+    .title-span span{ font-size:22px; color:var(--interactive); }
+    .title-span-clock span{ color:var(--interactive); }
+    .hr-ficha-title{ border: 1px solid var(--interactive); width:100%; }
+</style>
+{% endblock %}
+{% block contentpdf %}
+
+    <div class="row mt-4">
+        <div class="col-md-auto title-span">
+            <h5 style="color:var(--interactive);"><b>Uso de Medicamentos</b></h5>
+        </div>
+        <div class="col-9">
+            <hr style="border: 1px solid var(--interactive);">
+        </div>
+    </div>
+
+    <div class="" style="border:1px solid gray;">
+        <div class="row" style="margin:0 auto; margin-top:20px;">
+            <div class="col-3">
+                <label class="col-form-label">Nome Completo:</label>
+            </div>
+            <div class="col br-input input-highlight">
+                <input id="input-highlight-labeless" value="" type="text" readonly/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <label class="col-form-label" style="padding-top:20px;">Idade:</label>
+            </div>
+            <div class="col br-input input-highlight">
+                <input id="input-highlight-labeless" value="" type="text" readonly/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <label class="col-form-label" style="padding-top:20px;">CPF:</label>
+            </div>
+            <div class="col br-input input-highlight">
+                <input id="input-highlight-labeless" value="" type="text" readonly/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <label class="col-form-label" style="padding-top:;">Cartão SUS:</label>
+            </div>
+            <div class="col br-input input-highlight">
+                <input id="input-highlight-labeless" value="" type="text" readonly/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <label class="col-form-label" style="padding-top:20px;">Situação:</label>
+            </div>
+            <div class="col br-input input-highlight">
+                <input id="input-highlight-labeless" value="" type="text" readonly/>
+            </div>
+        </div>
+    </div>
+   
+{% endblock %}

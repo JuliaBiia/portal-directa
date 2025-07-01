@@ -1,0 +1,712 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Busca de agendamentos{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/estilizacao-grid.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-agendamento.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+{% endblock %}
+{% block content %}
+<div class="container">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+<!-- <div class="br-scrim-util foco modal-notificao-usuario" id="modal-mensagem-impossibilidade" data-scrim="true">
+<div class="br-modal">
+    <div class="br-modal-header"></div>
+    <div class="br-modal-body">
+        <div class="container-icone-atencao">
+            <img src="{% static 'img/icons/icone_impossibilidade.svg' %}" alt="Ícone de impossibilidade" title="Ícone de impossibilidade">
+        </div>
+        <p></p>
+        <button class="br-button primary" type="button" id="fechar-modal-mensagem-impossibilidade" data-dismiss="scrimexample">OK
+        </button>
+    </div>
+    <div class="br-modal-footer justify-content-center">
+    </div>
+</div>
+</div>
+<div class="br-scrim-util foco modal-notificao-usuario" id="modal-mensagem-sucesso" data-scrim="true">
+    <div class="br-modal">
+        <div class="br-modal-header"></div>
+        <div class="br-modal-body">
+            <div class="container-icone-atencao">
+                <img src="{% static 'img/icons/icone_sucesso.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                <p>Informação!</p>
+            </div>
+            <p></p>
+            <button class="br-button primary" type="button" id="" data-dismiss="scrimexample">OK
+            </button>
+        </div>
+      <div class="br-modal-footer justify-content-center">
+      </div>
+    </div>
+</div>
+<div class="br-scrim-util foco modal-notificao-usuario" id="modal-mensagem-erro" data-scrim="true">
+    <div class="br-modal">
+        <div class="br-modal-header"></div>
+        <div class="br-modal-body">
+            <div class="container-icone-atencao">
+                <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                <p>Atenção!</p>
+            </div>
+            <p></p>
+            <button class="br-button primary" type="button" id="fechar-modal-mensagem-erro" data-dismiss="scrimexample">OK
+            </button>
+        </div>
+      <div class="br-modal-footer justify-content-center">
+      </div>
+    </div>
+</div>
+<div class="br-scrim-util foco modal-notificao-usuario" id="modal-confirmacao-remocao" data-scrim="true">
+    <div class="br-modal">
+      <div class="br-modal-header"></div>
+      <div class="br-modal-body">
+        <div class="container-icone-atencao">
+            <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+            <p>Atenção!</p>
+        </div>
+        <p></p>
+        <div class="justify-content-center">
+            <button class="br-button primary" id="confirmacao-remocao" type="button" data-dismiss="scrimexample">Sim
+            </button>
+            <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" id="negacao-remocao" type="button">Não
+            </button>
+        </div>
+      </div>
+      <div class="br-modal-footer justify-content-center">
+      </div>
+    </div>
+</div> -->
+{% comment %} <div class="br-scrim-util foco" id="modal-agendamento-atendimento" data-scrim="true">
+    <div class="br-modal">
+        <div class="header">
+            <div class="br-modal-header">Editar Agendamento</div>
+            <a class="fechar-modal" id="fechar-modal-agendamento-atendimento"><i class="fas fa-times" aria-hidden="true" hidden></i></a>
+        </div>
+        <form
+            id="agendamento_form"
+            method="get"
+        >
+            {% csrf_token %}
+            <div class="br-modal-body">
+                <div class="form-group row campo-paciente">
+                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 col-11">
+                        <div class="br-input">
+                            <label for="id_paciente">Paciente</label>
+                            {% render_field form.paciente type="text" class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <label for="id_nome_paciente">Nome do paciente<span class="text-danger">(Obrigatório)</span></label>
+                            {% render_field form.nome_paciente class="input-com-alfanumericas" type="text" placeholder="Ex.: Paulo Santos da Silva" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <label for="id_cpf">
+                                CPF <a href="javascript:void(0);" data-tooltip-text="Aceito somente números.">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </a>
+                            </label>
+                            {% render_field form.cpf_paciente class="mask-cpf" type="text" placeholder="Ex.: 458.952.584-41" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <label for="id_celular">Celular</label>
+                            {% render_field form.celular_paciente type="text" placeholder="Ex.: (85) 99904-9695" class="mask-telefone" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <label for="id_telefone_fixo">
+                                Telefone fixo <a href="javascript:void(0);"
+                                                 data-tooltip-text="Aceito somente números.">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </a>
+                            </label>
+                            {% render_field form.telefone_fixo_paciente type="text" placeholder="Ex.: (85) 3656-2104" class="mask-telefoneresidencial" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <label for="id_medico">Médico</label>
+                            {% render_field form.medico class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento" disabled="True"%}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <label for="id_agendado_por">Agendado por</label>
+                            {% render_field form.agendado_por class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento" disabled="True"%}
+                        </div>
+                    </div>
+                </div>
+                <fieldset class="container-tipo">
+                    <legend>Tipo</legend>
+                    {% render_field form.tipo_atendimento type="radio" %}
+                </fieldset>
+                <div class="form-group row mt-2 container-data">
+                    <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5 col-4">
+                        <div class="br-datetimepicker" data-mode="single" data-type="text">
+                            <div class="br-input has-icon">
+                                <label for="id_data_atendimento">Data<span class="text-danger">(Obrigatório)</span></label>
+                                {% render_field form.data_atendimento type="text" placeholder="dd/mm/aaaa" data-input="data-input" %}
+                                <button class="br-button circle small" type="button" aria-label="Abrir Timepicker"
+                                        data-toggle="data-toggle" id="simples-input-btn"><i
+                                        class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2 container-horario">
+                    <div class="col-xl-1 col-lg-1 col-md-1 col-sm-2 col-2 label">
+                        <label for="">Início:</label>
+                    </div>
+                    <div class="ccontainer-hora">
+                        <select id="inicio_hora" name="inicio_hora" class="select-horario modal-campo-select" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento">
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                        </select>
+                    </div>
+                    <div class="divisor-hora-minuto">:</div>
+                    <div class="minuto">
+                        <select id="inicio_minuto" name="inicio_minuto" class="select-horario modal-campo-select" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento">
+                            <option value="00">00</option>
+                            <option value="20">20</option>
+                            <option value="40">40</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row mt-2 container-horario">
+                    <div class="col-xl-1 col-lg-1 col-md-1 col-sm-2 col-2 label">
+                        <label for="id_hora_termino_atendimento">Término:</label>
+                    </div>
+                    <div class="container-hora">
+                        <select id="termino_hora" name="termino_hora" class="select-horario modal-campo-select" disabled>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                        </select>
+                    </div>
+                    <div class="divisor-hora-minuto">:</div>
+                    <div class="minuto">
+                        <select id="termino_minuto" name="termino_minuto" class="select-horario modal-campo-select" disabled>
+                            <option value="00">00</option>
+                            <option value="20">20</option>
+                            <option value="40">40</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-textarea small">
+                            <label for="id_observacoes">Observações</label>
+                            {% render_field form.observacoes class="input-com-alfanumericas" type="text" %}
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="salvamento-edicao" name="salvamento-edicao" value="salvamento-edicao">
+            </div>
+            <!-- /.card-body -->
+            <div class="br-modal-footer justify-content-center">
+                {% if form.errors %}
+                    {% for field_errors in form.errors.values %}
+                        {% for error in field_errors %}
+                            <div class="br-message danger" role="alert">
+                                <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                     aria-hidden="true"></i>
+                                </div>
+                                <div class="content"><span
+                                        class="message-title">Erro: </span><span
+                                        class="message-body"> {{ error }}</span>
+                                </div>
+                                <div class="close">
+                                    <button class="br-button circle small" type="button"
+                                            aria-label="content"><i
+                                            class="fas fa-times" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <div class="br-message danger" role="alert">
+                                <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                     aria-hidden="true"></i>
+                                </div>
+                                <div class="content"><span
+                                        class="message-title">Erro no campo {{ field.label }}.</span><span
+                                        class="message-body"> {{ error }}</span>
+                                </div>
+                                <div class="close">
+                                    <button class="br-button circle small" type="button"
+                                            aria-label="content"><i
+                                            class="fas fa-times" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
+                <button class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="editar-agendamento" name="editar-agendamento">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+                <a class="br-button secondary" id="remover-agendamento"><i
+                    class="fas fa-trash-alt" aria-hidden="true"></i> Remover</a>
+            </div>
+            <!-- /.card-footer -->
+        </form>
+        <input type="hidden" id="id_remocao_agendamento" name="id_remocao_agendamento" value=""/>
+    </div>
+</div> {% endcomment %}
+
+{% comment %} Modal de agendamento de atendimento {% endcomment %}
+{% include 'saude_atendimento/atendimento/includes/modal-agendamento-atendimento.html' %}
+
+<div class="row">
+    <div class="col-md">
+        <div class="br-card">
+            <div class="card-header pr-0 pl-0 pt-2">
+                <div class="d-flex">
+                    <div class="ml-3">
+                        <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                            <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da agenda médica" title="Ícone da agenda médica" style="display: block;">
+                            <span class="mt-1 ml-4" style="display: block;">AGENDAMENTOS</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="br-divider mt-1 divider-grid mb-3 col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+            </div>
+            <div class="card-content">
+                <form
+                    id="id_agenda_medica_busca_agendamentos_form"
+                    class="col-xl-12 col-lg-12 col-md-12 col-sm-12"
+                    method="get"
+                >
+                    {% csrf_token %}
+                    <div class="card-body">
+                        <div class="form-group row mt-2">
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                <div class="br-input">
+                                    <div class="br-input">
+                                        <label for="id_nome_paciente_filtro">Nome do Paciente</label>
+                                        <input
+                                            id="id_nome_paciente_filtro"
+                                            class="input-com-alfanumericas"
+                                            name="nome_paciente_filtro"
+                                            type="text"
+                                            maxlength="200"
+                                            value="{{nome_paciente_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2">
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                <div class="br-input">
+                                    <div class="br-input">
+                                        <label for="id_cpf_paciente_filtro">CPF</label>
+                                        <input
+                                        id="id_cpf_paciente_filtro"
+                                        class="mask-cpf"
+                                        name="cpf_paciente_filtro"
+                                        type="text"
+                                        maxlength="14"
+                                        value="{{cpf_paciente_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2">
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                <div class="br-input select-medico ">
+                                    <label for="id_medico_filtro">Médico</label>
+                                    <select
+                                            id="id_medico_filtro"
+                                            class="select-busca-grid campo-select"
+                                            name="medico_filtro" 
+                                            style="width: 100%"
+                                        >
+                                            <option value="">TODOS</option>
+                                            {% for medico in medicos %}
+                                                {% if medico_filtro == medico.id %}
+                                                    <option selected value="{{medico.id}}">{{medico.nome_profissional}} - CRM: {{medico.crm}}</option>
+                                                {% else %}
+                                                    <option value="{{medico.id}}">{{medico.nome_profissional}} - CRM: {{medico.crm}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2">
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                                <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                    <div class="br-input has-icon">
+                                        <label for="id_data_atendimento_filtro">Data</label>
+                                        <input
+                                            id="id_data_atendimento_filtro"
+                                            name="data_atendimento_filtro"
+                                            type="text"
+                                            placeholder="dd/mm/aaaa"
+                                            data-input="data-input"
+                                            value="{{data_atendimento_filtro}}"
+                                        >
+                                        <button class="br-button circle small" type="button" aria-label="Abrir Timepicker"
+                                                data-toggle="data-toggle" id="simples-input-btn"><i
+                                                class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                <div class="br-datetimepicker" data-mode="single" data-type="time">
+                                    <div class="br-input has-icon">
+                                        <label for="id_hora_atendimento_filtro">Hora</label>
+                                        <input
+                                            id="id_hora_atendimento_filtro"
+                                            name="hora_atendimento_filtro"
+                                            type="time"
+                                            placeholder="hh:mm"
+                                            data-input="data-input"
+                                            value="{{hora_atendimento_filtro}}"
+                                        >
+                                        <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="timepicker-input-btn"><i class="fas fa-clock" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer mt-6">
+                        {{ form.errors }}
+                        {% if medico_id %}
+                            <a href="{% url 'saude_atendimento:agenda_medica_medico_view' medico_id=medico_id %}" class="br-button secondary mr-3"><i class="fas fa-arrow-left" aria-hidden="true" hidden></i> Voltar</a>
+                        {% else %}
+                            <a href="{% url 'saude_atendimento:agenda_medica_view' %}" class="br-button secondary mr-3"><i class="fas fa-arrow-left" aria-hidden="true" hidden></i> Voltar</a>
+                        {% endif %}
+                        <button type="submit" class="br-button primary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                    <!-- /.card-footer -->
+                </form>
+            </div>
+            <div class="card-footer">
+            
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md">
+        <div class="br-card hover">
+          <div class="card-content">
+            <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                data-random="data-random">
+                <div class="table-header">
+                    <div>
+                        <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                    </div>
+                    <div class="top-bar mt-2">
+                        <div class="d-flex table-title">
+                            <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da agenda médica" title="Ícone da agenda médica" style="display: block; height: 20px;"> 
+                            <span class="ml-4" style="display: block;">Listagem de Agendamentos</span>
+                        </div>
+                    </div>
+                </div>
+                <table class="mt-2">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Paciente</th>
+                        <th>CPF</th>
+                        <th>Telefone</th>
+                        <th>Data/Hora</th>
+                        <th>Médico</th>
+                        <th>Observações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if agendamentos %}
+                        {% for agendamento in agendamentos %}
+                            <tr>
+                                <td data-th="Visualizar">
+                                    <a>
+                                        <i
+                                            class="fas fa-eye" 
+                                            aria-hidden="true">
+                                        </i>
+                                    </a>
+                                </td>
+                                <td data-th="Editar">
+                                    <a data-id-agendamento="{{ agendamento.id }}"  class="{% if agendamento.data_atendimento >= data_atual %}link-editar-agendamento{% endif %}">
+                                        <i
+                                            class="fas fa-edit {% if agendamento.data_atendimento < data_atual %}icone-desativado{% endif %}" 
+                                            aria-hidden="true">
+                                        </i>
+                                    </a>
+                                </td>
+                                <td data-th="Excluir">
+                                    <a data-id-dado="{{ agendamento.id }}" class="{% if agendamento.data_atendimento >= data_atual %}link-remover-dado{% endif %}"><i
+                                        class="fas fa-trash-alt {% if agendamento.data_atendimento < data_atual %}icone-desativado{% endif %}" aria-hidden="true"></i></a>
+                                </td>
+                                <td data-th="Nome do Paciente">{{ agendamento.nome_paciente }}</td>
+                                {% if agendamento.cpf_paciente %}
+                                    <td data-th="CPF do Paciente" class="mask-cpf">{{ agendamento.cpf_paciente }}</td>
+                                {% else %}
+                                    <td data-th="CPF do Paciente">Não informado</td>
+                                {% endif %}
+                                {% if agendamento.celular_paciente %}
+                                    <td data-th="Celular do Paciente" class="mask-telefone">{{ agendamento.celular_paciente }}</td>
+                                {% else %}
+                                    <td data-th="Celular do Paciente">Não informado</td>
+                                {% endif %}
+                                <td data-th="Data do Atendimento">{{ agendamento.data_atendimento }} às {{ agendamento.hora_inicio_atendimento }}</td>
+                                <td data-th="Médico">{{ agendamento.medico }}</td>
+                                <td data-th="Obserações">{{ agendamento.observacoes|default:"Não informado" }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                    {% endif %}
+                    </tbody>
+                </table>
+                {% comment %} Paginação {% endcomment %}
+                {% include 'dashboard/includes/paginacao.html' %}
+                {% comment %} <div class="table-footer">
+                    <nav class="br-pagination" aria-label="Paginação de resultados" data-total="50" data-current="1"
+                        data-per-page="20">
+                        <div class="pagination-per-page">
+                            <div class="br-select">
+                                <div class="br-input">
+                                    <label for="per-page-selection-random-77664">Exibir</label>
+                                    <input id="per-page-selection-random-77664" type="text" placeholder=" "/>
+                                    <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1"
+                                            data-trigger="data-trigger"><i class="fas fa-angle-down" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div class="br-list" tabindex="0">
+                                    <div class="br-item" tabindex="-1">
+                                        <div class="br-radio">
+                                            <input id="per-page-10-random-77664" type="radio" name="per-page-random-77664"
+                                                value="per-page-10-random-77664" checked="checked"/>
+                                            <label for="per-page-10-random-77664">10</label>
+                                        </div>
+                                    </div>
+                                    <div class="br-item" tabindex="-1">
+                                        <div class="br-radio">
+                                            <input id="per-page-20-random-77664" type="radio" name="per-page-random-77664"
+                                                value="per-page-20-random-77664"/>
+                                            <label for="per-page-20-random-77664">20</label>
+                                        </div>
+                                    </div>
+                                    <div class="br-item" tabindex="-1">
+                                        <div class="br-radio">
+                                            <input id="per-page-30-random-77664" type="radio" name="per-page-random-77664"
+                                                value="per-page-30-random-77664"/>
+                                            <label for="per-page-30-random-77664">30</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="br-divider d-none d-sm-block mx-3"></span>
+                        <div class="pagination-information d-none d-sm-flex"><span class="current">1</span>&ndash;<span
+                                class="per-page">20</span>&nbsp;de&nbsp;<span class="total">50</span>&nbsp;itens
+                        </div>
+                        <div class="pagination-go-to-page d-none d-sm-flex ml-auto">
+                            <div class="br-select">
+                                <div class="br-input">
+                                    <label for="go-to-selection-random-13292">Página</label>
+                                    <input id="go-to-selection-random-13292" type="text" placeholder=" "/>
+                                    <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1"
+                                            data-trigger="data-trigger"><i class="fas fa-angle-down" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div class="br-list" tabindex="0">
+                                    <div class="br-item" tabindex="-1">
+                                        <div class="br-radio">
+                                            <input id="go-to-1-random-13292" type="radio" name="go-to-random-13292"
+                                                value="go-to-1-random-13292" checked="checked"/>
+                                            <label for="go-to-1-random-13292">1</label>
+                                        </div>
+                                    </div>
+                                    <div class="br-item" tabindex="-1">
+                                        <div class="br-radio">
+                                            <input id="go-to-2-random-13292" type="radio" name="go-to-random-13292"
+                                                value="go-to-2-random-13292"/>
+                                            <label for="go-to-2-random-13292">2</label>
+                                        </div>
+                                    </div>
+                                    <div class="br-item" tabindex="-1">
+                                        <div class="br-radio">
+                                            <input id="go-to-3-random-13292" type="radio" name="go-to-random-13292"
+                                                value="go-to-3-random-13292"/>
+                                            <label for="go-to-3-random-13292">3</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="br-divider d-none d-sm-block mx-3"></span>
+                        <div class="pagination-arrows ml-auto ml-sm-0">
+                            <button class="br-button circle" type="button" aria-label="Voltar página"><i
+                                    class="fas fa-angle-left" aria-hidden="true"></i>
+                            </button>
+                            <button class="br-button circle" type="button" aria-label="Avançar página"><i
+                                    class="fas fa-angle-right" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </nav>
+                </div> {% endcomment %}
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% comment %} <form id="remover-dado-form" action="{% url 'saude_atendimento:agendamedica_delete' pk=1234 %}" method="POST">
+    {% csrf_token %}
+</form>
+<div class="br-scrim-util foco modal-notificao-usuario" id="modal-confirmacao-remocao" data-scrim="true">
+    <div class="br-modal">
+      <div class="br-modal-header"></div>
+      <div class="br-modal-body">
+        <div class="container-icone-atencao">
+            <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+            <p>Atenção!</p>
+        </div>
+        <p id="mensagem-confirmacao">Deseja realmente remover este agendamento?</p>
+        <div class="justify-content-center">
+            <button class="br-button primary" id="confirmacao-remocao" type="button" data-dismiss="scrimexample">Sim
+            </button>
+            <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" id="negacao-remocao" type="button">Não
+            </button>
+        </div>
+      </div>
+      <div class="br-modal-footer justify-content-center">
+      </div>
+    </div>
+</div> {% endcomment %}
+
+<div class="br-scrim-util foco modal-notificao-usuario" id="modal-confirmacao-remocao" data-scrim="true">
+    <div class="br-modal">
+      <div class="br-modal-header"></div>
+      <div class="br-modal-body">
+        <div class="container-icone-atencao">
+            <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+            <p>Atenção!</p>
+        </div>
+        <p></p>
+        <div class="justify-content-center">
+            <button class="br-button primary" id="confirmacao-remocao" type="button" data-dismiss="scrimexample">Sim
+            </button>
+            <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" id="negacao-remocao" type="button">Não
+            </button>
+        </div>
+      </div>
+      <div class="br-modal-footer justify-content-center">
+      </div>
+    </div>
+</div>
+{% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    let url_api_detalhe_agendamento = `{% url 'saude_atendimento:api_detalhe_agendamento' id='123' %}`;
+</script>
+
+<script src="{% static 'js/gerenciamento_modal_notificacao_usuarios.js' %}"></script>
+{% comment %} <script src="{% static 'js/scripts_agendamedica/gerenciamento_remocao_dados.js' %}"></script> {% endcomment %}
+
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script src="{% static 'js/mask.js' %}"></script>
+
+<script src="{% static 'js/utils_forms.js' %}"></script>
+
+<script src="{% static 'js/utils_requisoes.js' %}"></script>
+<script src="{% static 'js/scripts_agendamedica/gerenciamento_requisicoes_agendamentos.js' %}"></script>
+
+<script src="{% static 'js/scripts_agendamedica/gerenciamento_geral_agendamento.js' %}"></script>
+<script src="{% static 'js/scripts_agendamedica/gerenciamento_edicao_agendamento.js' %}"></script>
+
+<script src="{% static 'js/scripts_agendamedica/gerenciamento_busca_agendamedica.js' %}"></script>
+
+<script>
+    // const removerAgendamentoForm = document.getElementById("remover-agendamento-form")
+
+    // const removerDado = (mensagemConfirmacaoRemocao, remocaoDadoForm) => {
+    //     const acaoRemoverDado = document.querySelectorAll('.link-remover-dado');
+
+    //     acaoRemoverDado.forEach(elemento => {        
+    //         elemento.addEventListener('click', e => {
+    //             const callbackConfirmacao = () => {
+    //                 document.querySelector("#modal-confirmacao-remocao > .br-modal > .br-modal-body #confirmacao-remocao").removeEventListener('click', () => {
+
+    //                 })
+
+    //                 document.getElementById('modal-confirmacao-remocao').style.display = "none";
+
+    //                 const dadoID = elemento.getAttribute("data-id-dado");
+    //                 removerAgendamentoForm.action = removerAgendamentoForm.action.replace("1234", dadoID);
+                    
+    //                 removerAgendamentoForm.submit();
+    //             }
+                
+    //             confirmarRemocao(mensagemConfirmacaoRemocao, callbackConfirmacao);
+    //         })
+    //     })
+    // }
+
+    // removerDado(
+    //     "Deseja realmente remover este agendamento?",
+    //     removerAgendamentoForm
+    // );
+</script>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'dashboard/base/base_fixed.html' %}
+{% block title %}Painel{% endblock %}
+
+{% block header %}
+    {% if not user.deve_mudar_senha %}
+        {% include 'dashboard/includes/saude/header.html' %}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    {% include 'dashboard/includes/saude/menu-lateral.html' %}
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+
+{% block components-modal %}
+{% endblock %}
+
+{% block footer %}
+    {% include 'dashboard/includes/saude/footer.html' %}
+{% endblock %}
+
+{% block script %}
+{% endblock %}

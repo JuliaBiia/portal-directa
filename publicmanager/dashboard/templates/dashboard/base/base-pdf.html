@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>1GOV - {% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static '@govbr-ds/core/dist/core.css' %}"/>
+    <!-- Fontawesome-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"/>
+     <!-- Bootstrap 4.4.1 CSS -->
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    
+    <!-- responsividade -->
+    <link rel="stylesheet" href="{% static 'css/responsividade.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+    
+    <!-- Add icon library -->  
+    <style>
+        
+        .logo{ width:100%; }
+        .caption {text-align: center; margin-left: 10px;}
+        .caption-container {display: flex; align-items: center;}
+        table {width: 100%; border-collapse: collapse; margin-top: 20px;}
+        th, td { padding: 10px; text-align: left; border:none;}
+        .tr{border:none !important;}
+        .main-header {display: flex; align-items: center; justify-content: space-between;}
+        
+        tbody th, tbody td { background-color: #fff !important; }
+        .custom-col-width {width: 83.33333333%; margin-left: auto; margin-right: auto;}
+
+        @media print {
+            title, head {display: none;}
+            .logo{ padding-top:15px; }
+            @page {size: auto; margin: 0;}
+            body {margin: 0; padding: 0;}
+            .btn-secondary {display: none;}
+            .container{--grid-maxwidth: antiquewhite; border:none !important; }
+            .footer {background-color: #f8f8f8; position: absolute; bottom: 0; width: 96%;}
+        }
+    </style>
+    {% block css-extra-pdf %}
+    {% endblock %}
+</head>
+<body>
+
+    <div class="container" style="border: 1px solid #d9d9d9; margin-top:30px;">
+        <div class="header">
+            <tr>
+                <th colspan="8">
+                    <div class="card-content mt-3">
+                        <div class="row no-gutters">
+                            <div class="col-3">
+                                <img class="logo" src="{% static 'img/logo-1gov.png' %}" alt="Logo" >
+                            </div>
+                            <div class="col-6 text-center">
+                                <h5 class="mt-3"><b>PREFEITURA MUNICIPAL DE {%if unidade_saude %}{{unidade_saude.municipio.nome}}{% endif %} <br/><br/> {{title_relatorio}}</b></h5>
+                            </div>
+                            <div class="col-3 d-flex justify-content-end">
+                                {% if unidade_saude.logo %}
+                                    <img src="{{unidade_saude.logo.url}}" style="width:130px;"/>
+                                {% endif %}
+                                {% if title_relatorio == 'INFORMAÇÕES DO ATENDIMENTO MÉDICO' %}
+                                    
+                                {% else %}
+                                    <button onclick="window.print()" style="border-radius:20px; height:40px;" class="btn btn-secondary secondary mr-3" type="button" aria-label="Ícone ilustrativo">
+                                        <i class="fas fa-print" aria-hidden="true"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            <hr>
+        </div>
+        
+        <div class="container">
+            {% block contentpdf %}
+            {% endblock %}
+        </div>
+
+        {% if title_relatorio == 'INFORMAÇÕES DO ATENDIMENTO MÉDICO' %}
+        {% else %}
+        {% block footerpdf %}
+        <footer class="footer mb-3">
+            <hr style="border-top: 1px solid #333;">
+            <div class="text-center">
+                <p>{{unidade_saude}}, {{unidade_saude.municipio.nome}} - {{unidade_saude.estado.sigla}} <br/> Telefone: {{unidade_saude.telefone}}</p>                                        
+            </div>
+            <hr style="border-top: 1px solid #333;">
+            <div class="row">
+                <div class="col-6 text-left">
+                    <p>{{BASE_URL}}</p>
+                </div>
+                <div class="col-6 text-right">
+                    <p><span class="mr-2">< 1GOV ></span> Impresso em {{data_impressao}}</p>
+                </div>
+            </div>
+        </footer>
+        {% endblock %}
+        {% endif %}
+        
+        {% if title_relatorio == 'INFORMAÇÕES DO ATENDIMENTO MÉDICO' %}
+
+        {% else %}
+            <script type="text/javascript">
+                window.print()
+            </script>
+        {% endif %}
+
+    </div>
+
+</body>

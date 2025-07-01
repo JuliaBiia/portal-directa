@@ -1,0 +1,211 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="row">
+            <div class="col-lg-12 mb-4 order-0">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0 d-sm-inline-block">Adicionar Servidor</h5>
+                    </div>
+                    <form method="post" id="servidor_form">{% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="codigo">Pessoa Física</label>
+                                        {% render_field form.pessoa_fisica class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="codigo">Matrícula</label>
+                                        {% render_field form.matricula type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="codigo">Setor</label>
+                                        {% render_field form.setor class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="codigo">Data do Início do Serviço Público</label>
+                                        {% render_field form.data_inicio_servico_publico class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="codigo">Data do Início do Exercício na Instituição </label>
+                                        {% render_field form.data_inicio_exercicio_na_instituicao class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="codigo">Data de Posse na Instituição</label>
+                                        {% render_field form.data_posse_na_instituicao class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Data de Posse no Cargo</label>
+                                        {% render_field form.data_posse_no_cargo class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Data de Início no Cargo</label>
+                                        {% render_field form.data_inicio_exercicio_no_cargo class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Data do Fim do Serviço na Instituição</label>
+                                        {% render_field form.data_fim_servico_na_instituicao class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-5">
+                                    <div class="br-input">
+                                        <label for="descricao">E-mail Institucional</label>
+                                        {% render_field form.email_institucional type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Cargo</label>
+                                        {% render_field form.cargo_emprego class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Data de Ocupação do Cargo</label>
+                                        {% render_field form.cargo_emprego_data_ocupacao class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Data de Saída do Cargo</label>
+                                        {% render_field form.cargo_emprego_data_saida class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Situação</label>
+                                        {% render_field form.situacao class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-2 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Jornada de Trabalho</label>
+                                        {% render_field form.jornada_trabalho class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Função</label>
+                                        {% render_field form.funcao class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Data de Ocupação na Função</label>
+                                        {% render_field form.funcao_data_ocupacao class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Data de Saída da Função</label>
+                                        {% render_field form.funcao_data_saida class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Regime Jurídico</label>
+                                        {% render_field form.regime_juridico class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Nível de Escolaridade</label>
+                                        {% render_field form.nivel_escolaridade class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Seção do Título</label>
+                                        {% render_field form.titulo_secao type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Setor em Exercício</label>
+                                        {% render_field form.setor_exercicio class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Data de Ocupação no Setor</label>
+                                        {% render_field form.setor_lotacao_data_ocupacao class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            {{ form.errors }}
+                            <input type="submit" class="br-button primary mr-3" value="Cadastrar">
+                            <a href="{% url 'servidor_list' %}" class="br-button">Cancelar</a>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/setor.js' %}"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+    <script src="{% static 'js/jquery.mask.min.js' %}"></script>
+    <script src="{% static 'js/mask.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'admin/change_list.html' %}
+
+
+{% block extrastyle %}
+    {{ block.super }}
+    {% load static %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/widgets.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/base.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}">
+    
+<style>
+    .btn:hover{
+        cursor: pointer;
+    }
+    #export{
+        margin-top: -10px;
+
+    }
+    @media (max-width: 767px){
+        #addlink {
+            display: none;
+        }
+        #export{
+            margin-top: 0px;
+    
+        }
+    }
+    
+</style>    
+{% endblock extrastyle %}
+    
+
+{% block object-tools %}
+    {{ block.super }}
+    <ul class="object-tools">
+        <li id="export">
+            <form action="{% url 'saude_atendimento:exportar_relatorio_atendimentos' %}?{{ request.GET.urlencode }}" method="POST" style="display: inline;">
+                {% csrf_token %}
+                <input type="submit" class="addlink" value="Exportar Atendimentos">
+            </form>
+        </li>
+        <li id="addlink">
+            <a href="/admin/saude_atendimento/atendimentomedico/add/?_changelist_filters=q%3D" class="addlink">
+                Adicionar Atendimento Médico
+            </a>
+        </li>
+    </ul>
+{% endblock %}

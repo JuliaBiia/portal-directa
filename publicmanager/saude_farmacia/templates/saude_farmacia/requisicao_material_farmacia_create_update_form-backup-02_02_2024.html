@@ -1,0 +1,214 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col-md">
+                <div class="br-card">
+                    <div class="card-header pr-0 pl-0">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="d-flexflex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                                    <img src="{% static 'img/icons/icone-requisicao-material-farmacia-grid.svg' %}" alt="Ícone do requisição de material da farmácia" title="Ícone do requisição de material da farmácia" style="display: block;">
+                                    <span class="mt-1 ml-4 text-weight-semi-bold text-up-02" style="display: block;">ADICIONAR MATERIAL</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                    </div>
+                    <div class="card-content pt-0">
+                        <form id="id_requisicao_material_farmacia_form" method="post">{% csrf_token %}
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                                        <div class="br-input">
+                                            <label for="codigo">Número do Pedido</label>
+                                            {% if object %}
+                                                {% render_field form.numero_pedido disabled="True" type="search" class="form-control" %}
+                                            {% else %}
+                                                <input type="search" name="numero_pedido" disabled="True"
+                                                for="basic-default-fullname" class="form-control" required=""
+                                                id="id_numero_pedido" value={{ numero }}>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1">
+                                            <label for="codigo">Farmacêutico(a)
+                                                Solicitante</label>
+                                                {% render_field form.farmaceutico_solicitante class="campo-select" disabled="True" %}
+                                    </div>
+                                    <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1">
+                                            <label for="codigo">Data da Solicitação</label>
+                                            {% if object %}
+                                                <input type="text" name="data_solicitacao_visualizacao" id="id_data_solicitacao_visualizacao" value="{{requisicao_material_farmacia.data_solicitacao|date:'d/m/Y H:i'}}">
+                                            {% else %}
+                                                <input type="text" name="data_solicitacao_visualizacao" id="id_data_solicitacao_visualizacao" value="{{data_atual|date:'d/m/Y H:i'}}">
+                                            {% endif %}
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1">
+                                        <label for="codigo">Farmácia</label>
+                                        {% render_field form.farmacia class="campo-select" for="basic-default-fullname" type="search" %}
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1">
+                                        {% if object %}
+                                            <input type="hidden" id="id_status" name="status" value="{{requisicao_material_farmacia.status}}">
+                                        {% else %}
+                                            <input type="hidden" id="id_status" name="status" value="0">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <h4>Adicionar Medicamentos à Requisição</h4>
+                                <div class="form-group row" style="display: flex; align-items: center;">
+                                    <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1">
+                                        <label for="codigo">Medicamento</label>
+                                        {% render_field medicamento_form.medicamento class="campo-select" for="basic-default-fullname" type="search" %}
+                                    </div>
+                                    <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2" style="margin: 0 10%;">
+                                        <label for="codigo">QTD</label>
+                                        {% render_field medicamento_form.quantidade_medicamento class="form-control" for="basic-default-fullname" type="search" %}
+                                    </div>
+                                    <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1">
+                                        <label for="codigo">Unidade</label>
+                                        {% render_field medicamento_form.unidade_medicamento class="campo-select" for="basic-default-fullname" type="search" %}
+                                    </div>
+                                    <div class="col-sm-1 mb-1" style="margin-top: 2px;">
+                                        <button
+                                            type="button"
+                                            
+                                            onclick="adicionarMedicamento()"
+                                            
+                                            style="background: #480992; border:  none;float: right;width: 30px;height: 30px;border-radius: 100%;"
+                                        >
+                                            <span style="font-size: 40px;position: relative;bottom: 19px; color: #75ce6f;">+</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4>Adicionar Insumos à Requisição</h4>
+                                <div class="form-group row">
+                                    <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1">
+                                        <label for="codigo">Insumo</label>
+                                        {% render_field insumo_form.insumo class="campo-select" for="basic-default-fullname" type="search" %}
+                                    </div>
+                                    <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2" style="margin: 0 10%;">
+                                        <label for="codigo">QTD</label>
+                                        {% render_field insumo_form.quantidade_insumo class="form-control" for="basic-default-fullname" type="search" %}
+                                    </div>
+                                    <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1">
+                                        <label for="codigo">Unidade</label>
+                                        {% render_field insumo_form.unidade_insumo class="campo-select" for="basic-default-fullname" type="search" %}
+                                    </div>
+                                    <div class="col-sm-1 mb-1">
+                                        <button type="button" onclick="adicionarInsumo()" style="background: #480992;/* border-color: #480992; */border:  none;float: right;width: 30px;height: 30px;border-radius: 100%;position: relative;top: 24px;">
+                                            <span style="font-size: 40px;position: relative;bottom: 19px;/* left: 0px; */color: #75ce6f;">+</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="container-materiais-adicionados" style="display: none;">
+
+                                </div>
+                                <div class="card">
+                                    <h5 class="card-header">Materiais Adicionados</h5>
+                                    <div class="table-responsive text-nowrap" id="tabelaMateriais">
+                                        <table class="table table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Material</th>
+                                                <th>Tipo do Material</th>
+                                                <th>Quantidade</th>
+                                                <th>Unidade</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="table-border-bottom-0" id="tabela_materiais">
+                                                <tr>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="id_farmaceutico_solicitante_hidden" name="farmaceutico_solicitante_hidden" value="{{farmaceutico_solicitante.id}}">
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                {{ form.errors }}
+                                <input type="submit" class="br-button primary mr-3" value="Cadastrar">
+                                <a href="{% url 'saude_farmacia:requisicao_material_farmacia_list' %}" class="br-button">Cancelar</a>
+                            </div>
+                            <!-- /.card-footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/utils_forms.js' %}"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/gerenciamento_modal_notificacao_usuarios.js' %}"></script>
+
+<script src="{% static 'js/requisicao.js' %}"></script>
+
+<script>
+    function adicionarMedicamento() {
+        // appendMedicamento();
+        // converterParaSelect2();
+        // aplicarEstilizacaoPadraoSelec2();
+
+        dadosMaterial = {
+            "id": $("#id_medicamento").val(),
+            "valor": $("#id_medicamento option:selected").text(),
+            "quantidade": $("#id_quantidade_medicamento").val(),
+            "unidade": $("#id_unidade_medicamento").val(),
+            "tipo": "Medicamento",
+        };
+
+        adicionarMaterial(dadosMaterial);
+    }
+
+    function adicionarInsumo() {
+        // appendInsumo();
+        // converterParaSelect2();
+        // aplicarEstilizacaoPadraoSelec2();
+
+        dadosMaterial = {
+            "id": $("#id_insumo").val(),
+            "valor": $("#id_insumo option:selected").text(),
+            "quantidade": $("#id_quantidade_insumo").val(),
+            "unidade": $("#id_unidade_insumo").val(),
+            "tipo": "Insumo",
+        };
+
+        adicionarMaterial(dadosMaterial);
+    }
+
+    mudarOptionSelected(
+        document.getElementById("id_farmaceutico_solicitante"),
+        document.getElementById("id_farmaceutico_solicitante_hidden").value
+    )
+    
+    document.getElementById("id_requisicao_material_farmacia_form").addEventListener('submit', e => {
+        document.getElementById("id_numero_pedido").removeAttribute("disabled");
+        document.getElementById("id_farmaceutico_solicitante").removeAttribute("disabled");
+    })
+
+</script>
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+
+{% load static %}
+
+{% block title %}Rastreamento de Pacientes{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+    <link rel="stylesheet" href="{% static 'libs/select2/css/select2.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+    <style>
+        .br-tag {font-size: 15px; width: 255px !important; height: 35px;}
+        .tag-amarelo { background-color: #eae451; }
+        .tag-azul { background-color: #4c9fe4; }
+        .tag-verde { background-color: #3ec86d; }
+        .tag-laranja { background-color: #ff9d29; }
+        .tag-roxo { background-color: #5942D2; }
+        .tag-cinza { background-color: #999; }
+        .tag-vermelho { background-color: #e52207; }
+        .tag-preto { background-color: rgba(0, 0, 0, 0.9); }
+        .table-responsive {overflow: visible !important; z-index: 10 !important;}
+        .spinner {width: 50px; height: 50px; border: 5px solid rgba(0, 0, 139, 0.3); border-top: 5px solid var(--interactive-light); border-radius: 50%; animation: spin 1s linear infinite; margin-left: 50%;}
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<template>
+    <div class="container-lg">
+        <div class="row">
+            <div class="col-md">
+                <div class="br-card">
+
+                    <div class="card-header">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="text-weight-semi-bold text-up-02 color-title font-size24"><i class="fa-solid fa-search mr-1"></i>RASTREAMENTO DE PACIENTES</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <div class="card-content">
+                        <form class="box-wdth-search" id="formSubmit">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-xl-8 col-lg-8 col-xxl-8 col-md-8 col-sm-12">
+                                        <div class="br-input">
+                                            <label for="id_nome">Busca pelo Paciente</label>
+                                            <input type="text" name="buscar_nome" maxlength="255" v-model="pacienteNome" class="form-control input-com-alfanumericas" value="{{buscar_nome}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-xl-4 col-xxl-4 col-md-4 col-sm-12 col-right-search">
+                                        <label for="tipo-select">Opções pelo Local</label>
+                                        <select id="tipo-select" name="tipo" class="form-control">
+                                            <option value="" selected>Selecione o Local</option>
+                                            <template v-if="locais.length > 0">
+                                                <option v-for="local in locais" :value="local.tag">${local.nome}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer mt-4">
+                                <button class="br-button primary ml-n15" type="button" @click="getRestreioPacientes()"><i class="fas fa-search"></i> Buscar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md">
+
+                <div class="br-card hover" id="cardundefined">
+                    <div class="card-content">
+                        <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                            
+                            <div class="table-header mt-n10 white"><h4 class="ml-2 color-title" style="font-size:16px;"><i class="fa-solid fa-search"></i> RASTREAMENTO DE PACIENTES NA UNIDADE</h4></div>
+                            <div class="responsive">
+                                <table class="table table-responsive mt-2">
+                                    <thead class="mt-2">
+                                        <tr>
+                                            <th style="width:8%;"></th>
+                                            <th style="width:25%;"><b>Paciente</b></th>
+                                            <th style="width:20%;"><b>Local</b></th>
+                                            <th><b>Situação</b></th>
+                                            <th><b>Data/Hora entrada</b></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="5" style="background-color: #00b0e4; color: #fff;"></td>
+                                        </tr>
+                                        <tr v-if="carregando">
+                                            <td class="text-center" colspan="5" style="padding: 50px;"><div class="spinner"></div></td>
+                                        </tr>
+                                        <template v-if="!carregando && listagemRestreioPacientes.length > 0">
+                                            <tr v-for="rastreio in listagemRestreioPacientes">
+                                                <td class="hgt-75">
+                                                    <a :href="rastreio.url" class="br-button primary small" type="button" style="width:115px; font-size:15px; margin-top:2px;"><i class="fa-solid fa-list-ul font-size18"></i>&nbsp; Listagem</a>
+                                                </td>
+                                                <td data-th="Nome do paciente">${rastreio.paciente}</td>
+                                                <td data-th="Setor">${rastreio.local}</td>
+                                                <td data-th="Situação">
+                                                    <span v-if="rastreio.situacao === 'medicacao_vacina'" class="br-tag small tag-cinza">MEDICAÇÃO</span>
+                                                    <span v-else-if="rastreio.situacao === 'classificacao_risco'" class="br-tag small tag-laranja">CLASSIFICAÇÃO DE RISCO</span>
+                                                    <span v-else-if="rastreio.situacao === 'em_atendimento'" class="br-tag small tag-azul">EM ATENDIMENTO MÉDICO</span>
+                                                    <span v-else-if="rastreio.situacao === 'lista_chamada'" class="br-tag small">PACIENTE EM ESPERA</span>
+                                                    <span v-else-if="rastreio.situacao === 'espera_chamada_atendimento'" class="br-tag small">AGUARDANDO ATENDIMENTO</span>
+                                                    <span v-else-if="rastreio.situacao === 'lista_retorno'" class="br-tag small">LISTA DE RETORNO</span>
+                                                    <span v-else-if="rastreio.situacao === 'retorno'" class="br-tag small">CHAMADA DE RETORNO</span>
+                                                    <span v-else-if="rastreio.situacao === 'em_atendimento_retorno'" class="br-tag small">EM ATENDIMENTO DE RETORNO</span>
+                                                    <span v-else-if="rastreio.situacao === 'em_espera'" class="br-tag small">EM ESPERA</span>
+                                                    <span v-else class="br-tag small tag-verde">${rastreio.situacao}</span>
+                                                </td>
+                                                <td data-th="Data e hora da entrada">${rastreio.data_hora_entrada}</td>
+                                            </tr>
+                                        </template>
+                                        <template v-else-if="!carregando && listagemRestreioPacientes.length === 0">
+                                            <tr>
+                                                <td colspan="5" style="text-align: center;">Não encontramos nenhum dado para a pesquisa realizada!</td>
+                                            </tr>
+                                        </template>
+                                    </tbody>    
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/moment.locale.min.js' %}"></script>
+<script src="{% static 'libs/select2/js/select2.min.js' %}"></script>
+<script src="{% static 'libs/select2/js/select2-pt-BR.js' %}"></script>
+<script>
+    moment.locale('pt-br');
+
+    var app = new Vue({
+        delimiters: ['${', '}'],
+        el: '#base-vue',
+        data: {
+            unidadeSaudeId: '{{unidade_saude.id}}',
+            listagemRestreioPacientes: [],
+            carregando: false,
+            pacienteNome: '',
+            locais: [],
+            localSelecionado: '',
+        },
+        methods: {
+            getRestreioPacientes(initial=false){
+                this.carregando = true;
+                axios.get(`{% url 'saude_atendimento:api_rastrear_pacientes' %}?unidade_saude_id=${this.unidadeSaudeId}&paciente_nome=${this.pacienteNome}&local=${this.localSelecionado}`)
+                .then((response)=>{
+                    this.listagemRestreioPacientes = response.data
+                    
+                    if(initial){
+                        const locaisUnicos = [...new Set(response.data.map(item => item.local))];
+                        this.locais = locaisUnicos.map(local => {
+                            const item = response.data.find(i => i.local === local);
+                            return { tag: item.local_tag, nome: item.local };
+                        });
+                    }
+                }).finally(() => {
+                    this.carregando = false;
+                });
+            },
+        },
+        mounted(){
+            self = this;
+            this.getRestreioPacientes(true);
+
+            setInterval(() => {
+                this.getRestreioPacientes();
+            }, 30000); // 3o segundos
+
+            $("#tipo-select").select2({
+                language: "pt-BR",
+                placeholder: "Selecione o Local",
+                allowClear: true,
+                minimumResultsForSearch: Infinity,
+                width: "100%",
+            }).on('select2:select', function(e) {
+                self.localSelecionado = e.params.data.id
+            }).on('select2:unselect', function(e) {
+                self.localSelecionado = '';
+            });
+
+            $('.select2-container--default .select2-selection--single').css({
+                "height": "42px",
+                "border": "1px solid rgb(131 133 136)",
+                "display": "flex",
+                "align-items": "center"
+            });
+
+            $('.select2-container--default .select2-selection--single .select2-selection__arrow').css({
+                "top": "18px",
+                "height": "32px",
+                "width": "32px",
+                "margin-top": "-15px",
+                "margin-right": "4px"
+            });
+
+            $('.select2-container--default .select2-selection--single .select2-selection__arrow b').css({
+                "border": "none"
+            });
+        }
+    });
+</script>
+{% endblock %}

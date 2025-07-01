@@ -1,0 +1,585 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load static %}
+{% block title %}{% if object %}Editar{% else %}Adicionar{% endif %} Classificação de Risco{% endblock %}
+{% load widget_tweaks %}
+{% load custom_filters %}
+{% load saude_extras%}
+
+{% block css %}
+    <link rel="stylesheet" href = "{% static 'css/responsividade_tb.css' %}">
+    <link rel="stylesheet" href = "{% static 'css/responsividade.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+    <style>
+        input{ height:41px !important; margin-top:7px !important;" }
+        textarea{ margin-top:7px !important;" }
+        .avatar-tb{margin-right: -20% !important;}
+    </style> 
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-lg">
+
+        {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+        <div class="br-card mt-2">
+
+            <div class="card-header">
+                <div class="row ml-1">
+                    <div class="col-title-classificacao-left"> 
+                        <div class="text-weight-semi-bold text-up-02 color-title pdt-10 font-size18 fontsize15-w"><i class="fa-solid fa-stethoscope font-size20"></i> {% if object %}EDITAR{% else %}ADICIONAR{% endif %} CLASSIFICAÇÃO DE RISCO</div>
+                    </div>
+                    <div class="col d-flex justify-content-end align-items-center">
+                        <a href="{% url 'saude_atendimento:anamnese_update' pk=object_paciente.anamnese_paciente_id %}?modulo=urgencia&boletim={{boletim.id}}" class="br-button success mr-2 hidden-xs hidden-tb" title="Anamnese">
+                            <i class="fas fa-heartbeat" style="font-size:20px;"></i>
+                        </a> 
+                        <a href="{% url 'saude_atendimento:classificacao_risco_list' %}" class="br-button secondary ml-2 mr-4 hidden-xs hidden-tb">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <hr style="border-color:#f2f2f2;">
+
+            <div class="card-content mt-3">
+                <div class="container-lg">
+                    <div class="row no-gutters">
+                        
+                        <div class="box-paciente-01">
+                            <div class="br-avatar mr-3" title="{{object_paciente.paciente_nome}}">
+                                {% if object_paciente.foto_paciente %}
+                                <div class="widthp75-tb">
+                                    <img src="{{object_paciente.foto_paciente.url}}" class="img-title" alt="Avatar"/>
+                                    <div id="progress" class="progress-img"></div>
+                                </div>
+                                {% else %}
+                                    <div class="widthp100-tb avatar-tb">
+                                        <span class="br-avatar large" style="margin-top: 5px;"><span class="content"><i class="fas fa-user" aria-hidden="true"></i></span></span>
+                                        <div id="progress" class="progress-img"></div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="box-paciente-02" style="text-align:left !important;">
+                            <hr class="visible-xs">
+
+                            <div class="ml-23 font-size17">
+                                <div class="row">
+                                    <div class="col-title-paciente-left">
+                                        <span class="color-title">Paciente:</span>
+                                    </div>
+                                    <div class="col-title-paciente-right">
+                                        <span class="capslock">{{object_paciente.nome_paciente}}</span>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-10">
+                                    <div class="col-title-paciente-left">
+                                        <span class="color-title">Sexo:</span>
+                                    </div>
+                                    <div class="col-title-paciente-right">
+                                        <span class="capslock">{{object_paciente.get_sexo_display}}</span>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-10">
+                                    <div class="col-title-paciente-left">
+                                        <span class="color-title">CPF:</span>
+                                    </div>
+                                    <div class="col-title-paciente-right">
+                                        <span class="capslock">{{ object_paciente.cpf|format_cpf }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-10">
+                                    <div class="col-title-paciente-left">
+                                        <span class="color-title">SUS:</span>
+                                    </div>
+                                    <div class="col-title-paciente-right">
+                                        <span class="capslock">{{ object_paciente.cartao_sus }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-10">
+                                    <div class="col-title-paciente-left">
+                                        <span class="color-title">Idade:</span>
+                                    </div>
+                                    <div class="col-title-paciente-right">
+                                        <span class="capslock">{{object_paciente.calcular_idade}}</span>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-20">
+                                    <div class="col-title-paciente-left">
+                                        <span class="color-title" id="bottom-situacao">Situação:</span>
+                                    </div>
+                                    <div class="col-title-paciente-right">
+                                        <span class="capslock bold ml-20-w">{{lista_chamada_classificacao.get_situacao_display}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="box-paciente-03 hidden-xs hidden-tb">
+                            <p class=""><i class="fa-solid fa-clock-rotate-left color-title"></i> Último atendimento:</p>
+                            <div class="br-message warning" style="background-color:#ebebeb; border-radius:10px; margin-top:-10px;">
+                                <div class="content">
+                                    {% if ultimo_atendimento %}
+                                    <div class="row">
+                                        <div class="col-md-auto">
+                                            <p><b>{{ultimo_atendimento.data_entrada}}</p>
+                                        </div>
+                                        <div class="col">
+                                            <div class="progress-img-sm"></div>
+                                        </div>
+                                    </div>
+                                    <p>{{ultimo_atendimento.boletim_classificacao_risco_set.queixa_principal}}</p>
+                                    <p>Médico: 
+                                        {% for dados in ultimo_atendimento.boletim_classificacao_risco_set.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.profissionais.all %}
+                                            {{dados.nome_profissional}}
+                                        {% endfor %}
+                                    </p>
+                                    {% else %}
+                                        <div class="" style="height:110px;">
+                                            <p style="padding-top:35px; text-align:center; font-size:15px;">Ainda não à registros de atendimento para esse paciente nessa unidade.</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="br-card mt-3">
+            <div id="focus-container-topo" class="container col-xl-12 col-lg-12 col-md-12 col-sm-12" style="margin:0 auto;">
+                <div style="color:white;">.</div>
+                <div class="" style=" border-radius:10px;">
+                    <form method="post" style="margin:0 auto; width:95%;" onsubmit="return validarFormulario()">
+                        {% csrf_token %}
+                        {{ form.media.js }}
+
+                        <div class="card-body mt-20-nmb">
+                           
+                            <fieldset class="mt-5" style="position: relative;">
+                                    <div class="mt-n30 row">
+                                        <div class="col-md-auto">
+                                            <h5 class="ml-1 color-title font-size19">ESTADO GERAL</h5>
+                                        </div>
+                                        <div class="col">
+                                            <span class="br-divider col-xl-12 col-lg-12 col-md-12 col-sm-12 mt-6 mt-20-nmb" style="border: 1px solid #0459A1;"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="container-campos col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                        <div class="form-group row mt-2">
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                                <div class="br-input mt-3">
+                                                    <label for="id_data">Data de Entrada:</label>
+                                                    <input type="text" name="data" class="form-control" value="{{data_atual|date:'d/m/Y'}}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                                <div class="br-input mt-3">
+                                                    <label for="id_hora">Hora</label>
+                                                    <input type="text" name="hora" class="form-control" value="{{data_atual|time:'H:i'}}" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="focus-container-queixa" class="form-group row mt-3">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                                <div class="br-textarea">
+                                                    <label for="{{ form.queixa_principal.id_for_label }}">Queixa Principal: <span class="text-danger campo-obrigatorio">(Obrigatório)</span></label>
+                                                    <textarea class="input-com-alfanumericas campo-obrigatorio-input input-border capslock" placeholder="Digite a queixa" type="text" id="{{ form.queixa_principal.auto_id }}" name="{{ form.queixa_principal.name }}">{{ form.queixa_principal.value|default:"" }}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mt-3">
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                                <div class="br-input">
+                                                    <label for="id_escala_dor">Escala de Dor: <span class="text-danger campo-obrigatorio">(Obrigatório)</span></label>
+                                                    <select name="escala_dor" id="id_escala_dor" class="campo-select" style="width: 100%" required="required">
+                                                        <option value="">Selecione uma opção</option>
+                                                        {% for value, text in form.escala_dor.field.choices %}
+                                                            {% if value != "" %}
+                                                                <option value="{{ value }}" {% if form.escala_dor.value == value %}selected{% endif %}>{{ text }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                                <div class="br-input">
+                                                    <label for="id_estado_geral">Estado Geral: <span class="text-danger campo-obrigatorio">(Obrigatório)</span></label>
+                                                    <select name="estado_geral" id="id_estado_geral" class="campo-select" style="width: 100%" required="required">
+                                                        <option value="">Selecione uma opção</option>
+                                                        {% for value, text in form.estado_geral.field.choices %}
+                                                            {% if value != "" %}
+                                                                <option value="{{ value }}" {% if form.estado_geral.value == value %}selected{% endif %}>{{ text }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="" class="form-group row mt-3">
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                                <div class="br-input">
+                                                    <label for="id_peso">Peso:</label>
+                                                    {% render_field form.peso placeholder='Ex.: 80,000 KG' type="text" class="input-com-alfanumericas mask-peso" maxlength="7" %}
+                                                    {% if form.peso.errors %}
+                                                        {% for error in form.peso.errors %}
+                                                        <p class="text-danger">
+                                                            {{ error|escape }}
+                                                        </p>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                                <div class="br-input">
+                                                    <label for="id_altura">Altura:</label>
+                                                    {% render_field form.altura placeholder='Ex.: 1.85 m' type="text" class="input-com-alfanumericas mask-altura" maxlength="4" %}
+                                                    {% if form.altura.errors %}
+                                                        {% for error in form.altura.errors %}
+                                                        <p class="text-danger">
+                                                            {{ error|escape }}
+                                                        </p>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mt-3">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                                <div class="br-textarea">
+                                                    <label for="{{ form.observacao.id_for_label }}">Observação:</label>
+                                                    <textarea placeholder="Digite a observação" class="input-com-alfanumericas input-border capslock" type="text" id="{{ form.observacao.auto_id }}" name="{{ form.observacao.name }}">{{ form.observacao.value|default:"" }}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </fieldset>
+
+                            <fieldset class="mt-5">
+                                <div class="mt-n30 row">
+                                    <div class="col-md-auto">
+                                        <h5 class="ml-1 color-title font-size19">SINAIS VITAIS</h5>
+                                    </div>
+                                    <div class="col">
+                                        <span class="br-divider col-xl-12 col-lg-12 col-md-12 col-sm-12 mt-6 mt-20-nmb" style="border: 1px solid #0459A1;"></span>
+                                    </div>
+                                </div>
+
+                                <div class="container-campos MT-4 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                        <div class="form-group row">
+                                            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                                <div class="br-input mt-3">
+                                                    {{ form.presao_arterial.vale }}
+                                                    <label for="{{ form.presao_arterial.id_for_label }}" class="visible-tb3 visible-xs">
+                                                        PA: <a href="javascript:void(0);" data-tooltip-text="Pressão Arterial:">
+                                                        <i class="fas fa-exclamation-circle"></i></a>
+                                                    </label>
+                                                    <label for="{{ form.presao_arterial.id_for_label }}" class="hidden-tb3">Pressão Arterial:</label>
+                                                    {% render_field form.presao_arterial placeholder='Ex.: 120/80 mmHg' type="text" class="input-com-alfanumericas mask-pressao-arterial" %}
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                                <div class="br-input mt-3">
+                                                    <label for="{{ form.frequencia_cardiaca.id_for_label }}" class="visible-tb3 visible-xs">
+                                                        FC: 
+                                                        <a href="javascript:void(0);" data-tooltip-text="Frequência Cardíaca:"><i class="fas fa-exclamation-circle"></i></a>
+                                                    </label>
+                                                    <label for="{{ form.frequencia_cardiaca.id_for_label }}" class="hidden-tb3">Frequência Cardíaca:</label>
+                                                    {% render_field form.frequencia_cardiaca placeholder="Ex.: 90 bpm" type="text" class="input-com-alfanumericas mask-frequecia-cardiaca" %}
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                                <div class="br-input mt-3">
+                                                    <label for="id_frequencia_respiratoria" class="visible-tb3 visible-xs">FR: <a href="javascript:void(0);" data-tooltip-text="Frequência Respiratória:">
+                                                        <i class="fas fa-exclamation-circle"></i>
+                                                    </a></label>
+                                                    <label for="id_frequencia_respiratoria" class="hidden-tb3">Frequência Respiratória:</label>
+                                                    {% render_field form.frequencia_respiratoria placeholder='Ex.: 20 rpm' type="text" class="input-com-alfanumericas mask-frequecia-cardiaca" %}
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                                <div class="br-input mt-3">
+                                                    <label for="id_temperatura" class="visible-tb3 visible-xs">Temp: <a href="javascript:void(0);" data-tooltip-text="Temperatura">
+                                                        <i class="fas fa-exclamation-circle"></i>
+                                                    </a></label>
+                                                    <label for="id_temperatura" class="hidden-tb3">Temperatura:</label>
+                                                    {% render_field form.temperatura placeholder='Ex.: 36,5 °C' type="text" class="input-com-alfanumericas mask-temperatura" %}
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                                <div class="br-input mt-3">
+                                                    <label for="id_spo2">SpO2:</label>
+                                                    {% render_field form.spo2 placeholder='Ex.: 95%' type="text" %}
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                                <div class="br-input mt-3">
+                                                    <label for="id_hgt">HGT:</label>
+                                                    {% render_field form.hgt placeholder='Ex.: 90 mg/dL' type="text" %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </fieldset>
+                           
+                            <div class="button-container mt-5 d-flex justify-content-center">
+                                <div class="row">
+                                    <div class="col-md">
+
+                                        {% for choice in tipo_classificacao_risco %}
+                                                <button id="btn-{{choice.pk}}" data-type="{{choice.get_cor_display}}"
+                                                    class="btn-tipo-classificacao mt-15-w width95-tb mt-15-tb br-button br-button-personalizado ml-3 btn-{% if choice.get_cor_display == 'AZUL' %}azul{% elif choice.get_cor_display == 'VERDE' %}verde{% elif choice.get_cor_display == 'AMARELO' %}amarelo{% elif choice.get_cor_display == 'LARANJA' %}laranja{% elif choice.get_cor_display == 'VERMELHO' %}vermelho{% endif %}" type="button" style="height: 74px; width:160px; text-transform: uppercase; border-radius:4px;"
+                                                    onclick="selectClassificacao(this, '{{forloop.counter0}}', '{{choice.pk}}')"
+                                                >
+                                                {{choice.get_tipo_display}}
+                                                </button>
+                                        {% endfor %}
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="container d-flex justify-content-center mt-4">
+                                <span id="mensagem-erro-seletor-urgencia" style="color: red;"></span>
+                            </div>
+
+                            <!-- tipo atendimento -->
+                            <fieldset class="mt-25" style="position: relative;">
+                                <div class="mt-n30 row">
+                                    <div class="col-md-auto">
+                                        <h5 class="ml-1 color-title font-size19">TIPO ATENDIMENTO</h5>
+                                    </div>
+                                    <div class="col">
+                                        <span class="br-divider col-xl-12 col-lg-12 col-md-12 col-sm-12 mt-6 mt-20-nmb" style="border: 1px solid #0459A1;"></span>
+                                    </div>
+                                </div>
+
+                                <div class="d-inline-block mr-5 mt-3">
+                                    <div class="br-radio">
+                                    <input id="h-radio-1" type="radio" name="tipo_fluxo" value="0" checked/>
+                                    <label for="h-radio-1" style="color:black !important;">Atendimento de Urgência</label>
+                                    </div>
+                                </div>
+                                <div class="d-inline-block mr-5">
+                                    <div class="br-radio">
+                                    <input id="h-radio-2" type="radio" name="tipo_fluxo" value="1"/>
+                                    <label for="h-radio-2" style="color:black !important;">Procedimento Ambulatorial</label>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                        </div>
+
+                        <div class="mt-40 ml-15">
+                            {% if not object %}
+                                <input type="hidden" name="paciente" value="{{ object_paciente.pk }}">
+                                <input type="hidden" name="boletim" value="{{ boletim.pk }}">
+                            {% endif %}
+
+                            <input type="hidden" id="id_tipo_classificacao_risco" name="tipo_classificacao_risco" value="">
+                            <input type="hidden" name="data_hora_avaliacao" value="{{ data_atual|date:'Y-m-d H:i' }}">
+
+                            <input type="hidden" name="acao" id="acao">
+                            <div class="row">
+                                <div class="col">
+                                    <a href="{% url 'saude_atendimento:classificacao_risco_list' %}" class="br-button secondary mr-3"> <i class="fas fa-arrow-left"></i> Voltar </a>
+                                    <button onclick="this.disabled = true; document.getElementById('acao').value='urgencia'; this.form.submit();" type="submit" class="br-button primary mr-3 mt-3 mb-3"><i class="fas fa-save"></i> 
+                                        {% if object %}Reclassificar{% else %}Salvar{% endif %}
+                                    </button>
+                                </div>
+                                <div class="col" style="text-align:right;">
+                                    <div id="botao-container" style="display: none; margin-top: 10px;">
+                                        <button onclick="document.getElementById('acao').value='finalizar'" type="submit" class="br-button primary mt-2 mb-3" id="botao-finalizar" title="Salva e Finaliza o atendimento do Procedimento Eletivo!">Finalizar Atendimento Ambulatorial</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </form>
+
+                </div>
+                <div style="color:white;">.</div>
+            </div>
+        </div>
+
+    </div>
+        
+{% endblock %}
+
+{% block script %}
+
+<script src="{% static 'js/mask.js' %}"></script>
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{% comment %} <script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script> {% endcomment %}
+
+<script>
+    document.querySelector("form").addEventListener("submit", function() {
+        document.querySelector("button[type='submit']").disabled = true;
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const radio1 = document.getElementById("h-radio-1");
+        const radio2 = document.getElementById("h-radio-2");
+        const botaoContainer = document.getElementById("botao-container");
+    
+        function toggleBotao() {
+            if (radio2.checked) {
+                botaoContainer.style.display = "block";
+            } else {
+                botaoContainer.style.display = "none";
+            }
+        }
+    
+        radio1.addEventListener("change", toggleBotao);
+        radio2.addEventListener("change", toggleBotao);
+    });
+</script>
+
+<script>
+    {% if object %}
+        let classificacaoPk = '{{object.tipo_classificacao_risco.pk}}'
+
+        document.getElementById('id_tipo_classificacao_risco').value = classificacaoPk;
+        
+        let button = document.getElementById('btn-'+ classificacaoPk)
+        button.classList.add('custom-button');
+        button.classList.add('selected');
+        button.style.transform = 'scale(1.15)';
+
+        let classificacaoTipo = '{{object.tipo_classificacao_risco.get_cor_display}}'
+
+        classificarProgress(classificacaoTipo)
+        
+    {% endif %}
+   
+    function selectClassificacao(button, index, pk) {
+        document.getElementById('id_tipo_classificacao_risco').value = pk;
+
+        let selectedButton = document.querySelector('.selected');
+        if (selectedButton) {
+            selectedButton.style.transform = 'scale(1)';
+            selectedButton.classList.remove('selected');
+            selectedButton.classList.remove('custom-button');
+        }
+        button.style.transform = 'scale(1.15)';
+        button.classList.add('selected');
+        button.classList.add('custom-button');
+
+        {% if not object %}
+            let elemento = document.getElementById('progress')
+            let classes = elemento.className.split(' ');
+
+
+            let classesFiltradas = classes.filter(function (classe) {
+                return !classe.startsWith('btn-');
+            });
+
+            elemento.className = classesFiltradas.join(' ');
+            classificarProgress(button.dataset.type)
+
+        {% endif %}
+
+        campoObrigatorio(button.dataset.type)
+
+    }
+
+    function validarFormulario() {
+        let seletor = document.getElementById('id_tipo_classificacao_risco').value
+        let mensagemErroClassificacao = document.getElementById('mensagem-erro-seletor-urgencia');
+        let queixaPrincipal = document.getElementById('id_queixa_principal').value
+        let peso = document.getElementById('id_peso').value
+        let altura = document.getElementById('id_altura').value
+        let classificacaoCor = document.getElementById('btn-'+seletor)
+
+        if(classificacaoCor){
+            classificacaoCor = classificacaoCor.dataset.type;
+        } else{
+            mensagemErroClassificacao.innerHTML = "<span class='feedback danger mt-1' role='alert'><i class='fas fa-times-circle' aria-hidden='true'></i>Por favor, selecione a classificação de risco!</span>"
+
+            var campo = document.getElementById('focus-container-topo');
+            campo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            campo.focus();
+            return false;
+        }
+
+        if(seletor === '') {
+            mensagemErroClassificacao.innerHTML = "<span class='feedback danger mt-1' role='alert'><i class='fas fa-times-circle' aria-hidden='true'></i>Por favor, selecione a classificação de risco!</span>"
+
+            var campo = document.getElementById('focus-container-topo');
+            campo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            campo.focus();
+            return false;
+
+        }else if(queixaPrincipal === '' && classificacaoCor !== 'VERMELHO'){
+            var queixa = document.getElementById('focus-container-queixa');
+            queixa.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            queixa.focus();
+            return false;
+
+        }
+
+        document.getElementById("id_temperatura").value = document.getElementById("id_temperatura").value.replace(",",".");
+
+        return true;
+    }
+
+    function classificarProgress(classificacaoTipo) {
+        let elemento = document.getElementById('progress');
+
+        const classificacaoClasses = {
+            'AZUL': 'btn-azul',
+            'VERDE': 'btn-verde',
+            'AMARELO': 'btn-amarelo',
+            'LARANJA': 'btn-laranja',
+            'VERMELHO': 'btn-vermelho'
+        };
+
+        elemento.classList.add(classificacaoClasses[classificacaoTipo]);
+
+        campoObrigatorio(classificacaoTipo)
+    }
+
+    function campoObrigatorio(classificacaoTipo) {
+        let camposObrigatorios = document.getElementsByClassName('campo-obrigatorio');
+
+        if (classificacaoTipo !== 'VERMELHO') {
+            let inputsObrigatorios = document.getElementsByClassName('campo-obrigatorio-input');
+            for (let i = 0; i < inputsObrigatorios.length; i++) {
+                inputsObrigatorios[i].setAttribute('required', 'required');
+            }
+            for (let i = 0; i < camposObrigatorios.length; i++) {
+                camposObrigatorios[i].style.display = 'inline';
+            }
+        } else {
+            if (document.getElementById("id_escala_dor").value === ''){ 
+                document.getElementById("id_escala_dor").value = 2;
+            }
+            if (document.getElementById("id_estado_geral").value === ''){ 
+                document.getElementById("id_estado_geral").value = 5;
+            }
+            let inputsComRequired = document.querySelectorAll('.campo-obrigatorio-input[required]');
+            inputsComRequired.forEach(function(input) {
+                input.removeAttribute('required');
+            });
+            for (let i = 0; i < camposObrigatorios.length; i++) {
+                camposObrigatorios[i].style.display = 'none';
+            }
+        }
+
+    }
+
+  </script>
+
+{% endblock %}

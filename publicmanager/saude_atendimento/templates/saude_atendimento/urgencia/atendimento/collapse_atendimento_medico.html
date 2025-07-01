@@ -1,0 +1,874 @@
+<div v-if="atendimentoMedico" class="container">
+
+    <div id="focus-container-topo" style="margin:0 auto;">
+        <div class="" style="">
+            
+            <div class="row" style="padding-top:15px;">
+                <div class="col tab-item tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine3 === 'evolucao' }" @click="activeTabLine3 = 'evolucao'" data-target="evolucao">Evolução</button>
+                </div>
+                <div class="col tab-item tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine3 === 'diagnostico' }" @click="activeTabLine3 = 'diagnostico'" data-target="diagnostico">Diagnóstico</button>
+                </div>
+                <div class="col tab-item tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine3 === 'historicoPatologico' }" @click="activeTabLine3 = 'historicoPatologico'" data-target="historicoPatologico">Histórico Patológico</button>
+                </div>
+                <div class="col tab-item tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine3 === 'atendimentoAnteriores' }" @click="activeTabLine3 = 'atendimentoAnteriores'" data-target="atendimentoAnteriores">Atendimentos Anteriores</button>
+                </div>
+                <div class="col-12">
+                    <hr id="hr-tab-antendimento">
+                </div>
+            </div>
+
+            <div class="mt-5" id="focus-container-evolucao">
+                <div id="evolucao" class="collapse-content3" v-show="activeTabLine3 === 'evolucao'">
+                    <div class="container box-card-border">
+                        <div class="">
+                            <h5 class="color-title ml-2 font-size17"><i class="fas fa-book"></i> PRONTUÁRIO MÉDICO</h5>
+                            <hr>
+                        </div>
+        
+                        <div class="row mt-45">
+                            <div class="col-3 col-left">
+                                <span class="col-form-label font-size16 color-title">Nº Atendimento Gerado:</span>
+                            </div>
+                            <div class="col-9 br-input input-highlight">
+                                <input class="form-control input-tab font-size15" style="width:90%; height:43px; margin-top: -3px !important;" id="input-highlight-labeless" type="text" :value="atendimentoMedico.numero_atendimento_formatado ? atendimentoMedico.numero_atendimento_formatado : 'Sem informação'" readonly/>
+                            </div>
+                        </div>
+        
+                        <div class="row mt-4">
+                            <div class="col-3 col-left">
+                                <span class="col-form-label font-size16 color-title">Médico Responsável:</span>
+                            </div>
+                            <div class="col-9 br-input input-highlight">
+                                <input class="capslock font-size15" id="input-highlight-labeless" type="text" style="width:90%; height:43px; margin-top: -3px !important;" :value="atendimentoMedico.profissional.nome ? atendimentoMedico.profissional.nome : 'Sem informação'" readonly/>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-3 col-left">
+                                <span class="col-form-label font-size16 color-title">Solicitação:</span>
+                            </div>
+                            <div class="col-9">
+                                <button type-data="btn-element" :disabled="paciente.situacao === 'EM PROCEDIMENTO' || verificarAtendimentoEncerrado" @click="formularioEvolucao.evolucaoRetorno = true" :class="formularioEvolucao.evolucaoRetorno === true ? 'primary': 'secondary'" class="br-button" type="button" style="border-radius: 7px; border-radius: 5px 0px 0px 5px;">
+                                    Com Retorno
+                                </button>
+                                <button type-data="btn-element" :disabled="paciente.situacao === 'EM PROCEDIMENTO' || verificarAtendimentoEncerrado" @click="formularioEvolucao.evolucaoRetorno = false" :class="formularioEvolucao.evolucaoRetorno === false ? 'primary': 'secondary'" class="br-button" type="button" style="border-radius: 7px; margin-left: -5px; border-radius: 0px 5px 5px 0px;">
+                                    Sem Retorno
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-3 col-left">
+                                <span class="col-form-label font-size16 color-title">Registrar Evolução:<br/><span style="color:red; opacity:1 !important;">(Obrigatorio)</span></span>
+                            </div>
+                            <div class="col-9">
+                                <textarea :disabled="paciente.situacao === 'EM PROCEDIMENTO' || verificarAtendimentoEncerrado" class="form-control capslock" style="height:180px; width:90%; border-radius:6px;" type="text" v-model="formularioEvolucao.registroEvolucao"></textarea>
+                                
+                            </div>
+                        </div>
+
+                        <div class="card-footer mt-3 mb-2">
+                            <div class="row">
+                                <div class="col-3">
+                                </div>
+                                <div class="col-9">
+                                    <button v-if="formularioEvolucao.id" type="button" @click="postEvolucao('PUT', formularioEvolucao.id)" class="br-button primary ml-n3">Atualizar Evolução</button>
+                                    <button v-else type="button" :disabled="!formularioEvolucao.registroEvolucao" @click="postEvolucao('POST')" class="br-button primary ml-n3">Registrar Evolução</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container mt-4 box-card-border">
+                        <div class="">
+                            <h5 class="color-title ml-2 font-size17"><i class="fas fa-history"></i> HISTÓRICO DE EVOLUÇÃO</h5>
+                            <hr>
+                        </div>
+                        <div class="overflow-auto mt-3" style="overflow-x: auto;">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="color-title" scope="col"></th>
+                                        <th class="color-title" scope="col"></th>
+                                        <th class="color-title" scope="col"><b>Data</b></th>
+                                        <th class="color-title" scope="col"><b>hora</b></th>
+                                        <th class="color-title" scope="col"><b>Nº Atendimento</b></th>
+                                        <th class="color-title" scope="col"><b>Médico</b></th>
+                                        <th class="color-title" scope="col"><b>Evolução</b></th>
+                                        <th class="color-title txt-center" scope="col"><b>Retorno</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-if="atendimentoMedico.evolucao.length > 0">
+                                        <tr class="capslock" v-for="evolucao in atendimentoMedico.evolucao">
+                                            <th class="txt-center" scope="row">
+                                                
+                                                <i class="fa fa-eye font-size16" style="cursor: pointer;" @click="visualizarInformacoes('evolucao', evolucao)"></i>
+                                            </th>
+                                            <th scope="row">
+                                                <i :class="evolucao.profissional.id !== profissionalPk || paciente.situacao === 'EM PROCEDIMENTO' || verificarAtendimentoEncerrado ? 'button-disabled' : ''" class="fa fa-edit font-size16" @click="EditarEvolucao(evolucao.id, evolucao.registro_evolucao, evolucao.retorno)" style="cursor: pointer;"></i>
+                                            </th>
+                                            <td>${convertDate(evolucao.created_at, 'DD/MM/YYYY')}</td>
+                                            <td>${convertDate(evolucao.created_at, 'H:mm')}</td>
+                                            <td>${evolucao.numero_evolucao_formatado}</td>
+                                            <td>${evolucao.profissional.nome}</td>
+                                            <td>${evolucao.registro_evolucao.length > 18 ? evolucao.registro_evolucao.substring(0, 18)+'...' : evolucao.registro_evolucao}</td>
+                                            <td style="text-align: center;">
+                                                <template v-if="evolucao.retorno"><i class="fa-solid fa-check" style="font-size: large; color: green;"></i></template>
+                                                <template v-else><i class="fa-solid fa-xmark" style="font-size: large; color: red;"></i></template>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr v-else>
+                                        <td colspan="7" style="text-align: center;">
+                                            <p class="mb-3 mt-2">Ainda não existe nenhuma evolução para esse paciente nesse atendimento!</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="mt-4" style="color:white;">.</div>
+                        </div>
+                    </div>
+                    
+                </div>
+        
+                <div id="diagnostico" class="collapse-content3" v-show="activeTabLine3 === 'diagnostico'">
+                    
+                    <div class="container box-card-border">
+                        <div class="">
+                            <h5 class="ml-2 color-title font-size17"><i class="fas fa-book"></i> DIAGNÓSTICO MÉDICO</h5>
+                            <hr>
+                        </div>
+        
+                        <div class="row" style="margin-top:50px;">
+                            <div class="col-3 col-left">
+                                <span class="col-form-label font-size16 color-title">CID:</span><br/>
+                                <span style="color:red; opacity:1 !important;">(Obrigatório)</span>
+                            </div>
+                            <div class="col-8">
+                                <custom-single-select
+                                    ref="customDiagnosticoCid"
+                                    placeholder="Digite o CID desejado.."
+                                    :load-options="getCids"
+                                    v-model="formularioDiagnostico.cid"
+                                    class="mt-n10"
+                                    :disabled="verificarAtendimentoEncerrado"
+                                ></custom-single-select>
+                            </div>
+                        </div>
+        
+                        <div class="row mt-4">
+                            <div class="col-3 col-left">
+                                <span class="col-form-label font-size16 color-title">Considerações:</span>
+                            </div>
+                            <div class="col-8 br-input">
+                                <textarea v-model="formularioDiagnostico.descricao" type="text" class="form-control capslock" style="width:100%; height:180px; border-radius:6px;" :disabled="verificarAtendimentoEncerrado"></textarea>
+                            </div>
+                        </div>
+        
+                        <form ref="diagnosticoForm">
+                            <div class="row mt-4">
+                                <div class="col-3 col-left">
+                                    <span class="col-form-label font-size16 color-title">Anexar Exames:</span>
+                                </div>
+                                <div class="col-9">
+                                    <label for="file-diagnostico" class="drop-container" id="dropcontainer" style="border: 1px dashed #1351b4; width: 89% !important;">
+                                        <i class="fas fa-box-open text-color-blue-1gov" style="font-size: 33px; margin-right: 19px;"></i>
+                                        <span class="drop-title">Clique aqui para anexar o arquivo</span>
+                                        <input type="file" id="file-diagnostico" class="form-control input-tab" @change="handleFileChange($event)" style="border: 0px" style="cursor: pointer" required :disabled="verificarAtendimentoEncerrado">
+                                    </label>
+                                </div>
+                                <div class="col-3 col-left"></div>
+                            </div>
+                            <div class="card-footer mt-3 mb-2">
+                                <div class="row">
+                                    <div class="col-3">
+                                    </div>
+                                    <div class="col-9">
+                                        <button :disabled="!formularioDiagnostico.cid" @click="postDagnostico()" type="button" class="br-button primary ml-n10">Registrar Diagnóstico</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        
+                    </div>
+
+                    <div class="container mt-4" style="border: 1px solid #d9d9d9; border-radius:10px;">
+                        <div class="">
+                            <h5 class="ml-2 color-title font-size17"><i class="fas fa-history"></i> HISTÓRICO DE DIAGNÓSTICOS</h5>
+                            
+                            <hr>
+                        </div>
+                        <div class="overflow-auto mt-3" style="overflow-x: auto;">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="color-title" scope="col"></th>
+                                        <th class="color-title" scope="col"><b>Data</b></th>
+                                        <th class="color-title" scope="col"><b>Nº Atendimento</b></th>
+                                        <th class="color-title" scope="col"><b>Médico</b></th>
+                                        <th class="color-title" scope="col"><b>CID</b></th>
+                                        <th class="color-title" scope="col"><b>Descrição</b></th>
+                                        <th class="color-title" scope="col"><b>Anexo</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-if="atendimentoMedico.diagnostico.length > 0">
+                                        <tr class="capslock" v-for="historico in atendimentoMedico.diagnostico">
+                                            <th scope="row txt-center">
+                                                <i class="fa fa-eye font-size16" style="cursor: pointer;" @click="visualizarInformacoes('diagnostico', historico)"></i>
+                                            </th>
+                                            <td>${convertDate(historico.created_at, 'DD/MM/YYYY')}</td>
+                                            <td>${historico.numero_diagnostico_formatado}</td>
+                                            <td>${historico.profissional.nome}</td>
+                                            <td>${historico.cid_nome}</td>
+                                            <td v-if="historico.descricao.length > 0">${historico.descricao.length > 12 ? historico.descricao.substring(0, 12)+'...' : historico.descricao}</td>
+                                            <td v-else>Sem descrição</td>
+                                            <td v-if="historico.nome_arquivo">${historico.nome_arquivo.length > 16 ? '...'+historico.nome_arquivo.slice(-16) : historico.nome_arquivo}</td>
+                                            <td v-else>Sem anexo</td>
+                                        </tr>
+                                    </template>
+                                    <tr v-else>
+                                        <td colspan="7" style="text-align: center;">
+                                            <p class="mb-3">Ainda não existe nenhum diagnóstico vinculado a esse paciente!</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="mt-4" style="color:white;">.</div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div v-if="!listagemHistoricoPatologico" class="col-12 text-center">
+                    <span class="loader"></span><br/>Carregando...
+                </div>
+                <div v-else id="historicoPatologico" class="collapse-content3" v-show="activeTabLine3 === 'historicoPatologico'">
+                    <div class="container box-card-border mt-40">
+                        <div class="">
+                            <h5 class="color-title font-size17"><i class="fas fa-heartbeat"></i> ANAMNESE RESPOSTAS HUMANAS DOS PROCEDIMENTOS VITAIS DO PACIENTE</h5><br/>
+                            <span class="br-divider" style="margin-top:-20px;"></span>
+                        </div>
+
+                        {% comment %} .forms {% endcomment %}
+                        <div class="row mt-4">
+                            {% comment %} 01 {% endcomment %}
+                            <div class="col-6" :style="bloqueioPatologicoForm ? 'pointer-events: none; opacity: 0.7;' : ''">
+                                <fieldset>
+                                    <div class="campos">
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Tem Doença Neurológica?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" v-model="listagemHistoricoPatologico.tem_doenca_neurologica" type="checkbox" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Tem Doença Psicológica?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" v-model="listagemHistoricoPatologico.tem_doenca_psicologica" type="checkbox" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Tem Hipertenção Arterial?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.tem_hipertensao_arterial" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Tem Doença do Sangue?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.tem_doenca_do_sangue" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Fez ou recebeu transfusão nos últimos 3 meses?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.fez_recebeu_transfusao_ultimos_3_meses" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Teve AVC / derrame?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.teve_avc_derrame" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Está com Tuberculose?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.estar_com_tuberculose" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Está com Hanseníase?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.estar_com_hanseniase" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Está Fumante?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.estar_fumante" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Faz uso de Álcool?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.faz_uso_alcool" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Faz uso de Drogas?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.faz_uso_drogas" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Faz Exercícios Físicos?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.faz_exercicio_fisicos" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Já sofreu infarto?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.ja_sofreu_infarto" id="flexCheckDefault">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row mt-4" id="container-alergias-medicamentosas">
+                                            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                                <custom-select
+                                                    ref="customSelect"
+                                                    label="Possui Alergias Medicamentosas"
+                                                    placeholder="Selecione uma opção"
+                                                    :options="principioOptions"
+                                                    v-model="selectedPrincipioValues"
+                                                    :load-options="getPrincipioAtivo"
+                                                ></custom-select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group row mt-4" id="container-alergias-medicamentosas">
+                                            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                                <custom-select
+                                                    ref="customAntecedentesPatologicos"
+                                                    label="Antecedentes Patológicos Pessoais"
+                                                    placeholder="Selecione uma opção"
+                                                    :options="pessoaisOptions"
+                                                    v-model="selectedPessoaisValues"
+                                                    :load-options="getCids"
+                                                ></custom-select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mt-3">
+                                            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                                <custom-select
+                                                    ref="customPatologicosFaliliares"
+                                                    label="Antecedentes Patológicos Familiares"
+                                                    placeholder="Selecione uma opção"
+                                                    :options="familiaresOptions"
+                                                    v-model="selectedFamiliaresValues"
+                                                    :load-options="getCids"
+                                                ></custom-select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                
+                            </div>
+
+                            {% comment %} 02 {% endcomment %}
+                            <div class="col-6" :style="bloqueioPatologicoForm ? 'pointer-events: none; opacity: 0.7;' : ''">
+                                <div class="">
+                                    <legend>Sobre seu peso, você se considera?</legend>
+                                    <div class="lista-opcoes-checkboxes" id="opcoes-tempo-situacao-de-rua">
+                                        <input class="form-check-input check-size" type="checkbox" :checked="listagemHistoricoPatologico.situacao_peso === 0" @change="atualizarCheckbox('situacaoPeso', 0)">
+                                        <label for="id_recebe_algum_beneficio">&nbsp;&nbsp;Abaixo do peso</label>
+
+                                        <input class="form-check-input check-size" style="margin-left:15px;" type="checkbox" :checked="listagemHistoricoPatologico.situacao_peso === 1" @change="atualizarCheckbox('situacaoPeso', 1)">
+                                        <label for="id_recebe_algum_beneficio" style="margin-left:15px;">Peso adequado</label>
+
+                                        <input class="form-check-input check-size" style="margin-left:15px;" type="checkbox" :checked="listagemHistoricoPatologico.situacao_peso === 2" @change="atualizarCheckbox('situacaoPeso', 2)">
+                                        <label for="id_recebe_algum_beneficio" style="margin-left:15px;">Acima do peso</label>
+                                    </div>
+                                </div>
+                                <div class="mt-5">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <label class="label-size font-size16">Tem alguma deficiência? <br/> Se sim, qual?</label>                                                        
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.tem_alguma_deficiencia">
+                                        </div>
+                                    </div>
+                                    <div class="br-input input-highlight">
+                                        <input class="form-control input-tab" style="width:90%;" :disabled="!listagemHistoricoPatologico.tem_alguma_deficiencia" type="text" v-model="listagemHistoricoPatologico.descricao_deficiencia">
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <label class="label-size font-size16">Está gestante? <br/> Se sim, qual período de gestação?</label>                                                        
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.estar_gestante" id="flexCheckDefault">
+                                        </div>
+                                    </div>
+                                    <div class="br-input input-highlight">
+                                        <input class="form-control input-tab" style="width:90%;" :disabled="!listagemHistoricoPatologico.estar_gestante" v-model="listagemHistoricoPatologico.periodo_gestacao" type="text"/>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <label class="label-size font-size16">Tem diabetes? <br/> Se sim, qual?</label>                                                        
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.tem_diabetes">
+                                        </div>
+                                    </div>
+                                    <div class="br-input input-highlight">
+                                        <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.tem_diabetes" v-model="listagemHistoricoPatologico.tipo_diabetes"/>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <label class="label-size font-size16">Tem doença respiratória crônica / no pulmão? <br/> Se sim, qual?</label>                                                        
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.tem_doenca_respiratoria_cronica_pulmao">
+                                        </div>
+                                    </div>
+                                    <div class="br-input input-highlight">
+                                        <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.tem_doenca_respiratoria_cronica_pulmao" v-model="listagemHistoricoPatologico.nome_doenca_respiratoria_cronica_pulmao"/>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <label class="label-size font-size16">Tem doença cardíaca / do coração? <br/> Se sim, qual?</label>                                                        
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.tem_doenca_cardiaca_do_coracao">
+                                        </div>
+                                    </div>
+                                    <div class="br-input input-highlight">
+                                        <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.tem_doenca_cardiaca_do_coracao" v-model="listagemHistoricoPatologico.nome_doenca_cardiaca_do_coracao"/>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <label class="label-size font-size16">Tem doença nos rins? <br/> Se sim, qual?</label>                                                        
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.tem_doenca_rins">
+                                        </div>
+                                    </div>
+                                    <div class="br-input input-highlight">
+                                        <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.tem_doenca_rins" v-model="listagemHistoricoPatologico.nome_doenca_rins"/>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <label class="label-size font-size16">Tem ou teve câncer? <br/> Se sim, qual é a causa?</label>                                                        
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.tem_teve_cancer">
+                                        </div>
+                                    </div>
+                                    <div class="br-input input-highlight">
+                                        <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.tem_teve_cancer" v-model="listagemHistoricoPatologico.tipo_cancer"/>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <label class="label-size font-size16">Teve alguma internação nos úiltimos 12 meses? <br/> Se sim, qual é a causa?</label>                                                        
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.teve_alguma_internacao_ultimos_12_meses">
+                                        </div>
+                                    </div>
+                                    <div class="br-input input-highlight">
+                                        <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.teve_alguma_internacao_ultimos_12_meses" v-model="listagemHistoricoPatologico.causa_internacao_ultimos_12_meses"/>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <label class="label-size font-size16">Usa plantas medicinais? <br/> Se sim, qual?</label>                                                        
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.usa_plantas_medicinais">
+                                        </div>
+                                    </div>
+                                    <div class="br-input input-highlight">
+                                        <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.usa_plantas_medicinais" v-model="listagemHistoricoPatologico.nome_planta_medicinal"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% comment %} 03 {% endcomment %}
+                            <div class="col-12" :style="bloqueioPatologicoForm ? 'pointer-events: none; opacity: 0.7;' : ''">
+                                <legend>ANAMNESE RESPOSTAS HUMANAS SOCIAIS</legend>
+                                <span class="br-divider col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+
+                                <div class="row mt-3">
+                                
+                                    <div class="col-6">
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Frequenta cuidador tradicional?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.frequenta_cuidador_tradicional">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Participa de algum grupo comunitário?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.participa_de_algum_grupo_comunitario">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Possui plano de saúde privado?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.possui_plano_saude_privado">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mt-3">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Recebe algum benefício? <br/> Se sim, qual?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.recebe_algum_beneficio">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 br-input input-highlight">
+                                                <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.recebe_algum_beneficio" v-model="listagemHistoricoPatologico.nome_beneficio"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">É membro de povo ou comunidade tradicional? <br/> Se sim, qual?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.eh_membro_povo_comunidade_tradicional">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 br-input input-highlight">
+                                                <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.eh_membro_povo_comunidade_tradicional" v-model="listagemHistoricoPatologico.nome_povo_comunidade_tradicional"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% comment %} 04 {% endcomment %}
+                            <div class="col-12 mt-3" :style="bloqueioPatologicoForm ? 'pointer-events: none; opacity: 0.7;' : ''">
+                                <legend>ANAMNESE RESPOSTAS HUMANAS SOCIAIS EM SITUAÇÃO DE RUA</legend>
+                                <span class="br-divider col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+
+                                <div class="row mt-3" >
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+
+                                        <div class="form-group row container-tempo-situacao-de-rua">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <fieldset class="mb-1">
+                                                    <legend>Quanto tempo em situação de rua?</legend>
+                                                    <div class="lista-opcoes-checkboxes" id="opcoes-tempo-situacao-de-rua">
+                                                        <input class="form-check-input check-size" style="margin-left:10px;" type="checkbox" :checked="listagemHistoricoPatologico.tempo_situacao_de_rua === 0" @change="atualizarCheckbox('situacaoRua', 0)">
+                                                        <label for="opcao-0" style="margin-left:10px;"> < 6 meses </label>
+                                                    
+                                                        <input class="form-check-input check-size" style="margin-left:10px;" type="checkbox" :checked="listagemHistoricoPatologico.tempo_situacao_de_rua === 1" @change="atualizarCheckbox('situacaoRua', 1)">
+                                                        <label for="opcao-1" style="margin-left:10px;"> 6 a 12 meses </label>
+                                                    
+                                                        <input class="form-check-input check-size" style="margin-left:10px;" type="checkbox" :checked="listagemHistoricoPatologico.tempo_situacao_de_rua === 2" @change="atualizarCheckbox('situacaoRua', 2)">
+                                                        <label for="opcao-2" style="margin-left:10px;"> 1 a 5 anos </label>
+                                                    
+                                                        <input class="form-check-input check-size" style="margin-left:10px;" type="checkbox" :checked="listagemHistoricoPatologico.tempo_situacao_de_rua === 3" @change="atualizarCheckbox('situacaoRua', 3)">
+                                                        <label for="opcao-3" style="margin-left:10px;"> > 5 anos </label>
+                                                    </div>
+                                                    <div class="mt-5">
+                                                        <div class="row">
+                                                            <div class="col-8">
+                                                                <label class="label-size font-size16">É acompanhado por outra instituição? <br/> Se sim, qual?</label>                                                        
+                                                            </div>
+                                                            <div class="col">
+                                                                <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.eh_acompanhado_por_outra_instituicao" >
+                                                            </div>
+                                                        </div>
+                                                        <div class="br-input input-highlight">
+                                                            <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.eh_acompanhado_por_outra_instituicao" v-model="listagemHistoricoPatologico.nome_instituicao"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                            <div class="row mt-3">
+                                                                <div class="col-8">
+                                                                    <label class="label-size font-size16">Possui referência familiar?</label>                                                        
+                                                                </div>
+                                                                <div class="col">
+                                                                    <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.possui_referencia_familiar">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-5">
+                                                        <div class="row">
+                                                            <div class="col-8">
+                                                                <label class="label-size font-size16">Visita algum familiar com frequência? <br/> Se sim, qual o grau de parentesco?</label>                                                        
+                                                            </div>
+                                                            <div class="col">
+                                                                <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.visita_algum_familiar_com_frequencia">
+                                                            </div>
+                                                        </div>
+                                                        <div class="br-input input-highlight">
+                                                            <input class="form-control input-tab" style="width:90%;" type="text" :disabled="!listagemHistoricoPatologico.visita_algum_familiar_com_frequencia" v-model="listagemHistoricoPatologico.grau_parentesco"/>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                        <legend>Quantas vezes se alimenta ao dia?</legend>
+                                        <div class="lista-opcoes-checkboxes" id="opcoes-tempo-situacao-de-rua">
+                                            <input class="form-check-input check-size" type="checkbox" :checked="listagemHistoricoPatologico.frequencia_diaria_alimentacao == 0" @change="atualizarCheckbox('frequenciaDiaria', 0)">
+                                            <label for="id_recebe_algum_beneficio" style="margin-left:10px;"> 1 vez </label>
+                                            <input class="form-check-input check-size" style="margin-left:10px;" type="checkbox" :checked="listagemHistoricoPatologico.frequencia_diaria_alimentacao == 1" @change="atualizarCheckbox('frequenciaDiaria', 1)">
+                                            <label for="id_recebe_algum_beneficio" style="margin-left:10px;"> 2 ou 3 vezes </label>
+                                            <input class="form-check-input check-size" style="margin-left:10px;" type="checkbox" :checked="listagemHistoricoPatologico.frequencia_diaria_alimentacao == 2" @change="atualizarCheckbox('frequenciaDiaria', 2)">
+                                            <label for="id_recebe_algum_beneficio" style="margin-left:10px;"> mais de 3 vezes </label>
+                                        </div>
+                                        <legend>Qual a origem de alimentação?</legend>
+                                        <div class="lista-opcoes-checkboxes" id="opcoes-tempo-situacao-de-rua">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.restaurante_popular">
+                                            <label for="id_recebe_algum_beneficio" style="margin-left:10px;"> Restaurante popular </label>
+                                            <input class="form-check-input check-size" style="margin-left:33px;" type="checkbox" v-model="listagemHistoricoPatologico.doacao_restaurante">
+                                            <label class=" mt-3" for="id_recebe_algum_beneficio" style="margin-left:10px;"> Doação restaurante </label><br/>
+                                            <input class="form-check-input check-size mt-3" style="margin-left:;" type="checkbox" v-model="listagemHistoricoPatologico.doacao_grupo_religioso">
+                                            <label class=" mt-3" for="id_recebe_algum_beneficio" style="margin-left:10px;"> Doação grupo religioso </label>
+                                            <input class="form-check-input check-size mt-3" style="margin-left:15px;" type="checkbox" v-model="listagemHistoricoPatologico.doacao_popular">
+                                            <label class=" mt-3" for="id_recebe_algum_beneficio" style="margin-left:10px;"> Doação de população </label><br/>
+                                            <input class="form-check-input check-size mt-3" style="margin-left:" type="checkbox" v-model="listagemHistoricoPatologico.doacao_outros">
+                                            <label class=" mt-3" for="id_recebe_algum_beneficio" style="margin-left:10px;"> Outros </label>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <div class="row mt-3">
+                                                    <div class="col-8">
+                                                        <label class="label-size font-size16">Tem acesso a higiene pessoal? <br/> Se sim, qual?</label>                                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.tem_acesso_a_higiene_pessoal">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div :disabled="!listagemHistoricoPatologico.tem_acesso_a_higiene_pessoal" class="lista-opcoes-checkboxes mt-3" id="opcoes-tempo-situacao-de-rua">
+                                            <input class="form-check-input check-size" type="checkbox" v-model="listagemHistoricoPatologico.higiene_pessoal_banho">
+                                            <label for="id_recebe_algum_beneficio" style="margin-left:10px;"> Banho </label>
+                                            <input class="form-check-input check-size" style="margin-left:33px;" type="checkbox" v-model="listagemHistoricoPatologico.higiene_pessoal_higiene_bocal">
+                                            <label class=" mt-3" for="id_recebe_algum_beneficio" style="margin-left:10px;"> Higiene bucal </label><br/>
+                                            <input class="form-check-input check-size mt-3" style="margin-left:;" type="checkbox" v-model="listagemHistoricoPatologico.higiene_pessoal_acesso_sanitario" >
+                                            <label class=" mt-3" for="id_recebe_algum_beneficio" style="margin-left:10px;"> Acesso sanitário </label>
+                                            <input class="form-check-input check-size mt-3" style="margin-left:15px;" type="checkbox" v-model="listagemHistoricoPatologico.higiene_outros" >
+                                            <label class=" mt-3" for="id_recebe_algum_beneficio" style="margin-left:10px;"> Outros </label><br/>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="!bloqueioPatologicoForm" class="col-12 mb-5">
+                                <button @click="getPutHistoricoPatologico('PUT')" type="button" class="br-button primary">Atualizar</button>
+                            </div>
+                            <div v-else class="col-12 mb-5">
+                                <button @click="bloqueioPatologicoForm=false" type="button" class="br-button primary">Editar</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+        
+                <div id="atendimentoAnteriores" class="collapse-content3" v-show="activeTabLine3 === 'atendimentoAnteriores'">
+                    
+                    <div class="container box-card-border">
+                        <div class="">
+                            <h5 class="ml-2 color-title font-size17"><i class="fas fa-history"></i> Histórico de Atendimentos Anteriores</h5>
+                            <hr>
+                        </div>
+                        <div class="overflow-auto mt-3" style="overflow-x: auto;">
+                            <table class="table table-striped mt-4">
+                                <thead>
+                                    <tr>
+                                        <th class="color-title" scope="col" style="width:5%;"></th>
+                                        <th class="color-title" scope="col" style="width:5%;"></th>
+                                        <th class="color-title" scope="col"><b>Data</b></th>
+                                        <th class="color-title" scope="col"><b>Hora</b></th>
+                                        <th class="color-title txt-center" scope="col" class="text-center"><b>Nº Atendimento</b></th>
+                                        <th class="color-title txt-center" scope="col" class="text-center"><b>Médico</b></th>
+                                        <th class="color-title txt-center" scope="col" class="text-center"><b>Queixa Principal</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-if="listagemHistoricoAnteriores.length > 0">
+                                        <tr class="capslock" v-for="anterior in listagemHistoricoAnteriores">
+                                            <td>
+                                                <a :href="replaceUrlId(baseUltimoAtendimentoFichaUrl, anterior.id)" target="_blank">
+                                                    <i class="fas fa-search color-title font-size18"></i>
+                                                </a>
+                                            </td>
+                                            <td data-th="Código">
+                                                <a :href="replaceUrlId(baseUltimoAtendimentoUrl, anterior.id)" target="_blank">
+                                                    <i class="fas fa-history font-size18"></i>
+                                                </a>
+                                            </td>
+                                            <td>${convertDate(anterior.created_at, 'DD/MM/YYYY')}</td>
+                                            <td>${convertDate(anterior.created_at, 'H:m')}</td>
+                                            <td v-if="anterior.classificacao" class="text-center">${anterior.classificacao.numero}</td>
+                                            <td v-else class="text-center">Não houve atendimento:<br/>
+                                                <span style="color:var(--interactive);">${anterior.situacao_nome}</span>
+                                            </td>
+                                            <template v-if="anterior.profissionais">
+                                                <td class="text-center" v-for="profissional in anterior.profissionais">${profissional}</td>
+                                            </template>
+                                            <td v-else class="text-center">Não houve atendimento:<br/>
+                                                <span style="color:var(--interactive);">${anterior.situacao_nome}</span>
+                                            </td>
+                                            <td v-if="anterior.classificacao" class="text-center">${anterior.classificacao.queixa}</td>
+                                            <td v-else class="text-center">Não houve atendimento:<br/>
+                                                <span style="color:var(--interactive);">${anterior.situacao_nome}</span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr v-else>
+                                        <td colspan="9" style="text-align: center;">
+                                            <span>Ainda não existe nenhum histórico de atendimento vinculado a esse paciente!</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <template v-if="listagemHistoricoAnteriores.length > 0">
+                        
+                        <div class="table-footer">
+                            {% include 'dashboard/includes/components/vue-pagination.html' %},
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

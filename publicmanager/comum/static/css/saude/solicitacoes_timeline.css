@@ -1,0 +1,12 @@
+@media screen and (max-width: 850px) {
+    div.step-progress > div.step-progress-btn > .step-info{
+        margin-left: -76px !important;
+        text-align: center !important;
+        width: 120px !important;
+        margin-bottom: 161px !important;
+    }
+
+    div.step-progress > div.step-progress-btn > div{
+        margin-left: 18px !important;
+    }
+}

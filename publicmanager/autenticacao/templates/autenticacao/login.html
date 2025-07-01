@@ -1,0 +1,210 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+
+<html
+    lang="pt-BR" class="light-style customizer-hide" dir="ltr" data-theme="theme-default" data-assets-path="../assets/" data-template="vertical-menu-template-free">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+    <title>Directa - Login</title>
+
+    <meta name="description" content=""/>
+
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'img/fav-logo2.png' %}" type="image/x-icon" />
+    <link rel="stylesheet" href="{% static '@govbr-ds/core/dist/core.css' %}"/>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+    <!-- Icons. Uncomment required icon fonts -->
+    <link rel="stylesheet" href="{% static 'fonts/boxicons.css' %}"/>
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{% static 'css/core.css' %}" class="template-customizer-core-css"/>
+    <link rel="stylesheet" href="{% static 'css/theme-default.css' %}" class="template-customizer-theme-css"/>
+    <link rel="stylesheet" href="{% static 'css/demo.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/responsividade.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="{% static 'css/perfect-scrollbar.css' %}"/>
+
+    <!-- Page CSS -->
+    <!-- Page -->
+    <link rel="stylesheet" href="{% static 'css/page-auth.css' %}"/>
+    <!-- Helpers -->
+    <script src="{% static 'js/helpers.js' %}"></script>
+
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="{% static 'js/config.js' %}"></script>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .login-right{ width:35%; margin:0 auto !important; }
+
+        .select-disabled {
+            pointer-events: none;
+            color: #141516;
+            text-decoration: none;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .swal2-confirm {
+            background-color: var(--interactive) !important;
+            border-radius: 25px !important;
+            font-weight: bold !important;
+            width: 130px !important;
+        }
+        .swal2-modal{
+            width: 450px !important;
+        }
+  </style>
+</head>
+<body>
+
+  <div class="container" style="margin-top:8%;">
+        <div class="login-right">
+            <div class="card-body box-login">
+                <div class="app-brand justify-content-center">
+                    <a href="index.html" class="app-brand-link gap-2">
+                    <img src="{% static 'img/logo-prefeitura-natal.png' %}" style="width:250px;" alt="logo" />
+                    </a>
+                </div>
+
+                <div class="col-12 text-center">
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+                                
+                <form id="formAuthentication" class="mb-3 mt-4" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="email" class="form-label" style="color:#333333;"><b>CPF:</b></label>
+                        {% render_field form.cpf class="form-control" placeholder="Digite seu CPF" %}
+                    </div>
+
+                    <div class="mb-3 form-password-toggle">
+                        <div class="d-flex justify-content-between">
+                            <label class="form-label" for="password" style="color:#333333;"><b>Senha:</b></label>
+                            <a href="{% url 'autenticacao:esqueceu_senha' %}">
+                                <small>Esqueceu a senha?</small>
+                            </a>
+                        </div>
+                        <div class="input-group input-group-merge">
+                            {% render_field form.password class="form-control" placeholder="********" aria-describedby="password" %}
+                            <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="" style="display:none;">
+                    <div id="select-unidades" class="mb-3" style="display:none;">
+                        <label for="unidades" class="form-label" style="color: #333333;"><b>Unidade:</b></label>
+                        <select id="unidades" name="unidades" class="form-control select-disabled" style="cursor: pointer;">
+                            <option value="" disabled selected hidden>
+                                <a href="auth-forgot-password-basic.html"> Selecione uma unidade
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                    
+                    <div class="mb-3">
+                        <button class="br-button primary d-grid w-100" type="submit">Entrar</button>
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="box-end-title">
+                <h4>ENTRAR COM GOV.BR</h4>
+            </div>
+        </div>
+
+  </div>
+
+<!-- Core JS -->
+<!-- build:js assets/vendor/js/core.js -->
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/popper.js' %}"></script>
+<script src="{% static 'js/bootstrap.js' %}"></script>
+<script src="{% static 'js/perfect-scrollbar.js' %}"></script>
+
+<script src="{% static 'js/menu.js' %}"></script>
+<!-- endbuild -->
+
+<!-- Main JS -->
+<script src="{% static 'js/main.js' %}"></script>
+
+<!-- Place this tag in your head or just before your close body tag. -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#id_cpf').on('change', function(event) {
+            var cpf = $(this).val();
+            var submitButton = $('button[type="submit"]');
+
+            submitButton.prop('disabled', true);
+
+            $.ajax({
+                url: '{% url "autenticacao:get_unidades_por_cpf" %}',
+                method: 'GET',
+                data: { 'cpf': cpf },
+                success: function(response) {
+                    exibirResultados(response);
+                    submitButton.prop('disabled', false);
+                },
+                error: function(error) {
+                    console.log(error)
+                    submitButton.prop('disabled', false);
+                }
+            });
+
+        });
+    });
+
+    function exibirResultados(data) {
+        var selectHtml = '';
+      
+        if (data && data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                selectHtml += '<option value="' + data[i].id + '">' + data[i].nome + '</option>';
+            }
+            $('#select-unidades').show();
+        } else {
+            selectHtml = '';
+            $('#select-unidades').hide();
+        }
+        $('#unidades').html(selectHtml);
+
+        if (data && data.length > 1) {
+            $('#unidades').removeClass('select-disabled');
+        }
+    }
+
+    function modalAlert() {
+        Swal.fire({
+            title: "Aviso!",
+            html: `Por gentileza, entre em contato com o suporte de desenvolvimento fornecendo seu nome completo, CPF, unidade, e-mail, por meio do <b>WhatsApp: (84) 00000-0000</b>.`,
+            imageUrl: "{% static 'img/suporte.svg' %}",
+            imageWidth: 380,
+            imageHeight: 190,
+            imageAlt: "Custom image"
+        });
+
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{% static 'css/responsividade_tb.css' %}">
+    <link rel="stylesheet" href = "{% static 'css/responsividade.css' %}">
+{% endblock %}
+
+<div class="row" style="justify-content: start;">
+
+    <div class="col-8">
+        <nav class="br-step vertical" data-initial="1" data-label="right" role="none">
+            <div v-if="detalhesTimeLine" style="margin-left: 20%;" class="step-progress" role="listbox" aria-orientation="vertical" aria-label="Lista de Opções">
+
+                <div style="margin-bottom: 55px;" class="step-progress-btn" role="option" aria-posinset="1" aria-setsize="1" type="button">
+
+                    <div class="" style="background-color:#fff; border-radius:40px; width:58px; z-index: 999; border: 1px solid var(--active);">
+                        <span style="color: var(--active); font-size: 40px; z-index: 1; margin-left: 3px; margin-top: -20px; padding: 17px;">1</span>
+                    </div>
+
+                    <span style="margin-left: -200px; text-align: end; width: 120px;" class="step-info">Consultório Médico</span>
+
+                    <div class="row mr-4" style="margin-left: 85px; margin-top: 15px;" class="step-info">
+                        <div class="col-md-auto">
+                            <p>Nº Atendimento: <b class="visible-xs">${detalhesTimeLine.numero_atendimento}</b></p>
+                            <p>Médico Responsável:</p>
+                            <p>Data de Entrada:</p>
+                        </div>
+                        <div class="col hidden-xs">
+                            <p class="col-text-medic5"><b>${detalhesTimeLine.numero_atendimento}</b></p>
+                            <p class="col-text-medic5">${converterParaCapitalized(detalhesTimeLine.profissional_nome)}</p>
+                            <p class="col-text-medic5">${detalhesTimeLine.data_entrada}h</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div v-for="(solicitacao, index) in detalhesTimeLine.timeline_solicitacoes.timeline_list" :class="detalhesTimeLine.progresso === index + 1 ? 'active' : ''" style="margin-bottom: 55px;" class="step-progress-btn" role="option" aria-posinset="1" aria-setsize="1" type="button">
+                    
+                    <span :style="detalhesTimeLine.progresso === index + 1 ? 'background-color:var(--active); color:#fff; font-size: 40px; z-index: 3; border-radius:40px; width:58px;' : 'background-color: #fff; color: var(--active); font-size: 40px; z-index: 3; border-radius:40px; width:58px; border: 1px solid var(--active);'">
+                        <span :style="detalhesTimeLine.progresso === index + 1 ? 'color:white;' : 'color:var(--active);'" style="padding-left:17px; padding-top:-20px; padding: 17px;">${index + 2}</span>
+                    </span>
+                    
+                    <span v-if="solicitacao.tipo === 0" style="margin-left: -220px; text-align: end; width: 135px;" class="step-info">Exames Laboratoriais</span>
+                    <span class="step-info" v-if="solicitacao.tipo === 1" style="margin-left: -220px; text-align: end; width: 135px;" class="step-info">Exames de Imagem</span>
+                    <span v-if="solicitacao.tipo === 2" style="margin-left: -220px; text-align: end; width: 135px;" class="step-info">Procedimento</span>
+                    <span v-if="solicitacao.tipo === 3" style="margin-left: -220px; text-align: end; width: 135px;" class="step-info">Medicação</span>
+                    
+                    <div v-if="solicitacao.line" class="row mr-4" style="margin-left: 85px; margin-top: 15px;" class="step-info">
+                        <div v-if="solicitacao.tipo === 1">
+                            <div class="col-md-auto">
+                                <p class="hidden-tb2 hidden-xs" style="margin-left: 10px;">Nº Atendimento:</p>
+                                <p class="hidden-tb2 hidden-xs" style="margin-left: 10px;">Profissional Responsável:</p>
+                                <p class="hidden-tb2 hidden-xs" style="margin-left: 10px;">Data de Entrada:</p>
+                                <p class="visible-tb2 visible-xs col-text-medic2">Nº Atendimento:</p>
+                                <p class="visible-tb2 visible-xs col-text-medic2">Profissional Responsável:</p>
+                                <p class="visible-tb2 visible-xs col-text-medic2">Data de Entrada:</p>
+                            </div>
+                        </div>
+                        <div v-if="solicitacao.tipo !== 1">
+                            <div class="col-md-auto">
+                                <p class="hidden-tb2 hidden-xs" style="margin-left: 10px;">Nº Atendimento:</p>
+                                <p class="hidden-tb2 hidden-xs" style="margin-left: 10px;">Profissional Responsável:</p>
+                                <p class="hidden-tb2 hidden-xs" style="margin-left: 10px;">Data de Entrada:</p>
+                                <p class="visible-tb2 visible-xs col-text-medic6">Nº Atendimento:</p>
+                                <p class="visible-tb2 visible-xs col-text-medic6">Profissional Responsável:</p>
+                                <p class="visible-tb2 visible-xs col-text-medic6">Data de Entrada:</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <p class="col-text-medic3"><b>${solicitacao.numero}</b>
+                                <span v-if="solicitacao.situacao === 6" class="br-tag ml-2 col-btn-waiting" style="width: 110px; font-size: 15px; margin-top: -4px; height: 32px; background-color: #289e34f7 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">Concluído</span>
+                                <span  v-else class="br-tag ml-2 col-btn-waiting" style="width: 110px; font-size: 15px; margin-top: -4px; height: 32px; background-color: #f19116f7 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">Aguardando</span>
+                            </p>
+                            <p class="col-text-medic col-text-medic3">${converterParaCapitalized(solicitacao.responsavel.nome)}</p>
+                            <p class="col-text-medic3">${solicitacao.data_entrada}h</p>
+                        </div>
+                    </div>
+                    <div v-else-if="solicitacao.processo" class="col-md-auto" style="margin-top: 16px; margin-left: 85px;">
+                        <p><b>Aguardando</b></p>
+                    </div>
+                    <div v-else class="col-md-auto" style="margin-top: 16px; margin-left: 85px;">
+                        <p><b>Não Solicitado</b></p>
+                    </div>
+                </div>
+                
+            </div>
+        </nav>
+    </div>
+
+    <div v-if="detalhesTimeLine" class="col-4 align-self-center" style="padding: 0px;">
+        <p style="color:var(--blue); font-size:15px; font-style: italic; margin-top:15px;"><b>Alergias do Paciente:</b></p>
+        <div class="br-message warning" style="background-color:#ebebeb; border-radius:5px; margin-top:-10px; box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px; width:90%; justify-content: center;">
+            <template v-if="detalhesTimeLine.alergias_medicamentosas.length" style="ground-color:#f2f2f2; border-radius:8px; margin-top:-15px; padding-top: 12px; padding-bottom: 1px;">
+                <p v-for="alergia in detalhesTimeLine.alergias_medicamentosas" class="ml-2" style="color:red;">
+                    <template v-if="alergia.length > 30">
+                        ${converterParaCapitalized(alergia.slice(0, 35))}...<br/>
+                    </template>
+                    <template v-else>
+                        ${converterParaCapitalized(alergia)}<br/>
+                    </template>
+                </p>
+            </template>
+            <p v-else style="color:red; margin: 50px; font-size: 23px;">Sem alergias</p>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,61 @@
+/* Estilos para o esqueleto do painel */
+.skeleton-panel {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 2px;
+    margin-bottom: 20px;
+}
+.skeleton-image {
+    height: 200px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.loading-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: #ccc;
+    animation: rotate 1s linear infinite;
+}
+@keyframes rotate {
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+.skeleton-line {
+    height: 20px;
+    width: 80%;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+}
+.pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+    0% {
+      background-color: #f0f0f0;
+    }
+    50% {
+      background-color: #e0e0e0;
+    }
+    100% {
+      background-color: #f0f0f0;
+    }
+}
+.skeleton-button {
+    height: 40px;
+    width: 200px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-top: 10px;
+}

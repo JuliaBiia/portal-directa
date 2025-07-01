@@ -1,0 +1,144 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de Atendimentos Efetuados{% endblock %}
+
+{% load enfermagem_filters %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/estilizacao-grid.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade_tb.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<div class="container-lg">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row mt-1">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="text-weight-semi-bold text-up-02 color-title font-size24">
+                                <i class="fa-solid fa-rectangle-list font-size25 mr-2"></i> Atendimentos
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+
+                <div class="card-content mt-n10-tb">
+                    
+                    <form class="box-wdth-search" id="atendimentos_efetuados_form" method="get">
+                        <div class="card-body">
+                            <div class="form-group row col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="id_data_filtro">Data Inícial</label>
+                                        <input id="id_data_filtro" class="input-busca-grid input-com-alfanumericas" name="data_inicial_filtro" type="date" maxlength="150" value="{{data_inicial_filtro}}">
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="id_data_filtro">Data Final</label>
+                                        <input id="id_data_filtro" class="input-busca-grid input-com-alfanumericas" name="data_final_filtro" type="date" maxlength="150" value="{{data_final_filtro}}">
+                                    </div>
+                                </div>
+                                {% comment %} <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="id_hora_inicial_filtro">Hora Inícial</label>
+                                        <input id="id_hora_inicial_filtro" class="input-busca-grid input-com-alfanumericas" name="hora_inicial_filtro" type="time" maxlength="150" value="{{hora_inicial_filtro}}">
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="id_hora_final_filtro">Hora Final</label>
+                                        <input id="id_hora_final_filtro" class="input-busca-grid input-com-alfanumericas" name="hora_final_filtro" type="time" maxlength="150" value="{{hora_final_filtro}}">
+                                    </div>
+                                </div> {% endcomment %}
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-3">
+                            <div class="row group-btn-search txt-center-w col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col ml-3 ml-lg-0 ml-sm-0" style="text-align: left;">
+                                    <button class="br-button primary ml-n15" type="submit"><i class="fas fa-search"></i> Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card hover">
+              <div class="card-content">
+                <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                    <div class="table-header">
+                        <div>
+                            <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                        </div>
+                        <div class="top-bar mt-2">
+                            <div class="table-title">
+                                <i class="fa-solid fa-rectangle-list mr-2" style="font-size: 20.16px;"></i> <span>Listagem de Atendimentos</span>
+                            </div>
+                            <div class="search-trigger">
+                                <a href="{% url 'saude_enfermagem:atendimento_realizados_pdf_view' %}?data_inicial_filtro={{data_inicial_filtro}}&data_final_filtro={{data_final_filtro}}&hora_inicial_filtro={{hora_inicial_filtro}}&hora_final_filtro={{hora_final_filtro}}" class="br-button primary" target="blank_"><i class="fas fa-file-pdf"></i> Relatório</a>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="mt-2">
+                        <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th style="text-align: center;">Classificação</th>
+                            <th style="text-align: center;">Data</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if listas %}
+                            {% for atendimento in listas %}
+                                <tr>
+                                    <td>{{ atendimento.paciente_nome }}</td>
+                                    <td style="text-align: center !important;" data-th="Tipo">
+                                        {% if atendimento.classificacao_risco == 4 %}
+                                            <span class="situacao-grid" style="padding: 5px !important; display: inline; border-radius: 5px; background-color: #E51010; color: #FFFFFF;">EMERGÊNCIA</span>
+                                        {% elif atendimento.classificacao_risco == 3 %}
+                                            <span class="situacao-grid" style="padding: 5px !important; display: inline; border-radius: 5px; background-color: #FF9D29; color: #FFFFFF;">MUITO URGENTE</span>
+                                        {% elif atendimento.classificacao_risco == 2 %}
+                                            <span class="situacao-grid" style="padding: 5px !important; display: inline; border-radius: 5px; background-color: #EAE451; color: #FFFFFF;">URGENTE</span>
+                                        {% elif atendimento.classificacao_risco == 1 %}
+                                            <span class="situacao-grid" style="padding: 5px !important; display: inline; border-radius: 5px; background-color: #2B982B; color: #FFFFFF;">POUCO URGENTE</span>
+                                        {% elif atendimento.classificacao_risco == 0 %}
+                                            <span class="situacao-grid" style="padding: 5px !important; display: inline; border-radius: 5px; background-color: #2196F3; color: #FFFFFF;">NÃO URGENTE</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <td style="text-align: center;">{{ atendimento.data }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                    {% comment %} Paginação {% endcomment %}
+                    {% include 'dashboard/includes/paginacao.html' %}
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+</div>
+{% endblock %}
+
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}

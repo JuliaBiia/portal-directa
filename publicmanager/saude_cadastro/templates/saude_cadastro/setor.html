@@ -1,0 +1,252 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de Setores{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/estilizacao-grid.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes-mod-cadastro.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade_tb.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<div class="container-lg">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row mt-1">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="text-weight-semi-bold text-up-02 color-title font-size24">
+                                {% comment %} <img src="{% static 'img/icons/icone-setor-grid.svg' %}" alt="Ícone do setor" title="Ícone do setor" style="display: block;">
+                                <span class="mt-1 ml-4" style="display: block;">SETORES</span> {% endcomment %}
+                                <i class="fa-solid fa-people-group mr-2"></i> SETORES
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="card-content mt-n10-tb">
+                    <form class="box-wdth-search" id="formSubmit" method="get" onsubmit="setDate()">
+                        <div class="card-body d-flex justify-content-center flex-column">
+                            <div class="form-group row col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-7 col-lg-7 col-md-7 col-sm-7">
+                                    <div class="br-input">
+                                        <label for="id_codigo_filtro">Código</label>
+                                        <input
+                                            id="id_codigo_filtro"
+                                            class="form-control input-com-alfanumericas"
+                                            name="codigo_filtro"
+                                            type="text"
+                                            maxlength="255"
+                                            value=""
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="id_sigla_filtro">Sigla</label>
+                                        <input
+                                            id="id_sigla_filtro"
+                                            class="form-control input-com-alfanumericas"
+                                            name="sigla_filtro"
+                                            type="text"
+                                            maxlength="255"
+                                            value=""
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 mt-3">
+                                    <div class="br-input">
+                                        <label for="id_nome_filtro">Nome</label>
+                                        <input
+                                            id="id_nome_filtro"
+                                            class="form-control input-com-alfanumericas"
+                                            name="nome_filtro"
+                                            type="text"
+                                            maxlength="255"
+                                            value=""
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mt-3">
+                                    <div class="br-input">
+                                        <label for="id_situacao_filtro">Situação</label>
+                                        <select
+                                            id="id_situacao_filtro"
+                                            class="select-busca-grid campo-select"
+                                            name="situacao_filtro" 
+                                            style="width: 100%"
+                                        >
+                                            <option value="">TODAS</option>
+                                            {% for situacao in situacoes %}
+                                                {% if situacao_filtro == forloop.counter0 %}
+                                                    <option selected value="{{forloop.counter0}}">{{situacao}}</option>
+                                                {% else %}
+                                                    <option value="{{forloop.counter0}}">{{situacao}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5 mt-3">
+                                    <div class="br-input">
+                                        <label for="id_recebe_paciente_filtro">Recebe Paciente</label>
+                                        <select
+                                            id="id_recebe_paciente_filtro"
+                                            class="select-busca-grid campo-select"
+                                            name="recebe_paciente_filtro" 
+                                            style="width: 100%"
+                                        >
+                                            <option value="">TODOS</option>
+                                            {% for option_value in listagem_select_recebe_paciente_busca %}
+                                                {% if recebe_paciente_filtro == option_value %}
+                                                    <option selected value="{{option_value}}">{{option_value}}</option>
+                                                {% else %}
+                                                    <option value="{{option_value}}">{{option_value}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 mt-3">
+                                    <div class="br-input">
+                                        <label for="id_setor_superior_filtro">Setor Superior</label>
+                                        <select
+                                            id="id_setor_superior_filtro"
+                                            class="select-busca-grid campo-select"
+                                            name="setor_superior_filtro" 
+                                            style="width: 100%"
+                                        >
+                                            <option value="">TODOS</option>
+                                            {% for setor in listagem_select_setores_busca %}
+                                                {% if setor_superior_filtro == setor.id %}
+                                                    <option selected value="{{setor.id}}">{{setor.nome}}</option>
+                                                {% else %}
+                                                    <option value="{{setor.id}}">{{setor.nome}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-4 ml-6 buttonbusc2tb2">
+                            <button type="submit" class="br-button primary ml-3">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card hover">
+                <div class="card-content">
+                    <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                        <div class="table-header">
+                            <div>
+                                <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                            </div>
+                            <div class="top-bar mt-2">
+                                <div class="table-title">
+                                    {% comment %} <img src="{% static 'img/icons/icone-setor-grid.svg' %}" alt="Ícone do setor" title="Ícone do setor" style="display: block; height: 38px;"> 
+                                    <span class="mt-1 ml-4" style="display: block;">Setores Registrados</span> {% endcomment %}
+                                    <i class="fa-solid fa-people-group mr-2" style="font-size: 20.16px;"></i> <span>Setores Registrados</span>
+                                </div>
+                                <div class="search-trigger">
+                                    <a href="{% url 'saude_cadastro:setor_add' %}" class="br-button primary"><i class="fas fa-plus-circle"></i> Adicionar</a>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="mt-2">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th>Código do Setor</th>
+                                    <th>Sigla</th>
+                                    <th>Nome</th>
+                                    <th>Setor Superior</th>
+                                    <th>Recebe Paciente</th>
+                                    <th>Situação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% if setores %}
+                                {% for setor in setores %}
+                                    <tr>
+                                        <td data-th="Editar">
+                                            <a data-th="Editar" href="{% url 'saude_cadastro:setor_update' pk=setor.id %}"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                                        </td>
+                                        <td data-th="Excluir">
+                                            <a href="javascript:void(0)" onclick="confirmCancel('{% url 'saude_cadastro:setor_delete' setor.id %}', 'setor')">
+                                                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                        <td data-th="Código" style="text-transform:uppercase;">{{ setor.codigo }}</td>
+                                        <td data-th="Sigla">{{ setor.sigla }}</td>
+                                        <td data-th="Nome">{{ setor.nome }}</td>
+                                        <td data-th="Setor Superior">{{ setor.superior|default:"Não informado" }}</td>
+
+                                        {% if setor.recebe_paciente %}
+                                            <td><span class="bg-situacao-ativo situacao-grid">Sim</span></td>
+                                        {% else %}
+                                            <td><span class="bg-situacao-inativo situacao-grid">Não</span></td>
+                                        {% endif %}
+
+                                        {% if setor.situacao|return_situacao_unidade_setor_choice_option_text == 'Ativo' %}
+                                            <td><span class="bg-situacao-ativo situacao-grid">{{setor.situacao|return_situacao_unidade_setor_choice_option_text}}</span></td>
+                                        {% elif setor.situacao|return_situacao_unidade_setor_choice_option_text == 'Inativado' %}
+                                            <td><span class="bg-situacao-inativo situacao-grid">{{setor.situacao|return_situacao_unidade_setor_choice_option_text}}</span></td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                        {% comment %} Paginação {% endcomment %}
+                        {% include 'dashboard/includes/paginacao.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

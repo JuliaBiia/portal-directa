@@ -1,0 +1,79 @@
+{% load static %}
+{% load getlist %}
+
+<div class="table-footer">
+  <nav class="br-pagination" aria-label="Paginação de resultados" data-total="{{ page_obj.paginator.count }}" data-current="{{ page_obj.number }}" data-per-page="{{ page_obj.paginator.per_page }}">
+    <div class="pagination-information d-none d-sm-flex">
+      <span class="current">{{ page_obj.start_index }}</span>&ndash;
+      <span class="per-page">{{ page_obj.end_index }}</span>&nbsp;de&nbsp;
+      <span class="total">{{ page_obj.paginator.count }}</span>&nbsp;itens
+    </div>
+    <div class="pagination-go-to-page d-none d-sm-flex ml-auto">
+      <div class="br-select">
+        <div class="br-input">
+          <label for="go-to-selection-random-13292">Página</label>
+          <input id="go-to-selection-random-13292" type="text" placeholder=" "/>
+          <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1"
+                  data-trigger="data-trigger">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="br-list" tabindex="0">
+          {% for page in paginator.page_range %}
+          <div class="br-item" tabindex="-1">
+            <div class="br-radio">
+              <input id="go-to-{{ page }}-random-13292" type="radio" name="go-to-random-13292"
+                     value="{{ page }}" {% if page == page_obj.number %}checked="checked"{% endif %}/>
+              <label for="go-to-{{ page }}-random-13292">{{ page }}</label>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <span class="br-divider d-none d-sm-block mx-3"></span>
+    <div class="pagination-arrows ml-auto ml-sm-0">
+      <a class="br-button circle {% if not page_obj.has_previous %}disabled{% endif %}" 
+        href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}{% endif %}" 
+        aria-label="Voltar página">
+          <i class="fas fa-angle-left" aria-hidden="true"></i>
+      </a>
+      <a class="br-button circle {% if not page_obj.has_next %}disabled{% endif %}" 
+        href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}{% endif %}" 
+        aria-label="Avançar página">
+          <i class="fas fa-angle-right" aria-hidden="true"></i>
+      </a>
+  </div>
+  </nav>
+</div>
+
+{% block script %}
+<script src="{% static 'js/jquery.js' %}"></script>
+<script>
+  $(document).ready(function() {
+    $('input[name="go-to-random-13292"]').change(function() {
+      var pageNumber = $(this).val();
+      updateUrl(pageNumber);
+    });
+
+    function updateUrl(pageNumber) {
+      var currentUrl = window.location.href;
+      var newUrl;
+
+      if (currentUrl.includes('?')) {
+        if (currentUrl.match(/page=\d+/)) {
+          newUrl = currentUrl.replace(/(page=)\d+/, '$1' + pageNumber);
+        } else {
+          newUrl = currentUrl + '&page=' + pageNumber;
+        }
+      } else {
+        newUrl = currentUrl + '?page=' + pageNumber;
+      }
+
+      window.history.replaceState({}, document.title, newUrl);
+      window.location.reload();
+    }
+
+  });
+</script>
+{% endblock %}

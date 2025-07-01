@@ -1,0 +1,191 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de Histórias Clínicas{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes-mod-cadastro.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/estilizacao-grid.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade_tb.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade.css' %}"/>
+<style>
+    .br-breadcrumb .crumb-list .crumb a {
+        max-width: 246px !important;
+    }
+    td[data-th="Situação"]{
+        width: 170px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row mt-1">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="text-weight-semi-bold text-up-02 color-title font-size24">
+                                {% comment %} <img src="{% static 'img/icons/icone-historia-clinica.svg' %}" alt="Ícone de histórico médico" title="Ícone de histórico médico" style="display: block;">
+                                <span class="mt-1 ml-4" style="display: block;"><i class="fa-solid fa-folder-open"></i> TIPOS DE HISTÓRIA CLÍNICA</span> {% endcomment %}
+                                <i class="fa-solid fa-folder-open font-size25 mr-2"></i> TIPOS DE HISTÓRIA CLÍNICA
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="card-content mt-n10-tb">
+                    <form
+                        class="box-wdth-search"
+                        id="tipohistoriaclinica_form"
+                        method="get"
+                    >
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8">
+                                    <div class="br-input">
+                                        <label for="id_nome_filtro">Tipo</label>
+                                        <input
+                                            id="id_nome_filtro"
+                                            class="input-busca-grid input-com-alfanumericas"
+                                            name="nome_filtro"
+                                            type="text"
+                                            maxlength="50"
+                                            value="{{nome_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="id_situacao_filtro">Situação</label>
+                                        <select
+                                            id="id_situacao_filtro"
+                                            class="select-busca-grid campo-select"
+                                            name="situacao_filtro" 
+                                            style="width: 100%"
+                                        >
+                                            <option value="">TODAS</option>
+                                            {% for situacao in situacoes %}
+                                                {% if situacao_filtro == situacao %}
+                                                    <option selected value="{{situacao}}">{{situacao}}</option>
+                                                {% else %}
+                                                    <option value="{{situacao}}">{{situacao}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-4 ml-6 buttonbusc3tb2">
+                            <button type="submit" class="br-button primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card hover">
+              <div class="card-content">
+                <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                    data-random="data-random">
+                    <div class="table-header">
+                        <div>
+                            <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                        </div>
+                        <div class="top-bar mt-2">
+                            <div class="table-title">
+                                {% comment %} <img src="{% static 'img/icons/icone-historia-clinica.svg' %}" alt="Ícone de carro funerário" title="Ícone de carro funerário" style="display: block; height: 30px;">
+                                <span class="mt-1 ml-4" style="display: block;"><i class="fa-solid fa-folder-open"></i> Tipos de História Clínica Registrados</span>  {% endcomment %}
+
+                                <i class="fa-solid fa-folder-open mr-2" style="font-size: 20.16px;"></i> <span>Tipos de História Clínica Registrados</span>
+                            </div>
+                            <div class="search-trigger">
+                                <a href="{% url 'saude_cadastro:tipohistoriaclinica_add' %}" class="br-button primary"><i class="fas fa-plus-circle"></i> Adicionar</a>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="mt-2">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>Tipo</th>
+                            <th style="text-align: center;">Situação</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if tiposdehistoriaclinica %}
+                            {% for tipodehistoriaclinica in tiposdehistoriaclinica %}
+                                <tr>
+                                    <td data-th="Editar">
+                                        <a href="{% url 'saude_cadastro:tipohistoriaclinica_update' pk=tipodehistoriaclinica.id %}"><i
+                                            class="fas fa-edit" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td data-th="Excluir">
+                                        <a href="javascript:void(0)" onclick="confirmCancel('{% url 'saude_cadastro:tipohistoriaclinica_delete' tipodehistoriaclinica.id %}', 'tipo de história clínica')">
+                                            <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td data-th="Nome">{{ tipodehistoriaclinica.nome }}</td>
+
+                                    {% if tipodehistoriaclinica.situacao == 'ATIVO' %}
+                                        <td data-th="Situação">
+                                            <span class="bg-situacao-ativo situacao-grid">{{tipodehistoriaclinica.situacao}}</span>
+                                        </td>
+                                    {% elif tipodehistoriaclinica.situacao == 'INATIVO' %}
+                                        <td data-th="Situação">
+                                            <span class="bg-situacao-inativo situacao-grid">{{tipodehistoriaclinica.situacao}}</span>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                    {% comment %} Paginação {% endcomment %}
+                    {% include 'dashboard/includes/paginacao.html' %}
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+</div>
+{% endblock %}
+
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/gerenciamento_modal_notificacao_usuarios.js' %}"></script>
+<script src="{% static 'js/scripts_agendamedica/gerenciamento_remocao_dados.js' %}"></script>
+
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

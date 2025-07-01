@@ -1,0 +1,164 @@
+
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %} Alterar senha{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<!-- Favicon -->
+<link rel="icon" href="{% static 'img/fav-logo2.png' %}" type="image/x-icon" />
+<link rel="stylesheet" href="{% static '@govbr-ds/core/dist/core.css' %}"/>
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+<!-- Icons. Uncomment required icon fonts -->
+<link rel="stylesheet" href="{% static 'fonts/boxicons.css' %}"/>
+
+<!-- Core CSS -->
+<link rel="stylesheet" href="{% static 'css/core.css' %}" class="template-customizer-core-css"/>
+<link rel="stylesheet" href="{% static 'css/theme-default.css' %}" class="template-customizer-theme-css"/>
+<link rel="stylesheet" href="{% static 'css/demo.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+
+<!-- Vendors CSS -->
+<link rel="stylesheet" href="{% static 'css/perfect-scrollbar.css' %}"/>
+
+<!-- Page CSS -->
+<!-- Page -->
+<link rel="stylesheet" href="{% static 'css/page-auth.css' %}"/>
+<!-- Helpers -->
+<script src="{% static 'js/helpers.js' %}"></script>
+
+<!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+<!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+<script src="{% static 'js/config.js' %}"></script>
+<style>
+    .br-breadcrumb .crumb-list .crumb a {
+        max-width: 220px !important;
+    }
+</style>
+{% endblock %}
+  
+{% block content %}
+<div class="container d-block">
+  {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+  <div class="row mt-3" {% if user.deve_mudar_senha %}style="margin-top: 6% !important;"{% endif %}>
+    <div class="col-md">
+      <div class="br-card">
+
+          <div class="card-header pr-0 pl-0 pt-2">
+              <div class="d-flex">
+                  <div class="ml-3">
+                      <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                          <i class="fa-solid fa-lock" style="font-size: 30px;"></i>
+                          <span class="mt-1 ml-4 text-weight-semi-bold text-up-02" style="display: block;">ALTERAR SENHA</span>
+                      </div>
+                  </div>
+              </div>
+              <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+          </div>
+
+          <div class="container">
+            <div class="mt-4" style="margin-left:38px;"><span class="feedback danger" role="alert"><i class="fa-solid fa-circle" style="font-size:7px !important;"></i> &nbsp;A senha deve ter no mínimo 8 caracteres, incluindo letras, números e pelo menos um caractere especial (ex.: @, #, $, %).</span></div>  
+          </div>
+
+          <div class="card-content pt-0">
+            <form method="post">
+            {% csrf_token %}
+
+              <div class="card-body">
+                <div class="form-group row">
+                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                        <div class="br-input mt-3 form-password-toggle">
+                          <label for="id_nome_profissional">Senha atual: </label>
+                          {% if form.errors.old_password %}
+                            <div class="input-group input-group-merge">
+                              {% render_field form.old_password class="is-invalid form-control" placeholder="Digite a sua senha atual" aria-describedby="password" %}
+                              <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                            </div>
+                            <div><span class="feedback danger" role="alert">{{ form.errors.old_password }}</span></div>
+                          {% else %}
+                            <div class="input-group input-group-merge">
+                              {% render_field form.old_password class="form-control" placeholder="Digite a sua senha atual" aria-describedby="password" %}
+                              <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                            </div>
+                          {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                        <div class="br-input mt-3 form-password-toggle">
+                            <label for="id_nome_profissional">Nova Senha: </label>
+                            {% if form.errors.new_password1 %}
+                              <div class="input-group input-group-merge">
+                                {% render_field form.new_password1 class="form-control is-invalid" placeholder="Digite a sua nova senha" aria-describedby="password" %}
+                                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                              </div>
+                              <div><span class="feedback danger" role="alert">{{ form.errors.new_password1 }}</span></div>
+                            {% else %}
+                              <div class="input-group input-group-merge">
+                                {% render_field form.new_password1 class="form-control" placeholder="Digite a sua nova senha" aria-describedby="password" %}
+                                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                              </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                        <div class="br-input mt-3 form-password-toggle">
+                            <label for="id_nome_profissional">Confirmação da nova senha: </label>
+                            {% if form.errors.new_password2 %}
+                              <div class="input-group input-group-merge">
+                                {% render_field form.new_password2 class="form-control is-invalid" placeholder="Digite novamente a sua nova senha" aria-describedby="password" %}
+                                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                              </div>
+                              <div class="mb-3"><span class="feedback danger" role="alert">{{ form.errors.new_password2 }}</span></div>
+                            {% else %}
+                            <div class="input-group input-group-merge">
+                              {% render_field form.new_password2 class="form-control" placeholder="Digite novamente a sua nova senha" aria-describedby="password" %}
+                              <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                          {% if user.tipo_usuario == 'painel' %}
+                            <a href="{% url 'saude_cadastro:painel_chamada_list' %}" class="br-button secondary" style="margin: 5px; max-width: 200px;">
+                              <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
+                          {% elif not user.deve_mudar_senha %}
+                              <a href="{% url 'saude_cadastro:profissional_list' %}" class="br-button secondary" style="margin: 5px; max-width: 200px;">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                              </a>
+                          {% endif %}
+
+                          {% comment %} {% if not user.deve_mudar_senha and not user.tipo_usuario == 'painel' %}
+                          <a href="{% url 'saude_cadastro:profissional_list' %}" class="br-button secondary" style="margin: 5px; max-width: 200px;">
+                              <i class="fas fa-arrow-left"></i> Voltar
+                          </a>
+                          {% endif %} {% endcomment %}
+                          <button type="submit" class="br-button primary" style="margin: 5px; max-width: 200px;">
+                              <i class="fas fa-save"></i> Salvar
+                          </button>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Main JS -->
+<script src="{% static 'js/main.js' %}"></script>
+
+<!-- Place this tag in your head or just before your close body tag. -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+{% endblock %}

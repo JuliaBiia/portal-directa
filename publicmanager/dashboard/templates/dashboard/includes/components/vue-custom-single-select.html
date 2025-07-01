@@ -1,0 +1,128 @@
+'custom-single-select': Vue.component('custom-single-select', {
+    props: ['label', 'placeholder', 'options', 'loadOptions'],
+    delimiters: ["#{", "}"],
+    data() {
+        return {
+            isOpen: false,
+            searchQuery: '',
+            selectedOption: null,
+            filteredOptions: [],
+            registerNotFound: false,
+            inputValue: '',
+        };
+    },
+    watch: {
+        searchQuery() {
+            this.filterOptions();
+        },
+        isOpen(newValue) {
+            if (!newValue) {
+                this.searchQuery = '';
+            }
+        },
+        selectedOption() {
+            this.isOpen = false;
+        }
+    },
+    methods: {
+        filterOptions() {
+            // Chama a API para obter os resultados da pesquisa
+            this.registerNotFound = false
+
+            const word = this.searchQuery.trim(); 
+            if (word.length > 0) {
+
+                this.loadOptions(this.searchQuery).then(response => {
+                    this.filteredOptions = response.data.slice(0, 20);
+
+                    if(response.data.slice(0, 5).length > 0){
+                        this.registerNotFound = false
+                    }else{
+                        this.registerNotFound = true
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao obter resultados da pesquisa:', error);
+                });
+            }else if (word.length < 1) {
+                this.filteredOptions = [];
+            }
+        },
+        toggleDropdown() {
+            this.filteredOptions = [];
+            this.isOpen = !this.isOpen;
+            if (this.isOpen) {
+                this.$nextTick(() => {
+                    this.$refs.searchInput.focus();
+                });
+            }
+        },
+        selectOption(option) {
+            this.searchQuery = '';
+            this.filteredOptions = [];
+            this.selectedOption = option;
+            this.$emit('input', this.selectedOption);
+            this.searchQuery = '';
+        },
+        removeOption() {
+            this.selectedOption = ''
+            this.$emit('input', this.selectedOption);
+        },
+        closeDropdownOnOutsideClick(event) {
+            // Fechar a lista de opções se o clique ocorrer fora do componente
+            const isClickInside = this.$el.contains(event.target);
+            if (!isClickInside) {
+                this.filteredOptions = [];
+                this.isOpen = false;
+            }
+        },
+        truncateText(text, maxLength) {
+            if (text.length > maxLength) {
+                return text.substring(0, maxLength) + '...';
+            }
+            return text;
+        },
+    },
+    mounted() {
+        document.addEventListener('click', this.closeDropdownOnOutsideClick);
+    },
+    beforeDestroy() {
+        // Remover o ouvinte de eventos ao destruir o componente para evitar vazamentos de memória
+        document.removeEventListener('click', this.closeDropdownOnOutsideClick);
+    },
+    template: `
+        <div class="custom-select-container">
+            <div v-if="!selectedOption" class="br-input large input-button" @click="toggleDropdown">
+                <label for="input-search-large">#{ label }</label>
+
+                <input class="input-sem-borda capslock select-input" type="search" :placeholder="placeholder" @keydown.prevent style="cursor:pointer; caret-color: transparent; height: 40px !important;"/>
+
+                <button class="br-button" @click="filterOptions" type="button" aria-label="Buscar" style="height: 43px important;"><i class="fa-solid fa-caret-down" aria-hidden="true" style="font-size: 12px; color: var(--color-secondary-06) !important; margin-top: 10px;"></i>
+                </button>
+            </div>
+            <div v-else class="br-input large input-button capslock truncate" @click="filterOptions(), isOpen=true" style="font-family: inherit !important; font-size:17px !important; height: 43px !important; width: 100% !important; background-color:white !important; border-radius:5px !important; color:black !important; border: 1px solid gray !important; padding-top: 5px; padding-left: 10px; display: flex; align-items: center; cursor:pointer;">
+                <span v-if="selectedOption.codigo">#{ selectedOption.codigo } - </span> #{ truncateText(selectedOption.text, 30) } 
+                <span style="margin-left: auto;"> <i @click="removeOption()" class="fas fa-times" aria-hidden="true" style="color: #e52207; cursor:pointer; font-size: 14px; margin-right: 10px"></i></span>
+            </div>
+            
+            <div v-if="isOpen" class="custom-options-list" :style="filteredOptions.length === 1 ? 'height: 100px;' : filteredOptions.length > 1 ? 'height: 400px !important;' : 'height: 90px'" style="text-transform: uppercase;">
+                <div class="col br-input">
+                    <input ref="searchInput" class="form-control w100 input-sem-borda capslock" type="search" v-model="searchQuery" @change="filterOptions" style="border-radius: 0px !important; height: 30px;"/>
+                </div>
+                <div v-if="searchQuery.length < 1" class="col" style="color: #393939 !important;">
+                    {% comment %} <span v-if="searchQuery.length === 0"> Digite 3 ou mais caracteres</span>
+                    <span v-if="searchQuery.length == 1"> Digite 2 ou mais caracteres</span> {% endcomment %}
+                    <span v-if="searchQuery.length === 0"> Digite 1 ou mais caracteres</span>
+                </div>
+                <template v-if="filteredOptions">
+                    <div class="col" v-for="(option, index) in filteredOptions" :key="index" @click="selectOption(option)">
+                        <span v-if="option.codigo">#{ option.codigo } -  </span>#{ option.text }
+                    </div>
+                </template>
+                <div v-if="registerNotFound">
+                    <span> Nenhum resultado encontado.</span>
+                </div>
+            </div>
+        </div>
+    `
+})

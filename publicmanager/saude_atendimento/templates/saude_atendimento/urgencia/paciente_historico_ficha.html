@@ -1,0 +1,560 @@
+{% extends 'dashboard/base/base-pdf.html' %}
+{% load static %}
+{% block title %}Histórico de Atendimento{% endblock %}
+{% load widget_tweaks %}
+
+{% block css-extra-pdf %}
+<style>
+    .col p{color:black;}
+    .color-title{ color:var(--interactive); padding-top:2px; }
+    .title-span{ text-align:right; }
+    .title-span-clock{ text-align:right; }
+    .title-span span{ font-size:17px; color:var(--interactive); }
+    .title-span-clock span{ color:var(--interactive); }
+    .hr-ficha-title{ border: 1px solid var(--interactive); width:100%; }
+</style>
+{% endblock %}
+
+{% block contentpdf %}
+
+    <div class="row" style="text-align:center; margin-top:40px;">
+        <div class="col-6">
+            <h5><b>Histórico de Atendimento</b></h5>
+        </div>
+        <div class="col-6">
+            <h5>Número do Prontuário: <b>{{classificacao_risco.formatar_numeros_atendimento|default:'SEM INFORMAÇÃO'}}</b></h5>
+        </div>
+    </div>
+
+    <section title="01 - Identificacao">
+        <div class="row mt-4">
+            <div class="col-2">
+                <h5 class="color-title"><b>Identificação</b></h5>
+            </div>
+            <div class="col-10">
+                <hr style="border: 1px solid var(--interactive);">
+            </div>
+        </div>
+
+        <div class="row" style="margin:0 auto; margin-top:20px;">
+            <div class="col-8" style="padding-left: 10% !important;">
+
+                <div class="row">
+                    <div class="col-3">
+                        {% comment %} <label class="col-form-label">Nome Completo:</label> {% endcomment %}
+                        <p>Nome Completo:</p>
+                    </div>
+                    <div class="col br-input input-highlight">
+                        {% comment %} <input id="input-highlight-labeless" value="{{boletim.paciente.nome_paciente}}" type="text" readonly/> {% endcomment %}
+                        <p><b>{{boletim.paciente.nome_paciente}}</b></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        {% comment %} <label class="col-form-label" style="padding-top:20px;">Idade:</label> {% endcomment %}
+                        <p>Idade:</p>
+                    </div>
+                    <div class="col br-input input-highlight">
+                        {% comment %} <input id="input-highlight-labeless" value="{{boletim.paciente.calcular_idade}}" type="text" readonly/> {% endcomment %}
+                        <p><b>{{boletim.paciente.calcular_idade}}</b></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        {% comment %} <label class="col-form-label" style="padding-top:20px;">CPF:</label> {% endcomment %}
+                        <p>CPF:</p>
+                    </div>
+                    <div class="col br-input input-highlight">
+                        {% comment %} <input id="input-highlight-labeless" value="{{boletim.paciente.cpf}}" type="text" readonly/> {% endcomment %}
+                        {% if boletim.paciente.cpf %}
+                            <p><b>{{boletim.paciente.cpf}}</b></p>
+                        {% else %}
+                            <p><b>-</b></p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        {% comment %} <label class="col-form-label" style="padding-top:;">Cartão SUS:</label> {% endcomment %}
+                        <p>Cartão SUS:</p>
+                    </div>
+                    <div class="col br-input input-highlight">
+                        {% comment %} <input id="input-highlight-labeless" value="{{boletim.paciente.cartao_sus}}" type="text" readonly/> {% endcomment %}
+                        {% if boletim.paciente.cartao_sus %}
+                            <p><b>{{boletim.paciente.cartao_sus}}</b></p>
+                        {% else %}
+                            <p><b>-</b></p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        {% comment %} <label class="col-form-label" style="padding-top:20px;">Situação:</label> {% endcomment %}
+                        <p>Situação:</p>
+                    </div>
+                    <div class="col br-input input-highlight">
+                        {% comment %} <input id="input-highlight-labeless" value="{{boletim.paciente.get_situacao_display}}" type="text" readonly/> {% endcomment %}
+                        {% if boletim.paciente.get_situacao_display %}
+                            <p><b>{{boletim.paciente.get_situacao_display}}</b></p>
+                        {% else %}
+                            <p><b>-</b></p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-4">
+                {% if boletim.paciente.foto_paciente %}
+                    <img class="mt-2 mb-0 foto-paciente" src="{{ boletim.paciente.foto_paciente.url }}" alt="Foto paciente" style="max-width: 80%; border: 1px solid gray;">
+                {% else %}
+                    <img class="sem-foto-paciente" src="{% static 'img/avatar-user-gov.png' %}" alt="Ícone de pessoa" style="max-width: 80%; width: 80%;">
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <div class="row" style="margin-top:50px;">
+        <div class="col-md-auto title-span">
+            <h5 style="color:var(--interactive);"><b>Informações de Atendimento</b></h5>
+        </div>
+        <div class="col-8">
+            <hr class="hr-ficha-title">
+        </div>
+    </div>
+    
+    <section title="02 - Pre Atendimento">
+        <div class="row mt-5" style="width:100%; margin:0 auto; ">
+            <div class="col-3 title-span">
+                <span><b>Pré-Atendimento</b></span>
+            </div>
+            <div class="col-7">
+                <hr class="hr-ficha-title">
+            </div>
+            <div class="col-md-auto title-span-clock">
+                <span><b>{{boletim.created_at|date:'d/m/Y'}}<br/>às {{boletim.created_at|time:'H:i'}}</b></span>
+            </div>
+        </div>
+
+        <div class="row mt-4" style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Responsável Atendimento:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.profissional.nome_profissional|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row" style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Queixa Principal:</p>
+            </div>
+            <div class="col capslock">
+                <p><b>
+                    {{classificacao_risco.queixa_principal|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row" style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Escala de Dor:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.get_escala_dor_display|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Escala Geral:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.get_estado_geral_display|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Peso:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.peso|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Altura:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.altura|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Observação:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.observacao|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Pressão Arterial:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.presao_arterial|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Frequência Cardiaca:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.frequencia_cardiaca|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Frequência Respiratória:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.frequencia_respiratoria|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Temperatura:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.temperatura|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Spo02:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.spo2|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>HTG:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    {{classificacao_risco.hgt|default:'SEM INFORMAÇÃO'}}
+                </b></p>
+            </div>
+        </div>
+    </section>
+               
+    <div class="row mt-5" style="width:100%; margin:0 auto; ">
+        <div class="col-3 title-span">
+            <span><b>Atendimento Médico</b></span>
+        </div>
+        <div class="col-7">
+            <hr class="hr-ficha-title">
+        </div>
+        <div class="col-md-auto title-span-clock">
+            {% if classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set %}
+                <span><b>{{ classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.created_at|date:'d/m/Y' }}
+                <br/> às {{ classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.created_at|time:'H:i' }}</b></span>
+            {% else %}
+                -
+            {% endif %}
+
+            {% comment %} <span><b>{{boletim.boletim_classificacao_risco_set.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.created_at|date:'d/m/Y'}}<br/>às {{boletim.boletim_classificacao_risco_set.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.created_at|time:'H:i'}}</b></span> {% endcomment %}
+        </div>
+    </div>
+
+    <div class="row mt-4" style="width:90%; margin:0 auto; ">
+        <div class="col-4" style="text-align:right;">
+            <p>Médico Responsável:</p>
+        </div>
+        <div class="col">
+            <p><b>
+                {% for profissional in classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.profissionais.all %}
+                    {{profissional.nome_profissional}}
+                {% endfor %}
+             </b></p>
+        </div>
+    </div>
+          
+    <div class="row " style="width:90%; margin:0 auto; ">
+        <div class="col-4" style="text-align:right;">
+            <p>Evolução:</p>
+        </div>
+        <div class="col capslock">
+            <p><b>
+                {% if classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_evolucao_atendimento_set.all %}
+                    {% for evolucao in classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_evolucao_atendimento_set.all %}
+                        {{evolucao.numero_evolucao}} - {{evolucao.registro_evolucao}}<br/><br/>
+                    {% endfor %}
+                {% else %}
+                    Não existem evoluções registradas para esse atendimento.
+                {% endif %}
+            </b></p>
+        </div>
+    </div>
+
+    <div class="row " style="width:90%; margin:0 auto; ">
+        <div class="col-4" style="text-align:right;">
+            <p>Diagnóstico:</p>
+        </div>
+        <div class="col">
+            <p><b>
+                {% if classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_diagnostico_atendimento_set.all %}
+                    {% for diagnostico in classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_diagnostico_atendimento_set.all %}
+                        {{diagnostico.cid.nome}}
+                    {% endfor %}
+                {% else %}
+                    Não existem diagnósticos registrados para esse atendimento.
+                {% endif %}
+            </b></p>
+        </div>
+    </div>
+
+    <section title="Medicacao">
+        <div class="row mt-5" style="width:90%; margin:0 auto; ">
+            <div class="col-2 title-span">
+                <span><b>Medicação</b></span>
+            </div>
+            <div class="col-8">
+                <hr class="hr-ficha-title">
+            </div>
+            <div class="col-md-auto title-span-clock">
+                {% if classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.medicacaoatendimento_set.exists %}
+                    <span><b>{{ classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.medicacaoatendimento_set.all.first.created_at|date:'d/m/Y' }}
+                    <br/> ÀS {{ classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.medicacaoatendimento_set.all.first.created_at|time:'H:i' }}</b></span>
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row mt-4" style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Enfermeiro Responsável:</p>
+            </div>
+            <div class="col">
+                {% if classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.medicacaoatendimento_set.all %}
+                    <p><b>
+                    {% for profissional in classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.profissionais.all %}
+                        {{profissional.nome_profissional}}
+                    {% endfor %}
+                    </b></p>
+                {% else %}
+                    <p><b>SEM INFORMAÇÃO</b></p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row" style="width:90%; margin:0 auto;">
+            <div class="col-4" style="text-align:right;">
+                <p>Medicação:</p>
+            </div>
+            <div class="col">
+                {% if classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.medicacaoatendimento_set.all %}
+                    <p><b>
+                    {% for dados in classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.medicacaoatendimento_set.all %}
+                        {{dados.medicacao.nome_medicamento}} - {{dados.dosagem}} - {{dados.get_admin_medicamentosa_display}} - {{dados.get_tipo_parenteral_display}}<br>
+                    {% endfor %}
+                    </b></p>
+                {% else %}
+                    <p><b>SEM INFORMAÇÃO</b></p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    {% comment %} exames {% endcomment %}
+    <div class="row mt-5" style="width:95%; margin:0 auto; ">
+        <div class="col-2 title-span">
+            <span><b>Exames</b></span>
+        </div>
+        <div class="col-8">
+            <hr class="hr-ficha-title">
+        </div>
+        <div class="col-md-auto title-span-clock">
+            {% if classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_exame_atendimento_set.exists %}
+                <span><b>{{ classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_exame_atendimento_set.first.created_at|date:'d/m/Y' }}
+                <br/> ÀS {{ classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_exame_atendimento_set.first.created_at|time:'H:i' }}</b></span>
+            {% else %}
+                -
+            {% endif %}
+        </div>
+    </div>
+
+    {% if classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_exame_atendimento_set.all %}
+        {% for dados in classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_exame_atendimento_set.all %}
+            <div class="row mt-4" style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>Enfermeiro Responsável:</p>
+                </div>
+                <div class="col capslock">
+                    <p><b>
+                    {% for profissional in classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.profissionais.all %}
+                        {{profissional.nome_profissional}}
+                    {% endfor %}
+                    </p></b>
+                </div>
+            </div>
+
+            <div class="row " style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>Exames:</p>
+                </div>
+                <div class="col capslock">
+                    <p><b>
+                        {{dados.exame.tipo_exame.nome}} - {{dados.exame.nome}}
+                    </b></p>
+                </div>
+            </div>
+                
+            <div class="row " style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>Resultado:</p>
+                </div>
+                <div class="col capslock">
+                    <p><b>
+                        {{dados.justificativa}}
+                    </b></p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+
+        <div class="row mt-4" style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Enfermeiro Responsável:</p>
+            </div>
+            <div class="col">
+                <p><b>NENHUM EXAME REALIZADO</b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Exames:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    NENHUM EXAME REALIZADO
+                </b></p>
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Resultado:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    NENHUM EXAME REALIZADO
+                </b></p>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row mt-5" style="width:100%; margin:0 auto; ">
+        <div class="col-3 title-span">
+            <span><b>Procedimentos</b></span>
+        </div>
+        <div class="col-7">
+            <hr class="hr-ficha-title">
+        </div>
+        <div class="col-md-auto title-span-clock">
+            {% if classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_procedimento_atendimento_set.exists %}
+                <span><b>{{ classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_procedimento_atendimento_set.first.created_at|date:'d/m/Y' }}
+                <br/> ÀS {{ classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_procedimento_atendimento_set.first.created_at|time:'H:i' }}</b></span>
+            {% else %}
+                -
+            {% endif %}
+        </div>
+    </div>
+
+    {% if classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_procedimento_atendimento_set.all %}
+        {% for dados in classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_procedimento_atendimento_set.all %}
+            <div class="row mt-4" style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>Enfermeiro Responsável:</p>
+                </div>
+                <div class="col">
+                    <p><b>
+                    {% for profissional in classificacao_risco.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.profissionais.all %}
+                        {{profissional.nome_profissional}}
+                    {% endfor %}
+                    </p></b>
+                </div>
+            </div>
+
+            <div class="row " style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>Procedimentos:</p>
+                </div>
+                <div class="col">
+                    <p><b>
+                        {% if dados.procedimento.nome %}
+                            {{dados.procedimento.codigo}} - {{dados.procedimento.nome}}
+                        {% else %}
+                            NENHUM PROCEDIMENTO REALIZADO
+                        {% endif %}
+                    </b></p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="row mt-4" style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Enfermeiro Responsável:</p>
+            </div>
+            <div class="col">
+                
+            </div>
+        </div>
+
+        <div class="row " style="width:90%; margin:0 auto; ">
+            <div class="col-4" style="text-align:right;">
+                <p>Procedimentos:</p>
+            </div>
+            <div class="col">
+                <p><b>
+                    NENHUM PROCEDIMENTO REALIZADO
+                </b></p>
+            </div>
+        </div>
+    {% endif %}
+<br/><br/><br/>
+
+{% endblock %}

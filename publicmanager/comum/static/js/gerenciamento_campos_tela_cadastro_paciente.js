@@ -1,0 +1,1 @@
+$("#foto_paciente-clear_id").show()

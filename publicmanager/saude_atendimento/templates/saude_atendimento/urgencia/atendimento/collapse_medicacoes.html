@@ -1,0 +1,291 @@
+{% load static %}
+
+<div class="container container-lg-custom">
+    <div id="focus-container-topo" class="container" style="margin:0 auto;">
+        <div style="color:white;">.</div>
+
+        <div class="" id="focus-container-medicamentos">
+            
+            <div class="container box-card-border">
+
+                <div class="">
+                    <h5 class="color-title ml-2 font-size17"><i class="fas fa-book"></i> PRESCRIÇÃO DE MEDICAÇÃO</h5>
+                    <hr>
+                </div>
+
+                <form class="mt-3" method="" id="">
+                    <div class="container mt-3">
+                        <div class="row mt-4 justify-content-left">
+                            <div class="col-6">
+                                <span class="font-size16 color-title">Aplicação:</span><br/>
+                                <button type-data="btn-element" @click="formularioMedicacao.aplicacao = '0'" :class="formularioMedicacao.aplicacao === '0' ? 'primary': 'secondary'" class="br-button mt-2" type="button" style="border-radius: 7px; border-radius: 5px 0px 0px 5px;" :disabled="verificarAtendimentoEncerrado">
+                                    Imediata
+                                </button>
+                                <button type-data="btn-element" @click="formularioMedicacao.aplicacao = '1'" :class="formularioMedicacao.aplicacao === '1' ? 'primary': 'secondary'" class="br-button mt-2" type="button" style="border-radius: 7px; margin-left: -5px; border-radius: 0px 5px 5px 0px;" :disabled="verificarAtendimentoEncerrado">
+                                    Posterior
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4 justify-content-center">
+
+                            <div class="col-md-6 br-input" :class="verificarAtendimentoEncerrado ? 'select-disabled' : ''">
+                                <span class="font-size16 color-title">Via de Administração: <span style="color:red; opacity:1 !important;">(Obrigatório)</span></span>
+                                <select v-model="formularioMedicacao.via" class="via-admin mt-2" style="width: 100%; height: 40px; background-color:white; border-radius:5px; color:black; font-size: 100% !important;">
+                                    <option value="0" style="font-size:18px !important;">ORAL</option>
+                                    <option value="1" style="font-size:18px !important;">PARENTAL</option>
+                                    <option value="2" style="font-size:18px !important;">SUBCUTÂNIA</option>
+                                    <option value="3" style="font-size:18px !important;">NASAL</option>
+                                    <option value="4" style="font-size:18px !important;">RETAL</option>
+                                    <option value="5" style="font-size:18px !important;">INTRAVESICAL</option>
+                                    <option value="6" style="font-size:18px !important;">NEBOLIZAÇÃO</option>
+                                    <option value="7" style="font-size:18px !important;">OCULAR</option>
+                                    <option value="8" style="font-size:18px !important;">SUBLINGUAL</option>
+                                    <option value="9" style="font-size:18px !important;">RESPIRATÓRIA</option>
+                                    <option value="10" style="font-size:18px !important;">TÓPICO</option>
+                                    <option value="11" style="font-size:18px !important;">DERMATOLÓGICA</option>
+                                    <option value="12" style="font-size:18px !important;">INALATÓRIA</option>
+                                    <option value="13" style="font-size:18px !important;">OTOLOGICA</option>
+                                    <option value="14" style="font-size:18px !important;">TRANSDÉRMICA</option>
+                                    <option value="15" style="font-size:18px !important;">VAGINAL</option>
+                                    <option value="16" style="font-size:18px !important;">LOCAL</option>
+                                    <option value="17" style="font-size:18px !important;">EPIDURAL</option>
+                                </select>
+                            </div>
+
+                            <div :class="formularioMedicacao.via !== '1' || verificarAtendimentoEncerrado ? 'select-disabled' : ''" class="col-md-6 br-input">
+                                <span class="font-size16 color-title">Tipo Parental: <span style="color:red; opacity:1 !important;">(Obrigatório)</span></span>
+                                <select class="parental mt-2" style="width: 100%; height: 40px; background-color:white; border-radius:5px; color:black; border:1px solid #0459A1;">
+                                    <option value=""></option>
+                                    <option value="0" style="font-size:18px !important;">INTRAVENOSA</option>
+                                    <option value="1" style="font-size:18px !important;">INTRAMUSCULAR</option>
+                                    <option value="2" style="font-size:18px !important;">SUBCUTÂNEA</option>
+                                    <option value="3" style="font-size:18px !important;">INTRATECAL</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 justify-content-center">
+                            <div class="col-6">
+                                <span class="font-size16 color-title">Medicação: <span style="color:red; opacity:1 !important;">(Obrigatório)</span>
+                                <custom-single-select
+                                    ref="customMedicacaoAtendimento"
+                                    placeholder="Selecione uma Medicação"
+                                    :load-options="getMedicacoes"
+                                    v-model="selectedMedicacoesValues"
+                                    class="form-control"
+                                    style="width: 100%; height: 40px; background-color:white; border-radius:5px; color:black; margin-top: 5px!important; padding-bottom: 45px !important;"
+                                    :disabled="verificarAtendimentoEncerrado"
+                                ></custom-single-select>
+                                <i class="fa-solid fa-pills"></i><span style="font-size: 15px; color: black;"> Quantidade em estoque: <span id="chamado-1" class="badge" style="margin-left: 10px; background-color: var(--interactive-light); padding: 0.35em 0.65em; font-size: .75em; font-weight: 700; border-radius: 0.25rem; color: #fff;">${formularioMedicacao.quantidade}</span></span>
+                            </div>
+
+                            <div class="col-6 br-input">
+                                <span class="font-size16 color-title">Dosagem: <span style="color:red; opacity:1 !important;">(Obrigatório)</span>
+                                <input v-model="formularioMedicacao.dosagem" style="width:90%;" class="form-control w100 capslock mt-2" type="text" :disabled="verificarAtendimentoEncerrado">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 justify-content-left">
+                            <div class="col-6">
+                                <span class="font-size16 color-title">Dose Única?</span><br/>
+                                <button type-data="btn-element" @click="formularioMedicacao.doseUnica = true" :class="formularioMedicacao.doseUnica ? 'primary': 'secondary'" class="br-button mt-2" type="button" style="border-radius: 7px; border-radius: 5px 0px 0px 5px;" :disabled="verificarAtendimentoEncerrado">
+                                    Sim
+                                </button>
+                                <button type-data="btn-element" @click="formularioMedicacao.doseUnica = false" :class="!formularioMedicacao.doseUnica ? 'primary': 'secondary'" class="br-button mt-2" type="button" style="border-radius: 7px; margin-left: -5px; border-radius: 0px 5px 5px 0px;" :disabled="verificarAtendimentoEncerrado">
+                                    Não
+                                </button>
+                            </div>
+                            <div v-if="formularioMedicacao.aplicacao === '0'" class="col-6" :disabled="verificarAtendimentoEncerrado"></div>
+                            <template v-if="formularioMedicacao.aplicacao === '1'">
+                                <div class="col-3">
+                                    <div class="br-input">
+                                        <label class="font-size16 color-title">Duração Tratamento:</label>
+                                        <input class="mt-2" v-model="formularioMedicacao.duracaoTratamento" type="number"/>
+                                        <span style="color: var(--interactive);">${calcularMeses(formularioMedicacao.duracaoTratamento) ? '('+calcularMeses(formularioMedicacao.duracaoTratamento)+')' : ''}</span>
+                                        <span v-if="!formularioMedicacao.duracaoTratamento" style="color: red;">*Campo Obrigatório</span>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <label class="font-size16 color-title">Uso contínuo?</label><br/>
+                                    <button type-data="btn-element" @click="formularioMedicacao.usoContinuo = false" :class="!formularioMedicacao.usoContinuo ? 'primary': 'secondary'" class="br-button mt-2" type="button" style="border-radius: 7px; border-radius: 5px 0px 0px 5px;">
+                                        Não
+                                    </button>
+                                    <button type-data="btn-element" @click="formularioMedicacao.usoContinuo = true" :class="formularioMedicacao.usoContinuo ? 'primary': 'secondary'" class="br-button mt-2" type="button" style="border-radius: 7px; margin-left: -5px; border-radius: 0px 5px 5px 0px;">
+                                        Sim
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="row justify-content-left">
+                            <div v-if="formularioMedicacao.aplicacao === '1'" class="col-6">
+                                <span class="font-size16 color-title">Medicamento Controlado?</span><br/>
+                                <button type-data="btn-element" @click="formularioMedicacao.medicamentoControlado = true" :class="formularioMedicacao.medicamentoControlado ? 'primary': 'secondary'" class="br-button mt-2" type="button" style="border-radius: 7px; border-radius: 5px 0px 0px 5px;" :disabled="verificarAtendimentoEncerrado">
+                                    Sim
+                                </button>
+                                <button type-data="btn-element" @click="formularioMedicacao.medicamentoControlado = false" :class="!formularioMedicacao.medicamentoControlado ? 'primary': 'secondary'" class="br-button mt-2" type="button" style="border-radius: 7px; margin-left: -5px; border-radius: 0px 5px 5px 0px;" :disabled="verificarAtendimentoEncerrado">
+                                    Não
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 justify-content-left">
+                            <div v-if="formularioMedicacao.doseUnica" class="col-6"></div>
+                            <template v-if="!formularioMedicacao.doseUnica">
+                                <div class="col-3 br-input">
+                                    <span class="font-size16 color-title">Posologia: </span>
+                                    <input v-model="formularioMedicacao.posologia" class="form-control w100 capslock mt-2" type="number">
+                                </div>
+
+                                <div class="col-3 br-input">
+                                    <span class="font-size16 color-title">Tipo: </span>
+                                    <select class="mt-2" v-model="formularioMedicacao.tipoPosologia"  style="width: 100%; height: 40px; background-color:white; border-radius:5px; color:black;">
+                                        <option value="0" style="font-size:18px !important;" selected="selected">HORAS</option>
+                                        <option value="1" style="font-size:18px !important;">MINUTOS</option>
+                                    </select>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="row justify-content-center">
+                            <div class="col-12">
+                                <span class="font-size16 color-title">Observação:</span>
+                                <textarea v-model="formularioMedicacao.observacao" class="form-control w100 capslock mt-2" type="text" style="height:180px; border-radius:6px;" :disabled="verificarAtendimentoEncerrado"></textarea>
+                            </div>
+                        </div>
+                        {% comment %} <div class="row justify-content-center">
+                            <div class="col-11 col-right mt-4">
+                                <i class="fa-solid fa-star-of-life" style="color: red; font-size: 12px;"></i> <span style="color: red;"><b>Campos Obrigatorios</b></span>
+                            </div>
+                        </div> {% endcomment %}
+
+                        <div class="row mt-3" style="width:100%; margin:0 auto;">
+                            <div class="col-md-auto">
+                                <label class="col-form-label" style="margin-left: -15px;"><i class="fas fa-exclamation-triangle"></i> Alergias do Paciente:</label>
+                            </div>
+                            <div class="col-11">
+                                <span class="text-danger" v-for="alergia in selectedPrincipioValues" style="font-size:16px; color: red;">
+                                    <b>${alergia.text}</b><br/>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer mt-5 mb-2 ml-4">
+                        <template v-if="formularioMedicacao.id">
+                            <button type="button" @click="EditarCancelarMedicacao('cancelar')" class="br-button secondary" :disabled="formularioMedicacao.carregando">Cancelar</button>
+                            <button type="button" @click="verificarCriarMedicacao('PUT', formularioMedicacao)" class="br-button primary" 
+                                :disabled="!verificationVia || !formularioMedicacao.medicacaoPk || !formularioMedicacao.dosagem || !formularioMedicacao.doseUnica && formularioMedicacao.posologia === '' || formularioMedicacao.aplicacao === '1' && formularioMedicacao.duracaoTratamento === '' || verificarAtendimentoEncerrado || formularioMedicacao.carregando"
+                            >Atualizar Medicação</button>
+                        </template>
+
+                        <button v-else type="button" @click="verificarCriarMedicacao('POST')" class="br-button primary" 
+                            :disabled="!verificationVia || !formularioMedicacao.medicacaoPk || !formularioMedicacao.dosagem || !formularioMedicacao.doseUnica && formularioMedicacao.posologia === '' || formularioMedicacao.aplicacao === '1' && formularioMedicacao.duracaoTratamento === '' || verificarAtendimentoEncerrado || formularioMedicacao.carregando"
+                        >Adicionar Medicação</button>
+                    </div>
+                </form>
+                
+            </div>
+
+            <div class="container box-card-border mt-4">
+                <div class="row">
+                    <div class="col-3">
+                        <h5 class="color-title ml-2 font-size17"><i class="fas fa-history"></i> LISTA DE MEDICAÇÕES</h5>
+                    </div>
+                    <div class="col-3 visible-tb2 visible-xs">
+                        <a type="button" :class="!verificarListaControlada ? 'button-disabled' : ''" href="{% url 'saude_atendimento:receita_posterior_imediata_pdf' pk=object.pk %}?tipo=controlada" target="blank_" class="br-button secondary mt-3 btn-posterior col-collapse-print1"><i class="fa-solid fa-print mr-2"></i>Receita Controlada</a>
+                    </div>
+                    <div class="col-3 hidden-tb2">
+                        <a type="button" :class="!verificarListaControlada ? 'button-disabled' : ''" href="{% url 'saude_atendimento:receita_posterior_imediata_pdf' pk=object.pk %}?tipo=controlada" target="blank_" class="br-button secondary mt-3 btn-posterior"><i class="fa-solid fa-print mr-2"></i> Imprimir Receita Controlada</a>
+                    </div>
+                    <div class="col-3 visible-tb2 visible-xs">
+                        <a type="button" :class="!verificarListaPosterior ? 'button-disabled' : ''" href="{% url 'saude_atendimento:receita_posterior_imediata_pdf' pk=object.pk %}?tipo=posterior" target="blank_" class="br-button secondary mt-3 btn-posterior col-collapse-print2"><i class="fa-solid fa-print mr-2"></i>Receita Posterior</a>
+                    </div>
+                    <div class="col-3 hidden-tb2">
+                        <a type="button" :class="!verificarListaPosterior ? 'button-disabled' : ''" href="{% url 'saude_atendimento:receita_posterior_imediata_pdf' pk=object.pk %}?tipo=posterior" target="blank_" class="br-button secondary mt-3 btn-posterior"><i class="fa-solid fa-print mr-2"></i> Imprimir Receita Posterior</a>
+                    </div>
+                    <div class="col-3 visible-tb2 visible-xs">
+                        <a type="button" :class="!verificarListaImediata ? 'button-disabled' : ''" href="{% url 'saude_atendimento:receita_posterior_imediata_pdf' pk=object.pk %}?tipo=imediata" target="blank_" class="br-button secondary mt-3 btn-imediata col-collapse-print2"><i class="fa-solid fa-print mr-2"></i>Receita Imediata</a>
+                    </div>
+                    <div class="col-3 hidden-tb2">
+                        <a type="button" :class="!verificarListaImediata ? 'button-disabled' : ''" href="{% url 'saude_atendimento:receita_posterior_imediata_pdf' pk=object.pk %}?tipo=imediata" target="blank_" class="br-button secondary mt-3 btn-imediata"><i class="fa-solid fa-print mr-2"></i> Imprimir Receita Imediata</a>
+                    </div>
+                    <hr>
+                </div>
+
+                <div class="overflow-auto mt-3" style="overflow-x: auto;">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col font-table-collapse-med" style="width:5%;"></th>
+                                <th scope="col font-table-collapse-med" style="width:5%;"></th>
+                                <th scope="col font-table-collapse-med" style="width:5%;"></th>
+                                <th class="color-title font-table-collapse-med" scope="col"><b>Medicamento</b></th>
+                                <th class="color-title font-table-collapse-med" scope="col"><b>Dosagem</b></th>
+                                <th class="color-title font-table-collapse-med" scope="col"><b>Aplicação</b></th>
+                                <th class="color-title font-table-collapse-med" scope="col"><b>Posologia</b></th>
+                                {% comment %} <th scope="col"><b>Via</b></th>
+                                <th scope="col font-table-collapse-med"><b>Médico</b></th> {% endcomment %}
+                                <th class="color-title font-table-collapse-med" scope="col"><b>Situação</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-if="listagemMedicacoesAtendimentos.length > 0">
+                                <tr v-for="medicacao in listagemMedicacoesAtendimentos" class="capslock">
+                                    <template v-if="formularioMedicacao.id !== medicacao.id">
+                                        <th scope="row">
+                                            <i class="fa fa-eye font-size17" @click="visualizarInformacoes('medicacao', medicacao)" style="cursor: pointer;"></i>
+                                        </th>
+                                        <th scope="row">
+                                            <i :class="medicacao.medico.id !== profissionalPk || medicacao.situacao !== 0 || medicacao.lista_chamada_solicitacao || verificarAtendimentoEncerrado ? 'button-disabled' : ''" class="fa fa-edit font-size16" @click="EditarCancelarMedicacao('editar', medicacao)" style="cursor: pointer;"></i>
+                                        </th>
+                                        <th scope="row">
+                                            <i class="far fa-trash-alt" :class="medicacao.medico.id !== profissionalPk || medicacao.situacao !== 0 || medicacao.lista_chamada_solicitacao ? 'button-disabled' : ''" @click="showModalDelete('medicação', 'Medicação', medicacao)" style="cursor: pointer;"></i>
+                                        </th>
+                                        <td>${medicacao.medicamento_nome}</td>
+                                        <td>${medicacao.dosagem}</td>
+                                        <td>${medicacao.aplicacao === 0 ? 'IMEDIATA' : 'POSTERIOR'}</td>
+                                        <td>
+                                            <template v-if="medicacao.dose_unica">
+                                                Dose Única
+                                            </template>
+                                            <template v-else>
+                                                ${medicacao.posologia}/${medicacao.posologia} ${medicacao.tipo_posologia}
+                                            </template>
+                                        </td>
+                                        {% comment %} <td>${medicacao.admin_medicamentosa_nome}</td>
+                                        <td>${medicacao.medico_nome}</td> {% endcomment %}
+                                        <td style="text-align: center;">
+                                            <span v-if="medicacao.situacao === 0" class="br-tag" style="font-size: 15px; height: 30px; background-color: #FF9D29 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                                <i class="fa-solid fa-clock-rotate-left mr-2"></i>Solicitado
+                                            </span>
+                                            <span v-if="medicacao.situacao === 2" class="br-tag" style="font-size: 15px; height: 30px; background-color: #e52207 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                                Suspenso
+                                            </span>
+                                            <span v-if="medicacao.situacao === 3 || medicacao.situacao === 1" class="br-tag" style="font-size: 15px; height: 30px; background-color: #289e34f7 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                                Concluído
+                                            </span>
+                                            <span v-if="medicacao.situacao === 4" class="br-tag" style="padding: 12px; font-size: 15px; height: 32px; background-color: var(--interactive-light) !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                                <i v-if="medicacao.situacao === 4" class="fa-solid fa-arrow-rotate-right mr-2"></i>
+                                                Reaberto
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </template>
+                            <tr v-else>
+                                <td colspan="8" style="text-align: center;">
+                                    <span>Ainda não existe nenhuma medicação vinculada a esse paciente!</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-4" style="color:white;">.</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div style="color:white;">.</div>
+    </div>
+</div>

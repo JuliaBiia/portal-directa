@@ -1,0 +1,377 @@
+
+{% load static %}
+{% load enfermagem_filters %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <link rel="icon" href="{% static 'img/fav-logo2.png' %}" type="image/x-icon" />
+    <title>1GOV - BOLETIM DIÁRIO DE PRODUÇÃO</title>
+
+    <link rel="stylesheet" href="{% static '@govbr-ds/core/dist/core.css' %}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+     
+    <style>
+        .logo{ padding-top:15px; width:30%; }
+        title, head {display: none;}
+        .caption {text-align: center; margin-left: 10px;}
+        .caption-container {display: flex; align-items: center;}
+        table {width: 100%; border-collapse: collapse; margin-top: 20px;}
+        .tr{border:none !important;}
+        .main-header {display: flex; align-items: center; justify-content: space-between;}
+        
+        body {margin: 0; padding: 0; font-family: 'Rawline', sans-serif;}
+        .custom-col-width {width: 83.33333333%; margin-left: auto; margin-right: auto;}
+        .container{width: 100%; --grid-maxwidth: antiquewhite; border:none !important; }
+
+        .vertical-header {
+            transform: rotate(-90deg);
+            white-space: nowrap;
+            text-align: right;
+            height: auto;
+            width: 30px !important;
+            vertical-align: middle !important;
+            padding: 0px !important;
+        }
+
+        .vertical-span {transform: rotate(-90deg); width: 10px !important;}
+        .custom-th {padding-top: 123px !important; border: 1px solid #333 !important;}
+        .border-custom {vertical-align: middle !important; border: 1px solid #333 !important;}
+        .table td {border: 1px solid #333;}
+
+        {% comment %} Footer {% endcomment %}
+        .footer {position: fixed; bottom: 0; width: 100%; background-color: white;}
+        .footer-content {text-align: center; padding: 10px; border-top: 1px solid #333;}
+
+        @page {
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+
+        @page {
+            @bottom-right {
+                content: "< 1GOV > Impresso em {{ data_impressao }}";
+                font-size: 12px;
+                color: gray;
+            }
+
+            @bottom-left {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 12px;
+                color: gray;
+            }
+            @bottom-center {
+                content: "OBS: Marcar com X nas colunas correspondentes aos procedimentos realizados com o paciente. Caso o procedimento realizado não conste nas colunas, escreva o código do mesmo nas linhas em branco subsequentes. Ao termino de suas atividades o profissional responsavél deve consolidar a produção.";
+                font-size: 14px;
+                margin-top: -20px;
+                color: gray;
+            }
+        }
+
+        @page {size: 490mm 291mm; margin: 10mm;}
+        .page-break {page-break-before: always;}
+    </style>
+</head>
+<body>
+
+    {% comment %} Enfermeiro {% endcomment %}
+    {% if profissional.tipo_profissional == 3 or profissional.tipo_profissional == 0 %}
+        <div class="header">
+            <div class="row no-gutters" style="border: 1px solid; padding: 5px;">
+                <div class="col-3">
+                    <img class="logo" src="{% static 'img/logo-1gov.png' %}" alt="Logo"/>
+                </div>
+                <div class="col-6 text-center">
+                    <h5 class="mt-3"><b>PREFEITURA MUNICIPAL DE {{unidade_saude.municipio.nome}} <br/> BOLETIM DIÁRIO DE PRODUÇÃO - BDP | ENFERMEIRO(A)</b></h5>
+                </div>
+                <div class="col-3 d-flex justify-content-end">
+                    {% if unidade_saude.logo %}
+                    <img src="{{unidade_saude.logo.url}}" style="width:100px; margin-left: -10px;"/>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row no-gutters mt-2" style="border: 1px solid; padding: 0px;">
+                <div class="col-6">
+                    <span style="margin-left: 3px;"><b>UNIDADE:</b></span> {{unidade_saude}}
+                </div>
+                <div class="col-6" style="border-left: 1px solid;">
+                    <span style="margin-left: 3px;"><b>DATA:</b></span> 
+                    <span class="mt-1">{% if data_inicial == data_final %}{{data_inicial}}{% else %}{{data_inicial}} até {{data_final}}{% endif %}</span>
+                    <span class="mt-1">{% if hora_inicial and hora_final and hora_inicial == hora_final %}{{hora_inicial}}{% elif hora_inicial and hora_final and hora_inicial != hora_final %}{{hora_inicial}} - {{hora_final}}{% elif hora_inicial and not hora_final %}{{hora_inicial}}{% elif not hora_inicial and hora_final %}{{hora_final}}{% endif %}</span>
+                </div>
+            </div>
+            <div class="row no-gutters mt-2" style="border: 1px solid; padding: 0px;">
+                <div class="col-6">
+                    <span style="margin-left: 3px;"><b>PROFISSIONAL:</b></span> {{profissional.nome_profissional}}
+                </div>
+                <div class="col-6" style="border-left: 1px solid;">
+                    <span style="margin-left: 3px;"><b>REGISTRO:</b></span> {{profissional.crm|default:'----------'}}
+                </div>
+            </div>
+        </div>
+
+        <div class="page">
+
+            <div class="container" style="padding: 0px !important; width: 100%;">
+                <table class="table text-nowrap table-hover">
+                    <thead class="text-center">
+                        <tr>
+                            <th class="text-center border-custom" rowspan="4" style="width: 35%;"><b>CNS PACIENTE</b></th>
+                            <th class="text-center border-custom" rowspan="4" style="width: 35%;"><b>NOME DO PACIENTE</b></th>
+                            <th class="text-center border-custom" style="padding: 21px !important;" rowspan="4"><b>I<br/>D<br/>A<br/>D<br/>E<br/></b></th>
+                            <th class="text-center border-custom" colspan="2"></th>
+                            <th class="text-center border-custom" colspan="2"><b>Aferição</b></th>
+                            <th class="text-center border-custom" colspan="1"></th>
+                            <th class="text-center border-custom" colspan="2"><b>Cateter</b></th>
+                            <th class="text-center border-custom" colspan="1"></th>
+                            <th class="text-center border-custom" colspan="2"><b>Curativo</b></th>
+                            <th class="text-center border-custom" colspan="1"></th>
+                            <th class="text-center border-custom" colspan="5"><b>TESTE RÁPIDOS</b></th>
+                            <th class="text-center border-custom" colspan="1"></th>
+                            <th class="text-center border-custom" colspan="2"><b>Pontos</b></th>
+                            <th class="text-center border-custom" colspan="1"></th>
+                            <th class="text-center" colspan="1" style="border-top: 1px solid #333 !important; border-right: 1px solid #333 !important; border-bottom: none !important;"><b>CARIMBO ASSINATURA</b></th>
+                        </tr>
+                        
+                        <tr>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.06.011-8 <br/> Classificação de Risco</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.01.004-8 <br/> Consultas/Ambulatório</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.003-9 <br/> Pressão</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.025-0 <br/> Temperatura</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 01.01.04.002-4 <br/> Antropometria</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.004-7 <br/> Alívio</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.005-5 <br/> Demora</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.014-4 <br/> Oxigenoterapia</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.027-6 <br/> Especial</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 04.01.01.001-5 <br/> Grau II</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.015-2 <br/> Retirada de Pontos</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 02.14.01.001-5 <br/> Gilcemia</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 02.14.01.004-0 <br/> HIV Gestante</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 02.14.01.008-2 <br/> Sífilis Gestante</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 02.14.01.010-4 <br/> HBs AG</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 02.14.01.0163 <br/> SARS-COVID2</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.001-2 <br/> adm. Medicação </div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.10.01.001-2 <br/> Asst. s/ Distorcia </div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.10.01.003-9 <br/> Normal </div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.10.01.002-0 <br/> Atend. Recem Nasc </div></th>
+                            <th class="text-center" rowspan="3" style="vertical-align: bottom !important; border-bottom: 1px solid #333 !important; border-right: 1px solid #333 !important;">
+                                <div style="border-top: 1px solid; margin-bottom: -10px;"> PROCEDIMENTO</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if lista_producao %}
+                            {% for producao in lista_producao %}
+                                <tr> 
+                                    <td style="padding: 4px !important; text-align: center;">{{ producao.profissional_cns|default:'-----' }}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{{ producao.paciente_nome|default:'-----'}}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{{ producao.paciente_idade|default:'-----' }}</td>
+                                    
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.classificacao %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.ambulatorio %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.pressao %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.temperatura %}X{% endif %}</td>
+                                    
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.antropometria %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.alivio %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.demora %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.oxigenoterapia %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.especial %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.grau %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.pontos %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.gilcemia %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.hiv %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.sifilis %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.hbs %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.sars %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.medicacao %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.distorcia %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.normal %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.nascido %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;"></td>
+                                </tr>
+                            {% endfor %}
+
+                            {% for i in linhas_brancas %}
+                                <tr>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="24"><p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p></td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="page-break"></div>
+
+    {% comment %} Técnico de Enfermeiro {% endcomment %}
+    {% if profissional.tipo_profissional == 10 or profissional.tipo_profissional == 0 %}
+        
+        <div class="header">
+            <div class="row no-gutters" style="border: 1px solid; padding: 5px;">
+                <div class="col-3">
+                    <img class="logo" src="{% static 'img/logo-1gov.png' %}" alt="Logo" >
+                </div>
+                <div class="col-6 text-center">
+                    <h5 class="mt-3"><b>PREFEITURA MUNICIPAL DE ACARI <br/> BOLETIM DIÁRIO DE PRODUÇÃO - BDP | TÉCNICO DE ENFERMAGEM</b></h5>
+                </div>
+                <div class="col-3 d-flex justify-content-end">
+                    <img src="{% static 'img/logo-acari.png' %}" style="width:100px; margin-left: -10px;"/>
+                </div>
+            </div>
+
+            <div class="row no-gutters mt-2" style="border: 1px solid; padding: 0px;">
+                <div class="col-6">
+                    <span style="margin-left: 3px;"><b>UNIDADE:</b></span> {{unidade_saude}}
+                </div>
+                <div class="col-6" style="border-left: 1px solid;">
+                    <span style="margin-left: 3px;"><b>DATA:</b></span> <span class="mt-1">{{data_inicial}} - {{data_final}}</span>
+                </div>
+            </div>
+            <div class="row no-gutters mt-2" style="border: 1px solid; padding: 0px;">
+                <div class="col-6">
+                    <span style="margin-left: 3px;"><b>PROFISSIONAL:</b></span> {{profissional.nome_profissional}}
+                </div>
+                <div class="col-6" style="border-left: 1px solid;">
+                    <span style="margin-left: 3px;"><b>REGISTRO:</b></span> {{profissional.crm|default:'----------'}}
+                </div>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="container" style="padding: 0px !important; width: 100%;">
+                <table class="table text-nowrap table-hover">
+                    <thead class="text-center">
+                        <tr>
+                            <th class="text-center border-custom" rowspan="4" style="width: 35%;"><b>CNS PACIENTE</b></th>
+                            <th class="text-center border-custom" rowspan="4" style="width: 35%;"><b>NOME DO PACIENTE</b></th>
+                            <th class="text-center border-custom" style="padding: 21px !important;" rowspan="4"><b>I<br/>D<br/>A<br/>D<br/>E<br/></b></th>
+                            <th class="text-center border-custom" colspan="2"><b>Teste</b></th>
+                            <th class="text-center border-custom" colspan="1"></th>
+                            <th class="text-center border-custom" colspan="2"><b>Aferição</b></th>
+                            <th class="text-center border-custom" colspan="11"></th>
+                            <th class="text-center" colspan="1" style="border-top: 1px solid #333 !important; border-right: 1px solid #333 !important; border-bottom: none !important;"><b>CARIMBO ASSINATURA</b></th>
+                        </tr>
+                        
+                        <tr>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 02.14.01.001-5 <br/> Gilcemia</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 02.14.01.016-3 <br/> Rápido SARS-COVID 2</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.001-2 <br/> Adm. Medicação</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.025-0 <br/> Temperatura</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.003-9 <br/> Pressão</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 01.01.04.002-4 <br/> Antropometria</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.014-4 <br/> Oxigenoterapia</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.018-7 <br/> Reidratação Oral</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.010-1 <br/> Nebulização</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.026-8 <br/> Preparação p/ ECG</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.015-2 <br/> Retirada de Pontos</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.028-4 <br/> Curativo Simples</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.004-7 <br/> Cateter Vesical Alivio</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.10.009-8 <br/> Enema</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.10.01.002-0 <br/> Atend. Recém Nascido</div></th>
+                            <th class="text-center custom-th" rowspan="3"><div class="vertical-header"> 03.01.03.015-4 <br/> Transferência </div></th>
+                            <th class="text-center" rowspan="3" style="vertical-align: bottom !important; border-bottom: 1px solid #333 !important; border-right: 1px solid #333 !important;">
+                                <div style="border-top: 1px solid; margin-bottom: -10px;"> PROCEDIMENTO</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% if lista_producao %}
+                            {% for producao in lista_producao %}
+                                <tr> 
+                                    <td style="padding: 4px !important; text-align: center;">{{ producao.profissional_cns|default:'-----' }}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{{ producao.paciente_nome|default:'-----'}}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{{ producao.paciente_idade|default:'-----' }}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.gilcemia %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.sars %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.medicacao %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.temperatura %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.pressao %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.antropometria %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.oxigenoterapia %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.reidratacao %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.nebulizacao %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.ecg %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.pontos %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.curativo_simples %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.cateter %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.enema %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.nascido %}X{% endif %}</td>
+                                    <td style="padding: 4px !important; text-align: center;">{% if producao.transferencia %}X{% endif %}</td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                </tr>
+                            {% endfor %}
+
+                            {% for i in linhas_brancas %}
+                                <tr>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                    <td style="padding: 13px !important; text-align: center;"></td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="20"><p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p></td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+</body>
+</html>

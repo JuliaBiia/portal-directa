@@ -1,0 +1,161 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Listagem de Paineis{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/estilizacao-grid.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes-mod-cadastro.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade_tb.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade.css' %}"/>
+<style>
+    .br-breadcrumb .crumb-list .crumb a {max-width: 221px !important;}
+    td[data-th="Link"]{width: 30px;}
+</style>
+{% endblock %}
+{% block content %}
+    <div class="container-lg">
+        {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+        <div class="row mt-1">
+            <div class="col-md">
+                <div class="br-card">
+
+                    <div class="card-header">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="text-weight-semi-bold text-up-02 color-title font-size24"><i class="fa-solid fa-solar-panel mr-1" aria-hidden="true"></i> PAINÉIS DE CHAMADOS</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    
+                    <div class="card-content mt-n10-tb">
+                        <form class="box-wdth-search" id="principio_ativo_form" method="get" onsubmit="setDate()">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                        <div class="br-input">
+                                            <label for="id_nome_filtro">Nome</label>
+                                            <input id="id_nome_filtro" class="input-com-alfanumericas form-control" name="nome_filtro" type="text" maxlength="50" value="{{nome_filtro}}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer mt-4 ml-6">
+                                {% comment %} <a href="{% url 'saude_cadastro:convenio_list' %}" class="br-button secondary mr-3">
+                                    <i class="fas fa-arrow-left" aria-hidden="true" hidden></i> Voltar
+                                </a> {% endcomment %}
+                                <button type="submit" class="br-button primary buttonbusc4tb2">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {% comment %} Mensagens de Alerta {% endcomment %}
+        {% include 'dashboard/includes/mensagens.html' %}
+
+        <div class="row">
+            <div class="col-md">
+                <div class="br-card hover">
+                <div class="card-content">
+                    <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                        data-random="data-random">
+                        <div class="table-header">
+                            <div>
+                                <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                            </div>
+                            <div class="top-bar mt-2">
+                                <div class="table-title">
+                                    <i class="fa-solid fa-list-ul mr-2"></i>
+                                    <span>Listagem de Painéis de chamados</span>
+                                </div>
+                                {% if user.tipo_usuario == 'administrador' or user.tipo_usuario == 'suporte' or user.tipo_usuario == 'desenvolvedor' or user.suporte %}
+                                <div class="search-trigger">
+                                    <a href="{% url 'saude_cadastro:painel_chamada_add' %}" class="br-button primary"><i class="fas fa-plus-circle"></i> Adicionar</a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <table class="mt-2">
+                            <thead>
+                            <tr>
+                                {% if user.tipo_usuario == 'administrador' or user.tipo_usuario == 'suporte' or user.tipo_usuario == 'desenvolvedor' or user.suporte %}
+                                <th></th>
+                                <th></th>
+                                {% endif %}
+                                <th class="bold">Nome</th>
+                                <th class="bold">Setores na Chamada</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if object_list %}
+                                {% for painel in object_list %}
+                                    <tr>
+                                        {% if user.tipo_usuario == 'administrador' or user.tipo_usuario == 'suporte' or user.tipo_usuario == 'desenvolvedor' or user.suporte %}
+                                        <td data-th="Editar">
+                                            <a href="{% url 'saude_cadastro:painel_chamada_update' pk=painel.id %}"><i
+                                                class="fas fa-edit" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                        <td data-th="Excluir">
+                                            <a href="javascript:void(0)" onclick="confirmCancel('{% url 'saude_cadastro:painel_chamada_delete' painel.id %}', 'Painel Chamado')">
+                                                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                        {% endif %}
+                                        <td class="capslock" data-th="Código">{{ painel.nome }}</td>
+                                        <td class="capslock" data-th="Código">
+                                            {% for setor in painel.setores.all %}
+                                                <span class="br-tag" aria-describedby="tag-text01" style="height: 35px; margin: 5px;">
+                                                    <span id="tag-text01">{{setor.nome}}</span>
+                                                </span>
+                                            {% endfor %}
+                                        </td>
+                                        <td data-th="Link">
+                                            
+                                            <a class="br-button circle primary mr-3" target="_blank" href="{% url 'dashboard:painel_chamado' slug2=painel.unidade_saude.slug slug1=painel.slug %}" type="button" aria-label="Ícone ilustrativo">
+                                                <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                        {% comment %} Paginação {% endcomment %}
+                        {% include 'dashboard/includes/paginacao.html' %}
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+{% endblock %}
+
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/gerenciamento_modal_notificacao_usuarios.js' %}"></script>
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_remocao_dados.js' %}"></script>
+    <script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Formulário Atestado Médico{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="br-card">
+            
+            <div class="card-header">
+                <div class="d-flex">
+                    <div class="ml-3 mt-3">
+                        <div class="text-weight-semi-bold text-up-02 color-title"><i class="fas fa-notes-medical" style="font-size:25px;"></i> ATESTADO MÉDICO</div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            
+            <div class="card-content">
+                <form method="post">    
+                    {% csrf_token %}
+                    {{ form.errors }}
+
+                    <div class="card-body">
+                        <div class="form-group row">
+                            
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 margin-0">
+                                <div class="br-input mt-3">
+                                    <div class="br-input">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                            <label for="id_nome_paciente">Paciente:</label>
+                                        </div>
+                                        <div class="col br-input input-highlight">
+                                            <input id="input-highlight-labeless" value="{{paciente.nome_paciente}}" type="text" readonly/>
+                                            <input type="hidden" name="atendimento" class="form-control" id="id_atendimento" value="{{atendimento.pk}}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 margin-0">
+                                <div class="br-input mt-3">
+                                    <div class="br-input">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                            <label for="id_nome_paciente">Data de Entrada:</label>
+                                        </div>
+                                        <div class="col br-input input-highlight">
+                                            <input id="input-highlight-labeless" value="{{data_atual}}" type="text" readonly/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 margin-0">
+                                <div class="br-input mt-3">
+                                    <div class="br-input">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                            <label for="id_nome_paciente">Quantidade de Dias:</label>
+                                        </div>
+                                        <div class="col mt-2">
+                                            <input class="form-control" type="number" name="quantidade" id="id_quantidade">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 margin-0">
+                                <div class="br-input mt-3">
+                                    <div class="br-input">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                            <label for="id_nome_paciente">CID:</label>
+                                        </div>
+                                        <div class="col-12 mt-1">
+                                            {% if diagnostico %}
+                                                <select class="col-12" name="cid" id="id_cid" style="height:50px; font-size:18px; border-radius:4px;">
+                                                    <option selected disabled>..:Selecione o Diagnostico:..</option>
+                                                    {% for dados in diagnostico %}
+                                                        <option value="{{dados.cid.pk}}">{{dados.cid.nome}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            {% else %}
+                                                <div class="br-input input-highlight mt-2">
+                                                    <input id="input-highlight-labeless" value="Paciente não possui Diagnostico para esse Atendimento" type="text" readonly/>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 margin-0">
+                                <div class="mt-5">
+                                    <a href="{% url 'saude_atendimento:atendimento_atestado_list' %}?pk={{paciente.pk}}&lista={{atendimento.lista_chamada.pk}}" class="br-button secondary mr-3"> <i class="fas fa-arrow-left"></i> Voltar </a>
+                                    <button type="submit" class="br-button primary"><i class="fas fa-print"></i> Imprimir</button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            
+        </div>
+    </div>
+
+{% endblock %}

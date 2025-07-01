@@ -1,0 +1,93 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}{% if object %}Edição{% else %}Cadastro{% endif %} de Farmácia{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+{% endblock %}
+{% block content %}
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="row">
+            <div class="col-lg-12 mb-4 order-0">
+                <div class="card d-flex flex-column justify-content-center align-items-center">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0 d-sm-inline-block">{% if object %}Editar{% else %}Adicionar{% endif %} Farmácia</h5>
+                    </div>
+                    <form class="col-xl-12 col-lg-12 col-md-12 col-sm-12" method="post" id="farmacia_form">{% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                    <div class="br-input mt-3">
+                                        <label for="id_nome_farmacia">Nome <span class="text-danger">(Obrigatório)</span></label>
+                                        {% render_field form.nome_farmacia class="input-com-alfanumericas" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                    <div class="br-input mt-3">
+                                        <label for="id_unidade_saude">Unidade de saúde<span class="text-danger">(Obrigatório)</span></label>
+                                        {% render_field form.unidade_saude type="text" class="campo-select" style="width: 100%" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                    <div class="br-input mt-3">
+                                        <label for="id_tipo_farmacia">Tipo da farmácia<span class="text-danger">(Obrigatório)</span></label>
+                                        {% render_field form.tipo_farmacia type="text" class="campo-select" style="width: 100%" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                    <div class="br-input mt-3">
+                                        <label for="id_situacao_farmacia">Situação<span class="text-danger">(Obrigatório)</span></label>
+                                        {% render_field form.situacao_farmacia type="text" class="campo-select" style="width: 100%" %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer d-flex justify-content-center">
+                            {% if form.errors %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <div class="br-message danger" role="alert">
+                                            <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                                aria-hidden="true"></i>
+                                            </div>
+                                            <div class="content"><span
+                                                    class="message-title">Erro no campo {{ field.label }}.</span><span
+                                                    class="message-body"> {{ error }}</span>
+                                            </div>
+                                            <div class="close">
+                                                <button class="br-button circle small" type="button"
+                                                        aria-label="content"><i
+                                                        class="fas fa-times" aria-hidden="true"></i></button>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                            <a href="{% url 'saude_farmacia:farmacia_list' %}" class="br-button secondary mt-6 mr-3"> <i class="fas fa-arrow-left"></i> Voltar</a>
+                            <button type="submit" class="br-button primary mt-6">
+                                <i class="fas fa-save"></i> Salvar
+                            </button>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

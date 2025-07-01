@@ -1,0 +1,33 @@
+.br-table > .table-header > div > span.br-divider{
+    border: 1.14px solid var(--interactive);
+}
+
+.br-table > .table-header > .top-bar{
+    margin-top: 17px !important;
+}
+
+.br-table > .table-header > .top-bar > .table-title{
+    color: #1351B4;
+
+    font-family: 'rawline';
+    font-weight: 600;
+    font-size: 1.196rem;
+}
+
+.br-table > .table-header > .top-bar > .table-title > span{
+    color: #000;
+}
+
+.br-table > .responsive > table > thead > tr > th{
+    font-family: "rawline";
+    color: #1351B4 !important;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.br-table > .responsive > table > tbody > tr > td{
+    font-family: 'rawline';
+    font-weight: 400;
+    font-size: 0.875rem;
+    color: #000;
+}

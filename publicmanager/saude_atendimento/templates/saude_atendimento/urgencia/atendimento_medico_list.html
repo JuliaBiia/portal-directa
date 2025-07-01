@@ -1,0 +1,520 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Atendimento Médico{% endblock %}
+
+{% load static %}
+{% load widget_tweaks %}
+{% load saude_extras %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/saude/classificacao-risco.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/datatables.min.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/sweetalert-custom-alta-hospitalar.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+
+<style>
+    .br-tag {font-size: 15px; width: 46px !important; height: 27px;}
+    .tag-amarelo { background-color: #eae451; }
+    .tag-azul { background-color: #4c9fe4; }
+    .tag-verde { background-color: #3ec86d; }
+    .tag-laranja { background-color: #ff9d29; }
+    .tag-roxo { background-color: #5942D2; }
+    .tag-cinza { background-color: #999; }
+    .tag-vermelho { background-color: #e52207; }
+    .tag-preto { background-color: rgba(0, 0, 0, 0.9); }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.35em 0.65em;
+        font-size: .75em;
+        font-weight: 700;
+        line-height: 1;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+    }
+
+    a[disabled="disabled"] {
+        pointer-events: none;
+        color: #888;
+        text-decoration: none;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    
+    #input-design{ border:none; border-bottom:1px solid #000; outline:none; }
+    
+    .swal2-modal {width: 550px !important; height: 420px !important;}
+    .swal2-validation-message{ margin-top:20px !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-lg">
+
+        {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+        <div class="row mt-2">
+            <div class="col-md">
+                <div class="br-card">
+                    
+                    <div class="card-header">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="text-weight-semi-bold text-up-02 color-title font-size24 fontsize15-w"><i class="fa-solid fa-hospital-user font-size25 fontsize15-w mr-2"></i> ATENDIMENTO MÉDICO</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="card-content mt-10-nmb">
+                        <form class="box-wdth-search" id="formSubmit" method="get" onsubmit="setDate()">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9">
+                                        <div class="br-input">
+                                            <label for="id_nome">Dados da Busca</label>
+                                            <input type="text" name="buscar_nome" maxlength="255" class="form-control input-com-alfanumericas" value="{{buscar_nome}}" style="height:44px !important;">
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 mt-10-w">
+                                        <div class="br-select">
+                                            <div class="br-input">
+                                            <label for="select-simple">Opção de Busca</label>
+                                            <input id="select-simple" type="text" placeholder="Selecione o item" style="height:44px !important;"/>
+                                            <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1" data-trigger="data-trigger">
+                                                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                            </button>
+                                            </div>
+                                            <div class="br-list" tabindex="0">
+                                            <div class="br-item {% if opcao_filtro == 'paciente' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb0" type="radio" name="opcao_filtro" value="paciente"/>
+                                                <label for="rb0">Paciente</label>
+                                                </div>
+                                            </div>
+                                            <div class="br-item {% if opcao_filtro == 'cpf' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb1" type="radio" name="opcao_filtro" value="cpf"/>
+                                                <label for="rb1">CPF</label>
+                                                </div>
+                                            </div>
+                                            <div class="br-item {% if opcao_filtro == 'rg' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb2" type="radio" name="opcao_filtro" value="rg"/>
+                                                <label for="rb2">RG</label>
+                                                </div>
+                                            </div>
+                                            <div class="br-item {% if opcao_filtro == 'sus' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb3" type="radio" name="opcao_filtro" value="sus"/>
+                                                <label for="rb3">Cartão Sus</label>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer mt-3">
+                                <button class="br-button primary ml-n15" type="submit">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+               
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md">
+                <div class="br-card hover">
+                    <div class="card-content">
+                        <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                            
+                            <div class="table-header ml-n20">
+                                <div class="top-bar">
+                                    <div class="table-title"><i class="fa-solid fa-list-ul color-title"></i> PACIENTES EM ESPERA</div>
+                                </div>
+                            </div>
+                            
+                            <table class="mt-2 myTable" style="width:100%;">
+                                <thead class="hgt-55">
+                                    <tr>
+                                        <th></th>
+
+                                        <th style="width:5%;"></th>
+                                        <th class="width100-w"><b>Nome do Paciente</b></th>
+                                        <th class="hidden-xs"><b>Idade</b></th>
+                                        <th class="hidden-xs"><b>Hora</b></th>
+                                        <th class="hidden-xs"><b>Queixa Principal</b></th>
+                                        <th class="hidden-xs txt-center"><b>Tempo de Espera</b></th>
+                                        <th class="hidden-xs bold" style="width:;">Situação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if esperando_chamadas %}
+                                        {% for dados in esperando_chamadas %}
+                                            <tr class="capslock">
+                                                <td class="hgt-75" style="width:10%; padding: 10px;">
+                                                    <a href="{% url 'saude_atendimento:lista_chamada_create' id_paciente=dados.paciente.id id_boletim=dados.boletim.id %}" class="br-button primary small" type="button" style="width:115px; font-size:15px; margin-top:2px;">CHAMAR</a>
+                                                </td>
+                                                <td data-th="Classificação" style="padding: 10px;">
+                                                    <span class="br-tag small
+                                                        {% if dados.tipo_classificacao_risco.get_cor_display == 'AZUL' %}tag-azul {% endif %}
+                                                        {% if dados.tipo_classificacao_risco.get_cor_display == 'VERDE' %}tag-verde {% endif %}
+                                                        {% if dados.tipo_classificacao_risco.get_cor_display == 'AMARELO' %}tag-amarelo {% endif %}
+                                                        {% if dados.tipo_classificacao_risco.get_cor_display == 'VERMELHO' %}tag-vermelho{% endif %}
+                                                        {% if dados.tipo_classificacao_risco.get_cor_display == 'LARANJA' %}tag-laranja{% endif %}
+                                                        {% if dados.tipo_classificacao_risco.get_cor_display == 'PRETO' %}tag-preto{% endif %}
+                                                        {% if dados.tipo_classificacao_risco.get_cor_display == 'ROXO' %}tag-roxo{% endif %}
+                                                        {% if dados.tipo_classificacao_risco.get_cor_display == 'CINZA' %}tag-cinza{% endif %}
+                                                    "></span>
+                                                </td>
+                                                <td style="padding: 5px;">{{dados.paciente.nome_paciente}}</td>
+                                                <td class="hidden-xs">{{dados.paciente.calcular_idade}}</td>
+                                                <td class="hidden-xs">{{dados.boletim.data_entrada|date:'d/m/Y' }}<br/>ás {{dados.boletim.data_entrada|time:'H:i'}}</td>
+                                                <td class="hidden-xs">{{dados.queixa_principal|default:'----------'}}</td>
+                                                <td class="hidden-xs txt-center">
+                                                    <span style="{% if dados.created_at|verificacao_tempo_limite:dados.tipo_classificacao_risco.tempo_atendimento %} color: red; {% endif %}">{{dados.created_at|tempo_medio_espera_data_hora}}</span>
+                                                    {% if dados.created_at|verificacao_tempo_limite:dados.tipo_classificacao_risco.tempo_atendimento %}
+                                                        <i class="fa-solid fa-warning mr-2" style="color: var(--warning);"></i>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="hidden-xs">
+                                                    {% if dados.classificacao_risco_lista_chamada_set.situacao == 9 %}
+                                                        <span style="color: var(--interactive);">RETORNO</span>
+                                                    {% else %}
+                                                        <span>NORMAL</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                            <div class="table-footer">
+                            
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+                        
+        <div class="row mt-4">
+            <div class="col-md">
+                <div class="br-card hover">
+                    <div class="card-content">
+                        <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                            
+                            <div class="table-header ml-n20">
+                                <div class="top-bar">
+                                    <div class="table-title"><i class="fa-solid fa-list-ul color-title"></i> PACIENTES DESIGNADOS</div><hr>
+                                </div>
+                            </div>
+                            <div class="responsive">
+                                <table class="mt-3 myTable w100">
+                                    <thead class="hgt-55">
+                                        <tr style="">
+                                            <th class="visible-xs" style="width:5%;"></th>
+                                            <th class="hidden-xs" style="width:5%;"></th>
+                                            <th class="hidden-xs" style="width:5%;"></th>
+                                            <th class="hidden-xs" style="width:5%;"></th>
+                                            <th style="width:5%;"></th>
+                                            <th class="bold width100-w" style="width:20%;">Nome do Paciente</th>
+                                            <th class="hidden-xs bold" style="width:20%;">Idade</th>
+                                            <th class="hidden-xs bold" style="width:20%;">Chegada</th>
+                                            <th class="hidden-xs bold" style="width:20%;">Último Chamado</th>
+                                            <th class="hidden-xs bold" style="width:20%;">Situação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if lista_chamadas %}
+                                            {% for dados in lista_chamadas %}
+                                                <tr>
+                                                    <td class="visible-xs hgt-75">
+                                                        <button class="mostra-columns br-button circle" onclick="modalInfo('{{dados.classificacao_risco_lista_chamada_set.id}}', '{{dados.paciente.nome_paciente}}', '{{dados.paciente.calcular_idade}}', '{{dados.classificacao_risco_lista_chamada_set.created_at|date:'d/m/Y'}}', '{{dados.classificacao_risco_lista_chamada_set.updated_at|date:'d/m/Y'}}', '{{dados.classificacao_risco_lista_chamada_set.situacao}}')"><i class="fa-solid fa-circle-plus font-size18"></i></button>
+                                                    </td>
+                                                    <td class="hidden-xs hgt-75" style="padding:5px;">
+                                                        <button class="br-button primary small example-elements" onclick="alertFinalizarBoletim('{{dados.boletim.pk}}', '{{dados.classificacao_risco_lista_chamada_set.pk}}', '{{dados.paciente.nome_paciente}}')" type="button" aria-label="Ícone ilustrativo" style="padding: 10px;">
+                                                            ALTA
+                                                        </button>
+                                                    </td>
+                                                    <td class="hidden-xs" style="padding: 3px;">
+                                                        <button onclick="atualizarChamado('{{dados.classificacao_risco_lista_chamada_set.pk}}', {{ forloop.counter }})" class="br-button primary small" type="button" style="font-size:15px; margin-top:2px; padding: 10px;">
+                                                            <i class="fa-solid fa-volume-high mr-2"></i> CHAMAR <span id="chamado-{{ forloop.counter }}" class="badge" style="margin-left: 10px; background-color: #888;">{{dados.classificacao_risco_lista_chamada_set.contagem}}</span>
+                                                        </button>
+                                                    </td>
+                                                    
+                                                    <td class="hidden-xs" style="padding: 5px;">
+                                                        <a href="{% url 'saude_atendimento:atendimento_medico_detail' pk=dados.classificacao_risco_lista_chamada_set.id %}?modulo={{modulo}}" class="br-button primary small" type="button" style="width:115px; font-size:15px; margin-top:2px;">
+                                                            <i class="fas fa-user-md"></i> &nbsp;ATENDER
+                                                        </a>
+                                                    </td>
+                                                    <td style="padding: 10px;">
+                                                        <span class="br-tag small
+                                                            {% if dados.tipo_classificacao_risco.get_cor_display == 'AZUL' %}tag-azul {% endif %}
+                                                            {% if dados.tipo_classificacao_risco.get_cor_display == 'VERDE' %}tag-verde {% endif %}
+                                                            {% if dados.tipo_classificacao_risco.get_cor_display == 'AMARELO' %}tag-amarelo {% endif %}
+                                                            {% if dados.tipo_classificacao_risco.get_cor_display == 'VERMELHO' %}tag-vermelho{% endif %}
+                                                            {% if dados.tipo_classificacao_risco.get_cor_display == 'LARANJA' %}tag-laranja{% endif %}
+                                                            {% if dados.tipo_classificacao_risco.get_cor_display == 'PRETO' %}tag-preto{% endif %}
+                                                            {% if dados.tipo_classificacao_risco.get_cor_display == 'ROXO' %}tag-roxo{% endif %}
+                                                            {% if dados.tipo_classificacao_risco.get_cor_display == 'CINZA' %}tag-cinza{% endif %}
+                                                        "></span>
+                                                    </td>
+                                                    <td class="capslock" style="padding: 5px;">{{dados.paciente.nome_paciente}}</td>
+                                                    <td class="hidden-xs capslock">{{dados.paciente.calcular_idade}}</td>
+                                                    <td class="hidden-xs">{{dados.classificacao_risco_lista_chamada_set.created_at|date:'d/m/Y'}}<br/>ÁS {{dados.classificacao_risco_lista_chamada_set.created_at|date:'H:i'}}</td>
+                                                    <td class="hidden-xs">{{dados.classificacao_risco_lista_chamada_set.updated_at|date:'d/m/Y'}}<br/>ÁS {{dados.classificacao_risco_lista_chamada_set.updated_at|date:'H:i'}}</td>
+                                                    <td class="hidden-xs">
+                                                        {% if dados.classificacao_risco_lista_chamada_set.situacao == 0 or dados.classificacao_risco_lista_chamada_set.situacao == 1 %}
+                                                            <span>NORMAL</span>
+                                                        {% elif dados.classificacao_risco_lista_chamada_set.situacao == 3 or dados.classificacao_risco_lista_chamada_set.situacao == 4 %}
+                                                            <span style="color: var(--interactive);">RETORNO</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="table-footer">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/moment.locale.min.js' %}"></script>
+<script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+
+{% comment %} <script>
+    let url = {% if DEVELOPMENT %}'ws://'{% else %}'wss://'{% endif %}
+
+    var websocket_url = url + '{{SITE_URL}}/atualizar/listagem/medico/';
+    var socket = new WebSocket(websocket_url);
+
+    socket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+
+        if(data.type === 'update_listagem'){
+            window.location.reload();
+        }
+    };
+</script> {% endcomment %}
+
+<script>
+    function modalInfo(id, nome, idade, chegada, updated, situacao){
+        let modulo = '{{modulo}}'
+        let urlAtender  = `{% url 'saude_atendimento:atendimento_medico_detail' pk='00000000-0000-0000-0000-000000000000' %}?modulo=${modulo}`
+
+        let status;
+        if (situacao == 0 || situacao == 1) {
+            status = 'NORMAL';
+        } else if (situacao == 3 || situacao == 4) {
+            status = '<span style="color: var(--interactive);">RETORNO</span>';
+        } else {
+            status = 'UNKNOWN'; // or handle other cases as needed
+        }
+        
+        Swal.fire({
+            html: `
+            <div class="container">
+
+                <div class="swal2-title swal2-title-custom text-left mt-1" id="swal2-title">
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="button" class="close" style="background-color:#0459A1; border:none; color:white; font-size:15px; width:30px; height:30px;" aria-label="Close" onclick="Swal.close()">X</button>
+                            <h2 class="mt-n1"><label class="text-color-blue-1gov custom-text ft-sz14">Detalhes do Paciente</label></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row font-size16 mt-3">
+                    <div class="col-4 color-title">
+                        <span class="">Paciente:</span>
+                    </div>
+                    <div class="col-8">
+                        <span>${nome}<span/>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-5 color-title">
+                        <span>CPF:</span>
+                    </div>
+                    <div class="col-7">
+                        <span>${idade}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-5 color-title">
+                        <span>Chegada:</span>
+                    </div>
+                    <div class="col-7">
+                        <span>${chegada}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-5 color-title">
+                        <span>Último Chamado:</span>
+                    </div>
+                    <div class="col-7 mt-2">
+                        <span>${updated}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-5 color-title">
+                        <span>Situação:</span>
+                    </div>
+                    <div class="col-7">
+                        <span>${status}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-30">
+                    <div class="col-6 color-title">
+                        <span><a href="${urlAtender.replace('00000000-0000-0000-0000-000000000000', id)}"><button class="br-button primary small" type="button" style="width:125px; font-size:15px;">Chamar</button></a></span>
+                    </div>
+                    <div class="col-6">
+                        <span><a href="${urlAtender.replace('00000000-0000-0000-0000-000000000000', id)}"><button class="br-button primary small" type="button" style="width:125px; font-size:15px;">Atender</button></a></span>
+                    </div>
+                </div>
+
+            </div>
+            `,
+            confirmButtonColor: "#1250b4",
+            confirmButtonText: '<i class="fa-regular fa-floppy-disk mr-2"></i>Salvar',
+            cancelButtonText: '<i class="fa-solid fa-xmark mr-2"></i> Fechar',
+            showCancelButton: false,
+            showConfirmButton: false,
+            //reverseButtons: true,
+            allowOutsideClick: true,
+        });
+
+    }
+    function atualizarChamado(id, index){
+        url = "{% url 'saude_atendimento:api_atualizar_chamado' pk='00000000-0000-0000-0000-000000000000' %}"
+        axios.put(url.replace("00000000-0000-0000-0000-000000000000", id))
+        .then((response) =>  {
+            $('#chamado-'+index).html(response.data.contagem)
+
+        }).catch((error) => {
+            console.error("Erro na requisição:", error);
+        });
+    }
+    function finalizarBoletim(boletimPk, listaChamadaPk, situacaoAltaPaciente){
+        let url  = "{% url 'saude_atendimento:api_finalizar_boletim' pk='00000000-0000-0000-0000-000000000000' %}"
+        axios.put(url.replace('00000000-0000-0000-0000-000000000000', boletimPk), {"situacao": situacaoAltaPaciente, "chamado_id": listaChamadaPk, 'situacao_chamado': 5})
+        .then((response)=>{
+            window.location.replace('{% url "saude_atendimento:atendimento_medico_list" %}');
+        });
+    }
+    function alertFinalizarBoletim(boletimPk, listaChamadaPk, pacienteNome){
+        Swal.fire({
+            html: `
+            <div class="swal2-title swal2-title-custom text-left" id="swal2-title" style="background-color:red;">
+                    <h2 class="ml-3">
+                        <i class="fas fa-clipboard-list text-color-blue-1gov"></i>
+                        <label class="text-color-blue-1gov custom-text">Alta do Paciente</label>
+                        <button type="button" class="close mr-2" aria-label="Close" onclick="Swal.close()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </h2>
+                </div>
+            
+                <div class="container">
+                    <div class="row br-input justify-content-center mt-2">
+                        <div class="col-11 br-input">
+                            <label class="text-color-blue-1gov">Paciente:</label>
+                            <input class="input-highlight-labeless input-tab capslock" type="text" value="${pacienteNome}" readonly/>
+                        </div>
+                    </div>
+                    <div class="row br-input justify-content-center mt-2">
+                        <div class="col-6 br-input">
+                            <label class="text-color-blue-1gov">Data:</label>
+                            <input class="input-highlight-labeless input-tab capslock" type="text" value="${moment().format('DD/MM/YYYY')}" readonly/>
+                        </div>
+                        <div class="col-5 br-input">
+                            <label class="text-color-blue-1gov">Hora:</label>
+                            <input class="input-highlight-labeless input-tab capslock" type="text" value="${moment().format('H:mm')}" readonly/>
+                        </div>
+                    </div>
+                    <div class="row br-input justify-content-center mt-2">
+                        <div class="col-11">
+                            <label class="text-color-blue-1gov">Tipo:</label>
+                            <div class="br-input mt-1">
+                                <select id="tipoSelect" class="select-custom modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="swal2-container">
+                                    <option value="">SELECIONE UMA OPÇÃO</option>
+                                    <option value="2">CURADO</option>
+                                    <option value="3">ÓBITO</option>
+                                    <option value="4">REVELIA</option>
+                                    <option value="5">MELHORADO</option>
+                                    <option value="6">INALTERADO</option>
+                                    <option value="7">TRANSFERÊNCIA</option>
+                                    <option value="8">DECISÃO MÉDICA</option>
+                                    <option value="9">ENCERRAMENTO ADMINISTRATIVO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmButtonColor: "#1250b4",
+            confirmButtonText: '<i class="fa-regular fa-floppy-disk mr-2"></i>Salvar',
+            cancelButtonText: '<i class="fa-solid fa-xmark mr-2"></i> Fechar',
+            showCancelButton: true,
+            showConfirmButton: true,
+            reverseButtons: true,
+            allowOutsideClick: false,
+            preConfirm: () => {
+                const selectElement = document.getElementById('tipoSelect');
+                const selectedValue = selectElement.value;
+
+                if (selectedValue === '') {
+                    Swal.showValidationMessage('Selecione o tipo da alta!');
+                    var modal = document.querySelector(".swal2-modal");
+                    var validate = document.querySelector(".swal2-validation-message");
+
+                    validate.style.setProperty("background-color", "transparent", "important");
+                    validate.style.setProperty("z-index", "1", "important");
+                    validate.style.setProperty("font-size", "20px", "important");
+                    validate.style.setProperty("height", "80px", "important");
+                    validate.style.setProperty("margin-top", "-50px", "important");
+                    validate.style.setProperty("opacity", "1", "important");
+                    validate.style.setProperty("color", "black", "important");
+                    validate.style.setProperty("margin-left", "-18px", "important");
+                    modal.style.setProperty("height", "480px", "important");
+                } else {
+                    finalizarBoletim(boletimPk, listaChamadaPk, selectedValue)
+                }
+                document.querySelector(".swal2-container").setAttribute('id', 'swal2-container');
+               
+            },
+        });
+    }
+</script>
+
+<script src="{% static 'js/datatables.min.js' %}"></script>
+<script src="{% static 'js/data_table.js' %}"></script>
+{% endblock %}

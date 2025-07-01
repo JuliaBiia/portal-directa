@@ -1,0 +1,58 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Minha Agenda Médica{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/fullcalendar.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/agendamedica.css' %}"/>
+<!-- <style>
+    .container-calendario > .col-md > .br-card > .card-header > div{
+        box-shadow: none;
+    }
+</style> -->
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row container-calendario">
+        <div class="col-md">
+            <div class="br-card hover">
+                <div class="d-flex pr-0 pl-0 pt-2">
+                    <div class="ml-3">
+                        <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                            <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da agenda médica" title="Ícone da agenda médica" style="display: block;"> 
+                            <span class="mt-1 ml-4" style="display: block;">MINHA AGENDA MÉDICA</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="br-divider mt-1 divider-grid mb-1 col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                <div class="card-header">
+                    <div>
+                        <!-- <div>
+                            <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                        </div> -->
+                        <div class="mt-2">
+                            <div class="d-flex">
+                                <img src="{% static 'img/icons/icone-agendamedica-calendario.svg' %}" alt="Ícone da agenda médica" title="Ícone da agenda médica" style="display: block;" class="ml-3"> 
+                                <span class="ml-2 text-color-blue-1gov" style="display: block;">Meus atendimentos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-content pt-0">
+                    <div id='calendar'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{business_hours|json_script:"business-hours-data"}}
+{{consultas|json_script:"agendamentos-data"}}
+{% endblock %}
+{% block script %}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="{% static 'js/scripts_agendamedica/gerenciamento_fullcalendario_minhaagendamedica.js' %}"></script>
+{% endblock %}

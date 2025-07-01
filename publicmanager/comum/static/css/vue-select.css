@@ -1,0 +1,74 @@
+.badge-select {
+    padding: 0.40em 0.40em;
+    font-size: .95em !important;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--interactive-light);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+.custom-select-container {
+    position: relative;
+   
+    font-family: Arial, sans-serif;
+}
+
+.custom-select-header {
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
+
+.custom-select-input {
+    flex: 1;
+    margin-left: 8px;
+    border: none;
+    outline: none;
+}
+
+.custom-options-list {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    border: 1px solid #ccc;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fff;
+    z-index: 1000;
+}
+
+.custom-options-list div {
+    padding: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.custom-options-list div:hover {
+    background-color: #f0f0f0;
+}
+
+.custom-selected-options {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.custom-selected-options div {
+    margin-bottom: 4px;
+    margin-right: 5px;
+    background-color: #f0f0f0;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.select-input::placeholder {
+    font-size: var(--font-size-scale-base) !important;
+    font-weight: var(--font-weight-medium) !important;
+}

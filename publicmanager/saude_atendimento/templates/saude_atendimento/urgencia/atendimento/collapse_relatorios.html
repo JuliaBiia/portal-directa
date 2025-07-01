@@ -1,0 +1,93 @@
+{%load static%}
+
+{% block css %}
+<link rel="stylesheet" href = "{% static 'css/responsividade_tb.css' %}">
+<link rel="stylesheet" href = "{% static 'css/responsividade.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row d-flex justify-content-center">
+        <div class="col-rel-patient">
+            <div class="row" style="padding-top:40px;">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+
+                    <div class="row">
+                        <div class="relatorio-col-header-left txt-center-tb">
+                            <i class="fa-solid fa-file-signature"></i>
+                        </div>
+                        <div class="relatorio-col-header-right">
+                            <p><b>DECLARAÇÃO DE <br/>ACOMPANHANTE DO PACIENTE</b></p>
+                        </div>
+                        <div class="relatorio-col-header-btn">
+                                <a href="{% url 'saude_atendimento:relatorio_paciente_declaracao_pdf' pk=object.paciente.pk %}" target="blank_"><button class="br-button secondary large mr-3" type="button"><i class="fas fa-print"></i> Imprimir</button></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">.</div>
+            </div>
+        </div>
+
+        <div class="col-rel-patient">
+            <div class="row" style="padding-top:40px;">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                    
+                    <div class="row">
+                        <div class="relatorio-col-header-left txt-center-tb">
+                            <i class="fa-solid fa-file-signature"></i>
+                        </div>
+                        <div class="relatorio-col-header-right">
+                            <p><b>ATESTADO <br/>MÉDICO</b></p>
+                        </div>
+                        <div class="relatorio-col-header-btn mt-30 ">
+                            <a href="{% url 'saude_atendimento:atendimento_atestado_list' %}?pk={{object.paciente.pk}}&lista={{object.pk}}"><button class="br-button secondary large mr-3" type="button"><i class="fas fa-print"></i> Imprimir</button></a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="mt-2">.</div>
+            </div>
+        </div>
+
+        <div class="col-rel-patient">
+            <div class="row mt-30-tb" style="padding-top:40px;">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+
+                    <div class="row">
+                        <div class="relatorio-col-header-left txt-center-tb">
+                            <i class="fa-solid fa-file-signature"></i>
+                        </div>
+                        <div class="relatorio-col-header-right">
+                            <p><b>DECLARAÇÃO DE <br> COMPARECIMENTO CONSULTA/EXAME</b></p>
+                        </div>
+                        <div class="relatorio-col-header-btn">
+                            <a href="{% url 'saude_atendimento:relatorio_paciente_comparecimento_pdf' pk=object.paciente.pk %}" target="blank_"><button class="br-button secondary large mr-3" type="button"><i class="fas fa-print"></i> Imprimir</button></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">.</div>
+            </div>
+        </div>
+
+        <div class="col-rel-patient">
+            <div class="row mt-30-tb" style="padding-top:40px;">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+
+                    <div class="row">
+                        <div class="relatorio-col-header-left txt-center-tb">
+                            <i class="fa-solid fa-file-signature"></i>
+                        </div>
+                        <div class="relatorio-col-header-right">
+                            <p><b>FICHA DE <br/>REFERÊNCIA MÉDICA</b></p>
+                        </div>
+                        <div class="relatorio-col-header-btn mt-30">
+                            <a href="{% url 'saude_atendimento:atendimento_ficha_referencia_create' pk=object.lista_chamada_atendimento_medico_set.pk %}" target="blank_"><button class="br-button secondary large mr-3" type="button"><i class="fas fa-print"></i> Imprimir</button></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">.</div>
+            </div>
+        </div>  
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,482 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/sweetalert-custom-alta-hospitalar.css' %}">
+<link rel="stylesheet" href="{% static 'css/sweetalert-modal-notificacao-usuario.css' %}">
+<style>
+    .custom-popup-view-material-farmacia-entrada{
+        width: 80%;
+    }
+</style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+
+        <div class="row mt-3">
+            <div class="col-md">
+                <div class="br-card">
+                    <div class="card-header">
+                        <div class="row ml-1">
+                            <div class="col-md-auto">
+                                <img src="{% static 'img/icons/icone-requisicao-material-farmacia-grid.svg' %}" style="display: block; width:30px;">
+                            </div>
+                            <div class="col-9">
+                                <div class="text-weight-semi-bold text-up-02 color-title mt-1 ml-n3"><i class="fa-solid fa-stethoscope"></i> ADICIONAR MATERIAL</div>
+                            </div>
+                            <div class="col-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr style="border-color:#f2f2f2;">
+
+                    <div class="card-content pt-0">
+                        <form class="col-xl-12 col-lg-12 col-md-12 col-sm-12"  id="id_entrada_material_farmacia_form" method="post">{% csrf_token %}
+                            <div class="card-body d-flex justify-content-center flex-column">
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                        <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                            <div class="br-input has-icon">
+                                                <label for="id_rg_data">Data da Entrada: <span class="text-danger">*</span></label>
+                                                {% render_field form.data_entrada type="text" placeholder="dd/mm/aaaa" data-input="data-input" %}
+                                                <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 col-11 ml-md-11">
+                                        <div class="br-input mt-3">
+                                            <label for="id_numero_pedido">N° do Pedido: <span class="text-danger">*</span></label>
+                                            {% render_field form.numero_pedido type="text"%}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                        <div class="br-input mt-3">
+                                            <label for="id_farmacia">Farmácia: <span class="text-danger">*</span></label>
+                                            {% render_field form.farmacia  type="text" class="campo-select"  style="width: 100%" %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                        <div class="br-input mt-3">
+                                            <label for="id_farmacia">Tipo de Entrada: <span class="text-danger">*</span></label>
+                                            {% render_field form.tipo_entrada  type="text" class="campo-select"  style="width: 100%" %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                        <div class="br-input mt-3">
+                                            <label for="id_farmacia">Fornecedor: <span class="text-danger">*</span></label>
+                                            {% render_field form.fornecedor type="text"%}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                        <div class="br-input mt-3">
+                                            <label for="id_farmacia">N° Nota Fiscal: <span class="text-danger">*</span></label>
+                                            {% render_field form.numero_nota_fiscal type="text"%}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                        <div class="br-input mt-3">
+                                            <label for="id_farmacia">Empenho: <span class="text-danger">*</span></label>
+                                            {% render_field form.empenho type="text"%}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                        <div class="br-input mt-3">
+                                            <label for="id_farmacia">Processo: <span class="text-danger">*</span></label>
+                                            {% render_field form.processo type="text"%}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                        <div class="br-input mt-3">
+                                            <label for="id_tipos_materiais">Tipo de Material</label>
+                                            <select class="campo-select" id="id_tipos_materiais" name="tipos_materiais" style="width: 100%">
+                                                <option value="tipo-produto-medico">Produto médico</option>
+                                                <option value="tipo-medicamento">Medicamento</option>
+                                                <option value="tipo-insumo-farmaceutico">Insumo farmacêutico</option>
+                                              </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="container-campos-tipo-produto">
+                                    <div class="form-group row d-flex justify-content-center">
+                                        <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                            <div class="br-input mt-3">
+                                                <label for="id_produto">Produto médico</label>
+                                                {% render_field produto_form.produto type="text" class="campo-select"  style="width: 100%" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row d-flex justify-content-center">
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                            <div class="br-input mt-3">
+                                                <label for="id_quantidade_produto">Quantidade</label>
+                                                {% render_field produto_form.quantidade_produto class="form-control" type="number" %}
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-input mt-3">
+                                                <label for="id_unidade_produto">Unidade</label>
+                                                {% render_field produto_form.unidade_produto type="text" class="campo-select"  style="width: 100%" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row d-flex justify-content-center">
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                            <div class="br-input mt-3">
+                                                <label for="id_numero_lote_produto">Número do lote</label>
+                                                {% render_field produto_form.numero_lote_produto class="form-control" type="text" %}
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-datetimepicker mt-3" data-mode="single" data-type="text">
+                                                <div class="br-input has-icon">
+                                                    <label for="id_data_vencimento_produto">Data de Vencimento</label>
+                                                    {% render_field produto_form.data_vencimento_produto type="text" placeholder="dd/mm/aaaa" data-input="data-input" %}
+                                                    <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="container-campos-tipo-medicamento" style="display: none;">
+                                    <div class="form-group row d-flex justify-content-center">
+                                        <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                            <div class="br-input mt-3">
+                                                <label for="id_medicamento">Medicamento</label>
+                                                {% render_field medicamento_form.medicamento type="text" class="campo-select"  style="width: 100%" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row d-flex justify-content-center">
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                            <div class="br-input mt-3">
+                                                <label for="id_quantidade_medicamento">Quantidade</label>
+                                                {% render_field medicamento_form.quantidade_medicamento class="form-control" type="number" %}
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-input mt-3">
+                                                <label for="id_unidade_medicamento">Unidade</label>
+                                                {% render_field medicamento_form.unidade_medicamento type="text" class="campo-select"  style="width: 100%" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row d-flex justify-content-center">
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                            <div class="br-input mt-3">
+                                                <label for="id_numero_lote_medicamento">Número do lote</label>
+                                                {% render_field medicamento_form.numero_lote_medicamento class="form-control" type="text" %}
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-datetimepicker mt-3" data-mode="single" data-type="text">
+                                                <div class="br-input has-icon">
+                                                    <label for="id_data_vencimento_medicamento">Data de Vencimento</label>
+                                                    {% render_field medicamento_form.data_vencimento_medicamento type="text" placeholder="dd/mm/aaaa" data-input="data-input" %}
+                                                    <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="container-campos-tipo-insumo" style="display: none;">
+                                    <div class="form-group row d-flex justify-content-center">
+                                        <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                            <div class="br-input mt-3">
+                                                <label for="id_insumo">Insumo</label>
+                                                {% render_field insumo_form.insumo type="text" class="campo-select"  style="width: 100%" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row d-flex justify-content-center">
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                            <div class="br-input mt-3">
+                                                <label for="id_quantidade_insumo">Quantidade</label>
+                                                {% render_field insumo_form.quantidade_insumo class="form-control" type="number" %}
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-input mt-3">
+                                                <label for="id_unidade_insumo">Unidade</label>
+                                                {% render_field insumo_form.unidade_insumo type="text" class="campo-select"  style="width: 100%" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row d-flex justify-content-center">
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                            <div class="br-input mt-3">
+                                                <label for="id_numero_lote_insumo">Número do lote</label>
+                                                {% render_field insumo_form.numero_lote_insumo class="form-control" type="text" %}
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-datetimepicker mt-3" data-mode="single" data-type="text">
+                                                <div class="br-input has-icon">
+                                                    <label for="id_data_vencimento_insumo">Data de Vencimento</label>
+                                                    {% render_field insumo_form.data_vencimento_insumo type="text" placeholder="dd/mm/aaaa" data-input="data-input" %}
+                                                    <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="container-botao-adicionar-material mt-5 d-flex justify-content-center">
+                                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 pl-0">
+                                        <a id="botao-adicionar-material" class="br-button primary"><i class="fas fa-plus-circle"></i> Adicionar</a>
+                                    </div>
+                                </div>
+                                {% comment %} Explicação da indicação de campos obrigatórios {% endcomment %}
+                                {% include 'dashboard/includes/explicacao-campos-obrigatorios.html' %}
+                                <div id="container-materiais-adicionados" style="display: none;">
+                                    {% if object %}
+                                        {% for material in materiais %}
+                                            <div class='form-group' id="id_material_container_campos_{{forloop.counter0}}">
+                                                <select
+                                                    name="material" 
+                                                    for="basic-default-fullname" 
+                                                    class="campo-select" 
+                                                    id="id_material_{{forloop.counter0}}"
+                                                    readonly='readonly'
+                                                >
+                                                    <option
+                                                        value='{{material.id}}'
+                                                        selected
+                                                    >
+                                                        {{material.valor}}
+                                                    </option>
+                                                </select>
+                                                <input
+                                                    type='search'
+                                                    class='br-input' 
+                                                    name='tipo_material'
+                                                    id='id_tipo_material' 
+                                                    value='{{material.tipo}}' 
+                                                    readonly='readonly'
+                                                >
+                                                <input
+                                                    type='search'
+                                                    class='br-input'
+                                                    name='quantidade_material' id='id_quantidade_material'
+                                                    value='{{material.quantidade}}' 
+                                                    readonly='readonly'
+                                                >
+                                                <input
+                                                    type='search'
+                                                    class='br-input'
+                                                    name='unidade_material' 
+                                                    id='id_unidade_material'
+                                                    value='{{material.unidade}}' 
+                                                    readonly='readonly'
+                                                >
+                                                <input
+                                                    type='search'
+                                                    class='br-input'
+                                                    name='numero_lote_material' 
+                                                    id='id_numero_lote_material'
+                                                    value='{{material.numero_lote}}' 
+                                                    readonly='readonly'
+                                                >
+                                                <input
+                                                    type='search'
+                                                    class='br-input'
+                                                    name='data_vencimento_material' 
+                                                    id='id_data_vencimento_material'
+                                                    value='{{material.data_vencimento|date:"Y-m-d"}}' 
+                                                    readonly='readonly'
+                                                >
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer ml-6">
+                                    {% if form.errors %}
+                                        {% for error in  form|join_to_error_messages%}
+                                            <div class="br-message danger" role="alert">
+                                                <div class="icon"><i class="fas fa-times-circle fa-lg" aria-hidden="true"></i></div>
+                                                <div class="content">
+                                                    {% if error|get_element_dict:"field_label" %}
+                                                        <span class="message-title">Erro no campo {{ error|get_element_dict:"field_label" }}: </span><span class="message-body"> {{ error|get_element_dict:"error"  }}</span>
+                                                    {% else %}
+                                                        <span class="message-title">Erro: </span><span class="message-body"> {{ error|get_element_dict:"error"  }}</span>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="close">
+                                                    <button class="br-button circle small" type="button" aria-label="content">
+                                                        <i class="fas fa-times" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% comment %} <input type="hidden" id="id_farmaceutico_responsavel_hidden" name="farmaceutico_responsavel_hidden" value="{{farmaceutico_responsavel.id}}"> {% endcomment %}
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                            </div>
+                            <!-- /.card-footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md">
+                <div class="d-flex justify-content-center br-card hover">
+                    <div class="card-content d-flex justify-content-center col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                        <div class="br-table d-flex flex-column justify-content-center col-xl-12 col-lg-12 col-md-12 col-sm-12" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                            
+                            <div class="table-header">
+                                <div>
+                                    <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                                </div>
+                                <div class="top-bar mt-2">
+                                    <div class="d-flex table-title">
+                                        <img src="/static/img/icons/icone-requisicao-material-farmacia-grid.svg" alt="Ícone do requisição de material da farmácia" title="Ícone do requisição de material da farmácia" style="display: block; height: 38px;" draggable="false">
+                                        <span class="mt-1 ml-4" style="display: block;">Lista de Materiais</span>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <table class="mt-2">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th><b class="text-color-blue-1gov">Material</b></th>
+                                        <th><b class="text-color-blue-1gov">Tipo de Material</b></th>
+                                        <th><b class="text-color-blue-1gov">Quantidade</b></th>
+                                        <th><b class="text-color-blue-1gov">Unidade de Medida</b></th>
+                                        <th><b class="text-color-blue-1gov">N° do Lote</b></th>
+                                        <th><b class="text-color-blue-1gov">Data de Vencimento</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela_materiais">
+                                    <tr>
+                                    </tr>
+                                    {% if object %}
+                                        {% for material in materiais %}
+                                            <tr id="id_material_grid_{{forloop.counter0}}">
+                                                <td style="position: relative; bottom: 1px;">
+                                                    <a id="visualizar-material" href="javascript:void(0)" class="br-button circle">
+                                                        <i class="fas fa-eye" aria-hidden="true"></i>
+                                                    </a>
+                                                </td>
+                                                <td style="position: relative; bottom: 1px;">
+                                                    <a href="javascript:void(0)" class="br-button circle btnDetele" onclick="confirmarRemocaoMaterial({{forloop.counter0}})">
+                                                        <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                                    </a>
+                                                </td>
+                                                <td style="position: relative; top: 4px;">
+                                                    {{material.valor}}
+                                                </td>
+                                                <td style="position: relative; top: 4px;">{{material.tipo}}</td>
+                                                <td style="position: relative; top: 4px;">
+                                                    {{material.quantidade}}
+                                                </td>
+                                                <td style="position: relative; top: 4px;">
+                                                    {{material.unidade}}
+                                                </td>
+                                                <td style="position: relative; top: 4px;">
+                                                    {{material.numero_lote}}
+                                                </td>
+                                                <td style="position: relative; top: 4px;">
+                                                    {{material.data_vencimento}}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md">
+                                    <a href="{% url 'saude_farmacia:entrada_material_farmacia_list' %}" class="br-button secondary mt-6 mr-3"> <i class="fas fa-arrow-left"></i> Voltar</a>
+                                    <button id="botao-salvar" class="br-button primary mt-6">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        
+
+    </div>
+    {% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+
+
+    <div class="br-scrim-util foco modal-notificao-usuario" id="modal-confirmacao-operacao" data-scrim="true">
+        <div class="br-modal">
+          <div class="br-modal-header"></div>
+          <div class="br-modal-body">
+            <div class="container-icone-atencao">
+                <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                <p></p>
+            </div>
+            <p></p>
+            <div class="justify-content-center">
+                <button class="br-button primary" id="confirmacao-operacao" type="button" data-dismiss="scrimexample">Sim
+                </button>
+                <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" id="negacao-operacao" type="button">Não
+                </button>
+            </div>
+          </div>
+          <div class="br-modal-footer justify-content-center">
+          </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    let url_produto_medico_detalhes = `{% url 'saude_farmacia:produtomedico_detalhe' %}?produto_id=00000000-0000-0000-0000-000000000000`
+    let url_medicamento_detalhes = `{% url 'saude_farmacia:medicamento_detalhe' %}?medicamento_id=00000000-0000-0000-0000-000000000000`
+    let url_insumo_detalhes = `{% url 'saude_farmacia:insumo_detalhe' %}?insumo_id=00000000-0000-0000-0000-000000000000`
+</script>
+
+<script src="{% static 'js/utils_forms.js' %}"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+<!-- <script src="{% static 'js/gerenciamento_modal_notificacao_usuarios.js' %}"></script> -->
+<script>
+    {% include 'comum/includes/sweetalert-mixin-notificacao-usuario.js' %}
+</script>
+
+<script src="{% static 'js/scripts_modulo_farmacia/requisicoes.js' %}"></script>
+<script src="{% static 'js/scripts_modulo_farmacia/gerenciamento_entrada_material.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,223 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de Horários Médicos{% endblock %}
+{% load static %}
+{% load widget_tweaks %}
+{% load custom_filters %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/estilizacao-grid.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<style>
+    .br-breadcrumb .crumb-list .crumb a {
+        max-width: 220px !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header pr-0 pl-0 pt-2">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                                <img src="{% static 'img/icons/icone-horario-medico.svg' %}" alt="Ícone de relógio" title="Ícone de relógio" style="display: block;"> 
+                                <span class="mt-1 ml-4" style="display: block;">HORÁRIOS MÉDICOS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="br-divider mt-1 divider-grid mb-3 col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                </div>
+                <div class="card-content">
+                    <form
+                        id="id_horario_medico_form"
+                        class="col-xl-12 col-lg-12 col-md-12 col-sm-12"
+                        method="post"
+                    >
+                        {% csrf_token %}
+                        {{ form.media.js }}
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input">
+                                        <label for="id_medico_horariomedico">Nome do médico</label>
+                                        {% render_field form.medico_horariomedico class="campo-select" style="width: 100%" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_dia_semana_horariomedico">Dia da semana</label>
+                                        {% render_field form.dia_semana_horariomedico class="campo-select" style="width: 100%" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                    <div class="br-datetimepicker" data-mode="single" data-type="time">
+                                        <div class="br-input has-icon mt-3">
+                                          <label for="id_hora_inicial_horariomedico">Hora inicial</label>
+                                          {% render_field form.hora_inicial_horariomedico type="time" placeholder="hh:mm" data-input="data-input" %}
+                                          <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="timepicker-input-btn"><i class="fas fa-clock" aria-hidden="true"></i>
+                                          </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                    <div class="br-datetimepicker" data-mode="single" data-type="time">
+                                        <div class="br-input has-icon mt-3">
+                                          <label for="id_hora_final_horariomedico">Hora final</label>
+                                          <!-- <input id="id_hora_inicial_horariomedico" type="time" placeholder="hh:mm" data-input="data-input"/> -->
+                                          {% render_field form.hora_final_horariomedico type="time" placeholder="hh:mm" data-input="data-input" %}
+                                          <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="timepicker-input-btn"><i class="fas fa-clock" aria-hidden="true"></i>
+                                          </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-6">
+                            {% if form.errors %}
+                                {% for field_errors in form.errors.values %}
+                                    {% for error in field_errors %}
+                                        <div class="br-message danger" role="alert">
+                                            <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                                aria-hidden="true"></i>
+                                            </div>
+                                            <div class="content"><span
+                                                    class="message-title">Erro: </span><span
+                                                    class="message-body"> {{ error }}</span>
+                                            </div>
+                                            <div class="close">
+                                                <button class="br-button circle small" type="button"
+                                                        aria-label="content"><i
+                                                        class="fas fa-times" aria-hidden="true"></i></button>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+    
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <div class="br-message danger" role="alert">
+                                            <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                                aria-hidden="true"></i>
+                                            </div>
+                                            <div class="content"><span
+                                                    class="message-title">Erro no campo {{ field.label }}.</span><span
+                                                    class="message-body"> {{ error }}</span>
+                                            </div>
+                                            <div class="close">
+                                                <button class="br-button circle small" type="button"
+                                                        aria-label="content"><i
+                                                        class="fas fa-times" aria-hidden="true"></i></button>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                            <div class="card-footer mt-6 ml-6">
+                                <button type="submit" class="br-button primary mr-3">
+                                    <i class="fas fa-save"></i> Salvar
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+                <div class="card-footer">
+                
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card hover">
+              <div class="card-content">
+                <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                    data-random="data-random">
+                    <div class="table-header">
+                        <div>
+                            <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                        </div>
+                        <div class="top-bar mt-2">
+                            <div class="d-flex table-title">
+                                <img src="{% static 'img/icons/icone-horario-medico.svg' %}" alt="Ícone de relógio" title="Ícone de relógio" style="display: block; height: 28px;"> 
+                                <span class="ml-4" style="display: block;">Horários Médicos Registrados</span>
+                            </div>
+                            <div class="search-trigger">
+                                <!-- <a href="{% url 'saude_cadastro:profissional_add' %}" class="br-button primary"><i class="fas fa-plus-circle"></i> Adicionar</a> -->
+                            </div>
+                        </div>
+                    </div>
+                    <table class="mt-2">
+                        <caption>Título da Tabela</caption>
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>Nome do Médico</th>
+                            <th>Dia da Semana</th>
+                            <th>Hora Inicial</th>
+                            <th>Hora Final</th>
+                        </tr>
+                        </thead>
+                        <tbody class="capslock">
+                        {% if horariosmedico %}
+                            {% for horariomedico in horariosmedico %}
+                                <tr>
+                                    <td data-th="Editar">
+                                        <a href="{% url 'saude_atendimento:horario_medico_update' pk=horariomedico.id %}"><i
+                                            class="fas fa-edit" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td data-th="Excluir">
+                                        <a href="javascript:void(0)" class="br-button circle" onclick="confirmCancel('{% url 'saude_atendimento:horario_medico_delete' horariomedico.id %}', 'horário médico')">
+                                            <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td data-th="Código">{{ horariomedico.medico_horariomedico }}</td>
+                                    <td data-th="Nome Longo">{{ horariomedico.dia_semana_horariomedico|convert_number_day_for_string_day }}</td>
+                                    <td data-th="Nome Longo">{{ horariomedico.hora_inicial_horariomedico }}</td>
+                                    <td data-th="Nome Longo">{{ horariomedico.hora_final_horariomedico }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                    {% comment %} Paginação {% endcomment %}
+                    {% include 'dashboard/includes/paginacao.html' %}
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+</div>
+{% endblock %}
+
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/gerenciamento_modal_notificacao_usuarios.js' %}"></script>
+<script src="{% static 'js/scripts_agendamedica/gerenciamento_remocao_dados.js' %}"></script>
+{% endblock %}

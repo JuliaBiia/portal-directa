@@ -1,0 +1,78 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de Manuais{% endblock %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="container">
+        {% if object_list %}
+            {% for manual in object_list %}
+            <div class="row mt-1">
+                <div class="col-md">
+                    <div class="br-card">
+
+                        <div class="card-header">
+                            <div class="d-flex">
+                                <div class="ml-3">
+                                    <div class="text-weight-semi-bold text-up-02 color-title font-size24" style="color: #1351B4;"><i class="fas fa-book" aria-hidden="true"></i> {{manual.nome}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+
+                        <div class="card-content">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <img src="{% static 'img/saude_undraw/undraw_manual.svg' %}" width="106" alt="Manual" title="Manual">
+                                    </div>
+                                    <div class="col-8">
+                                        {% if manual.descricao %}
+                                            <p style="font-size: 14px; text-transform: uppercase; word-wrap: break-word; margin: 21px;">{{manual.descricao}}</p>
+                                        {% else %}
+                                            <p style="font-size: 14px; text-transform: uppercase; text-align: center;">Sem Descrição</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <a class="br-button primary ml-n15 ml-10-w" href="{{manual.arquivo.url}}" target="_blank">
+                                            <i class="fa-solid fa-file-pdf mr-2"></i> Abrir Manual
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+            
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+
+
+            <div class="row mt-1">
+                <div class="col-md">
+                    <div class="br-card">
+                        <div class="card-content">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <img src="{% static 'img/saude_undraw/undraw_alert.svg' %}" width="150" alt="Manual" title="Manual">
+                                    </div>
+                                    <div class="col-10 d-flex align-items-center justify-content-center">
+                                        <p style="text-align: center" class="my-2">Não existem manuais no momento!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+            
+                    </div>
+                </div>
+            </div>
+
+
+            
+        {% endif %}
+    </div>
+
+{% endblock %}

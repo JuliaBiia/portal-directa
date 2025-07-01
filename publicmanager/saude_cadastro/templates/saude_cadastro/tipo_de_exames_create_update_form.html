@@ -1,0 +1,109 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}{% if object %}Edição{% else %}Cadastro{% endif %} de Tipo de Exames{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<style>
+    .br-breadcrumb .crumb-list .crumb a {
+        max-width: 220px !important;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container-lg">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row mt-1">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="text-weight-semi-bold text-up-02 color-title font-size24">
+                                {% comment %} <img src="{% static 'img/icons/icone-exame.svg' %}" alt="Ícone de exame" title="Ícone de exame" style="display: block;">
+                                <span class="mt-1 ml-4 text-weight-semi-bold text-up-02" style="display: block;">{% if object %}EDITAR{% else %}ADICIONAR{% endif %} TIPO DE EXAME</span> {% endcomment %}
+
+                                <i class="fa-solid fa-file-waveform font-size25 mr-2"></i>{% if object %}EDITAR INFORMAÇÕES DO{% else %}CADASTRAR{% endif %} TIPO DE EXAME
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="card-content pt-0">
+                    <form
+                        id="tipoexame_form"
+                        class="col-xl-12 col-lg-12 col-md-12 col-sm-12"
+                        method="post"
+                    >
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 mt-3">
+                                    <div class="br-input mt-2">
+                                        <label for="id_nome">Nome <span class="text-danger">*</span></label>
+                                        {% render_field form.nome class="input-com-alfanumericas" type="text" placeholder="Ex.: Angiografia" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 mt-3">
+                                    <div class="br-input mt-2">
+                                        <label for="id_tipo">Tipo</label>
+                                        {% render_field form.tipo type="text" class="campo-select" style="width: 100%" required="true" %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% comment %} Explicação da indicação de campos obrigatórios {% endcomment %}
+                            {% include 'dashboard/includes/explicacao-campos-obrigatorios.html' %}
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer ml-6">
+                            {% if form.errors %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <div class="br-message danger" role="alert">
+                                            <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                                aria-hidden="true"></i>
+                                            </div>
+                                            <div class="content"><span
+                                                    class="message-title">Erro no campo {{ field.label }}.</span><span
+                                                    class="message-body"> {{ error }}</span>
+                                            </div>
+                                            <div class="close">
+                                                <button class="br-button circle small" type="button"
+                                                        aria-label="content"><i
+                                                        class="fas fa-times" aria-hidden="true"></i></button>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                            <div class="button-container">
+                                <a href="{% url 'saude_cadastro:tipoexame_list' %}" class="br-button secondary mt-3 mr-3 buttonvoltartb2 buttonreturnmobile">
+                                    <i class="fas fa-arrow-left"></i> Voltar
+                                </a>
+                                <button type="submit" class="br-button primary mt-3 buttonsavemobile">
+                                    <i class="fas fa-save"></i> Salvar
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

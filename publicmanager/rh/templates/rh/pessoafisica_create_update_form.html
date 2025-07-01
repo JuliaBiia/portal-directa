@@ -1,0 +1,333 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="row">
+            <div class="col-lg-12 mb-4 order-0">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0 d-sm-inline-block">Adicionar Pessoa Física</h5>
+                    </div>
+                    <form method="post" id="pessoafisica_form">{% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="codigo">Nome de Registro</label>
+                                        {% render_field form.nome_registro class="input-com-alfanumericas" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="codigo">Nome Social</label>
+                                        {% render_field form.nome_social class="input-com-alfanumericas" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="codigo">Nome Usual</label>
+                                        {% render_field form.nome_usual placeholder='O nome apresentado no crachá' class="input-com-alfanumericas" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="codigo">E-mail</label>
+                                        {% render_field form.email placeholder='E-mail utilizado para recuperação de senha.' type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="codigo">E-mail Secundário</label>
+                                        {% render_field form.email_secundario type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-5 col-lg-4 col-md-4 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="codigo">Website</label>
+                                        {% render_field form.website type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-5 col-lg-4 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">CPF</label>
+                                        {% render_field form.cpf class="mask-cpf" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-1 col-sm-1">
+                                    <div class="br-input">
+                                        <label for="descricao">Sexo</label>
+                                        {% render_field form.sexo class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-2 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Grupo Sanguíneo</label>
+                                        {% render_field form.grupo_sanguineo class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Fator RH</label>
+                                        {% render_field form.fator_rh class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="descricao">Município de Nascimento</label>
+                                        {% render_field form.nascimento_municipio class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-4 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">Data de Nascimento</label>
+                                        {% render_field form.nascimento_data class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-4 col-lg-4 col-md-5 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="descricao">Nome da Mãe</label>
+                                        {% render_field form.nome_mae class="input-com-alfanumericas" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-5 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="descricao">Nome do Pai</label>
+                                        {% render_field form.nome_pai class="input-com-alfanumericas" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">RG</label>
+                                        {% render_field form.rg class="mask-rg" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Órgão do RG</label>
+                                        {% render_field form.rg_orgao class="input-com-alfanumericas" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">Data de Emissão do RG</label>
+                                        {% render_field form.rg_data class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">UF do RG</label>
+                                        {% render_field form.rg_uf class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">Número do Título</label>
+                                        {% render_field form.titulo_numero class="mask-tituloeleitor" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Zona do Título</label>
+                                        {% render_field form.titulo_zona type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Seção do Título</label>
+                                        {% render_field form.titulo_secao type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">Data de Emissão do Título</label>
+                                        {% render_field form.titulo_data_emissao class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">UF do Título</label>
+                                        {% render_field form.titulo_uf class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Nº CNH</label>
+                                        {% render_field form.cnh_registro class="mask-cnh" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Categoria da CNH</label>
+                                        {% render_field form.cnh_categoria class="input-com-alfanumericas" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">Data da Emissão da CNH</label>
+                                        {% render_field form.cnh_emissao class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">UF da CNH</label>
+                                        {% render_field form.cnh_uf class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Validade da CNH</label>
+                                        {% render_field form.cnh_validade class="mask-data" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-3 col-lg-2 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Número da CTPS</label>
+                                        {% render_field form.ctps_numero type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">UF da CTPS</label>
+                                        {% render_field form.ctps_uf class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Série da CTPS</label>
+                                        {% render_field form.ctps_serie type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-3 col-lg-2 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">PIS/PASEP</label>
+                                        {% render_field form.pis_pasep type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-3 col-lg-4 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Banco</label>
+                                        {% render_field form.pagto_banco class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-2 col-lg-2 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Agência</label>
+                                        {% render_field form.pagto_agencia type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Conta</label>
+                                        {% render_field form.pagto_ccor type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Tipo da Conta</label>
+                                        {% render_field form.pagto_ccor_tipo class="input-com-alfanumericas" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Estado Civil</label>
+                                        {% render_field form.estado_civil class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-1 col-lg-1 col-md-1 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="descricao">Raça</label>
+                                        {% render_field form.raca class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="descricao">Nacionalidade</label>
+                                        {% render_field form.nacionalidade class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-4 col-md-2 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">País de Origem</label>
+                                        {% render_field form.pais_origem class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="form-group row">
+                                <div class="col-xl-2 col-lg-4 col-md-6 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Deficiência</label>
+                                        {% render_field form.deficiencia class="campo-select" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-2 col-lg-4 col-md-7 col-sm-7">
+                                    <div class="br-input">
+                                        <label for="descricao">Lattes</label>
+                                        {% render_field form.lattes type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            {{ form.errors }}
+                            <input type="submit" class="br-button primary mr-3" value="Cadastrar">
+                            <a href="{% url 'pessoafisica_list' %}" class="br-button">Cancelar</a>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+    <script src="{% static 'js/jquery.mask.min.js' %}"></script>
+    <script src="{% static 'js/mask.js' %}"></script>
+
+    <script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

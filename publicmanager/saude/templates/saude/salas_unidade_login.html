@@ -1,0 +1,428 @@
+{% extends 'dashboard/base/base_fixed.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+{% load atendimento_filters %}
+
+{% block header %}
+    {% if inicial %}
+        {% include 'dashboard/includes/saude/header-custom.html' %}
+    {% else %}
+        {% include 'dashboard/includes/saude/header.html' %}
+    {% endif %}
+{% endblock %}
+
+{% block title %}Salas{% endblock %}
+
+{% block css %}
+<style>
+    .card-border {
+        border-left: 8px solid transparent;
+        border-top: 1px solid var(--interactive-light);
+        border-right: 1px solid var(--interactive-light);
+        border-bottom: 1px solid var(--interactive-light);
+        border-radius: 5px;
+    }
+    .swal2-backdrop-show {z-index: 99999999999 !important;}
+    .swal2-modal {width: 650px; height: 400px;}
+    .swal2-confirm {background-color: #1351b4 !important; border-radius: 25px !important; font-weight: bold !important; width: 130px !important;}
+    .swal2-cancel{border-radius: 25px !important; font-weight: bold !important; background-color: #fff !important; color: #1351b4 !important; border: 1px solid !important; width: 130px !important;}
+    .swal2-cancel:hover{background-color: #ecf1f9 !important; width: 130px !important;}
+    .nome-sala {
+        word-wrap: break-word; /* Permite a quebra de palavras longas */
+        overflow-wrap: break-word; /* Permite a quebra de palavras longas */
+        hyphens: auto; /* Adiciona hifens automáticos em palavras longas */
+    }
+</style>
+{% endblock %}
+
+{% block menu %}
+    {% if not inicial %}
+        {% include 'dashboard/includes/saude/menu-lateral.html' %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="{% if not inicial %}container{% endif %}" style="{% if inicial %}margin-top: 0px;{% else %}margin-top:-20px;{% endif %}">
+        {% if not inicial %}
+            {% include 'dashboard/includes/mensagens.html' %}
+        {% endif %}
+
+        <div class="row mt-2">
+            <div class="col-md">
+                <div class="br-card hover">
+                    <div class="card-content">
+                        <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                            {% if inicial %}
+                                {% include 'dashboard/includes/mensagens.html' %}
+                            {% endif %}
+                            <div class="custom-tilte text-center" style="font-size: 40px; color: #1351b4; text-transform: uppercase;">
+                                <i class="fa-solid fa-house-medical-circle-check ml-2"></i> Salas
+                            </div>
+                            <div class="br-tab" data-counter="true">
+                                <nav class="tab-nav">
+                                    <ul>
+                                        {% if tipo_usuario == 'medico' or tipo_usuario == 'desenvolvedor' %}
+                                        <li class="tab-item panel-1-count {% if setor == '1' %} is-active {% endif %}" title="Urgência">
+                                            <button class="tab-button" type="button" data-panel="panel-1-count"><span class="name">Urgência</span></button><span class="results">({{object_list|get_contar_salas_tipo:1}})</span>
+                                        </li>
+                                        <li class="tab-item panel-2-count {% if setor == '2' %} is-active {% endif %}" title="Consultório">
+                                            <button class="tab-button" type="button" data-panel="panel-2-count"><span class="name">Consultório</span></button><span class="results">({{object_list|get_contar_salas_tipo:2}})</span>
+                                        </li>
+                                        {% endif %}
+
+                                        {% if tipo_usuario == 'enfermeiro' or tipo_usuario == 'desenvolvedor' %}
+                                        <li class="tab-item panel-3-count {% if setor == '7' %} is-active {% endif %}" title="Laboratório">
+                                            <button class="tab-button" type="button" data-panel="panel-3-count"><span class="name">Laboratório</span></button><span class="results">({{object_list|get_contar_salas_tipo:7}})</span>
+                                        </li>
+                                        <li class="tab-item panel-5-count {% if setor == '3' %} is-active {% endif %}" title="Enfermaria">
+                                            <button class="tab-button" type="button" data-panel="panel-5-count"><span class="name">Enfermaria</span></button><span class="results">({{object_list|get_contar_salas_tipo:3}})</span>
+                                        </li>
+                                        {% endif %}
+
+                                        {% if tipo_usuario == 'enfermeiro' or tipo_usuario == 'desenvolvedor' %}
+                                        <li class="tab-item panel-4-count {% if setor == '12' %} is-active {% endif %}" title="Radiologia">
+                                            <button class="tab-button" type="button" data-panel="panel-4-count"><span class="name">Radiologia</span></button><span class="results">({{object_list|get_contar_salas_tipo:12}})</span>
+                                        </li>
+                                        {% endif %}
+
+                                        {% if tipo_usuario == 'enfermeiro' or tipo_usuario == 'medico' or tipo_usuario == 'desenvolvedor' %}
+                                        <li class="tab-item panel-6-count {% if setor == '15' %} is-active {% endif %}" title="Classificação">
+                                            <button class="tab-button" type="button" data-panel="panel-6-count"><span class="name">Classificação de Risco</span></button><span class="results">({{object_list|get_contar_salas_tipo:15}})</span>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+
+                                <div class="tab-content">
+                                    <div class="tab-panel {% if setor == '1' %} active {% endif %}" id="panel-1-count">
+                                        <div class="container">
+                                            <div class="row" style="justify-content: center;">
+                                                {% if object_list|get_contar_salas_tipo:1 > 0 %}
+                                                    {% for sala in object_list|get_filtrar_setor_tipo:1 %}
+                                                        <div class="col-sm-4 col-md-4 col-lg-4 mt-4 d-flex">
+                                                            
+                                                            <div class="br-card card-border d-flex flex-column" style="{% if unidades_login|verificar_profissional_sala:sala.id %}border-left-color: #F55252;{% else %}border-left-color: #40C057;{% endif %}; flex-grow: 1;">
+                                                                <div class="card-header text-center">
+                                                                    <div class="text-weight-semi-bold text-up-03 nome-sala" style="color: var(--interactive-light);">{{sala.nome_sala}}</div>
+                                                                </div>
+                                                                <div class="card-content text-center capslock flex-grow-1" style="color: var(--interactive-light); padding-top: 0px !important; margin-top: -10px !important;">
+                                                                    <p><div class="text-weight-semi-bold text-up-01">codigo: {{sala.unidade_setor.codigo}}</div></p>
+                                                                    {% if sala.id == user.get_unidade_login.sala.id %}
+                                                                        <div class="text-weight-semi-bold text-up-01" style="word-break: break-all; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"><i class="fa-regular fa-user mr-2"></i>{{user.get_unidade_login.profissional.nome_profissional}}</div>
+                                                                    {% elif unidades_login|verificar_profissional_sala:sala.id %}
+                                                                        <div class="text-weight-semi-bold text-up-01" style="word-break: break-all; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"><i class="fa-regular fa-user mr-2"></i>{{unidades_login|verificar_profissional_sala:sala.id}}</div>
+                                                                    {% else %}
+                                                                        <div class="text-weight-semi-bold text-up-01"><i class="fa-regular fa-circle-check"></i> Sala Livre</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    {% if unidades_login|verificar_ocupacao_sala:sala.id and sala.id != user.get_unidade_login.sala.id %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'substituir', null, 'urgencia')" type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">SUBSTITUIR</button>
+                                                                    {% elif sala.id == user.get_unidade_login.sala.id %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'sair', null, 'urgencia')" type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">SAIR</button>
+                                                                    {% else %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'entrar', '{{sala.nome_sala}}', 'urgencia')" type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">ENTRAR</button>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <div class="capslock m-4">Não há salas registradas para urgência.</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-panel {% if setor == '2' %} active {% endif %}" id="panel-2-count">
+                                        <div class="container">
+                                            <div class="row" style="justify-content: center;">
+                                                {% if object_list|get_contar_salas_tipo:2 > 0 %}
+                                                    {% for sala in object_list|get_filtrar_setor_tipo:2 %}
+                                                        <div class="col-sm-4 col-md-4 col-lg-4 mt-4 d-flex">
+                                                                
+                                                            <div class="br-card card-border d-flex flex-column" style="{% if unidades_login|verificar_profissional_sala:sala.id %}border-left-color: #F55252;{% else %}border-left-color: #40C057;{% endif %}; flex-grow: 1;">
+                                                                <div class="card-header text-center">
+                                                                    <div class="text-weight-semi-bold text-up-03 nome-sala" style="color: var(--interactive-light);">{{sala.nome_sala}}</div>
+                                                                </div>
+                                                                <div class="card-content text-center capslock flex-grow-1" style="color: var(--interactive-light); padding-top: 0px !important; margin-top: -10px !important;">
+                                                                    <p><div class="text-weight-semi-bold text-up-01">codigo: {{sala.unidade_setor.codigo}}</div></p>
+                                                                    {% if sala.id == user.get_unidade_login.sala.id %}
+                                                                        <div class="text-weight-semi-bold text-up-01" style="word-break: break-all; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"><i class="fa-regular fa-user mr-2"></i>{{user.get_unidade_login.profissional.nome_profissional}}</div>
+                                                                    {% elif unidades_login|verificar_profissional_sala:sala.id %}
+                                                                        <div class="text-weight-semi-bold text-up-01" style="word-break: break-all; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"><i class="fa-regular fa-user mr-2"></i>{{unidades_login|verificar_profissional_sala:sala.id}}</div>
+                                                                    {% else %}
+                                                                        <div class="text-weight-semi-bold text-up-01"><i class="fa-regular fa-circle-check"></i> Sala Livre</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    {% if unidades_login|verificar_ocupacao_sala:sala.id and sala.id != user.get_unidade_login.sala.id %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'substituir', null, 'urgencia')" type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">SUBSTITUIR</button>
+                                                                    {% elif sala.id == user.get_unidade_login.sala.id %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'sair', null, 'urgencia')" type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">SAIR</button>
+                                                                    {% else %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'entrar', '{{sala.nome_sala}}', 'urgencia')"  type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">ENTRAR</button>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <div class="capslock m-4">Não há salas registradas para o consultório.</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-panel {% if setor == '7' %} active {% endif %}" id="panel-3-count">
+                                        <div class="container">
+                                            <div class="row" style="justify-content: center;">
+                                                {% if object_list|get_contar_salas_tipo:7 > 0 %}
+                                                    {% for sala in object_list|get_filtrar_setor_tipo:7 %}
+
+                                                        <div class="col-sm-4 col-md-4 col-lg-4 mt-4 d-flex">
+                                                            <div class="br-card card-border d-flex flex-column" style="{% if sala.id == user.get_unidade_login.sala.id %}border-left-color: #F55252;{% else %}border-left-color: #40C057;{% endif %}; flex-grow: 1;">
+                                                                <div class="card-header text-center">
+                                                                    <div class="text-weight-semi-bold text-up-03 nome-sala" style="color: var(--interactive-light);">{{sala.nome_sala}}</div>
+                                                                </div>
+                                                                <div class="card-content text-center capslock flex-grow-1" style="color: var(--interactive-light); padding-top: 0px !important; margin-top: -10px !important;">
+                                                                    <p><div class="text-weight-semi-bold text-up-01">codigo: {{sala.unidade_setor.codigo}}</div></p>
+                                                                    {% if sala.id == user.get_unidade_login.sala.id %}
+                                                                        <div class="text-weight-semi-bold text-up-01" style="word-break: break-all; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"><i class="fa-solid fa-users mr-2"></i>{{sala|get_usuarios_sala}}</div>
+                                                                    {% elif sala|get_usuarios_sala > 0 %}
+                                                                        <div class="text-weight-semi-bold text-up-01"><i class="fa-solid fa-users mr-2"></i> {{sala|get_usuarios_sala}}</div>
+                                                                    {% else %}
+                                                                        <div class="text-weight-semi-bold text-up-01"><i class="fa-regular fa-circle-check"></i> Sala Livre</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    {% if sala.id == user.get_unidade_login.sala.id %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'sair', null, 'urgencia')" type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">SAIR</button>
+                                                                    {% else %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'entrar', '{{sala.nome_sala}}', 'urgencia')"  type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">ENTRAR</button>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <div class="capslock m-4">Não há salas registradas para o Laboratório.</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-panel {% if setor == '12' %} active {% endif %}" id="panel-4-count">
+                                        <div class="container">
+                                            <div class="row" style="justify-content: center;">
+                                                {% if object_list|get_contar_salas_tipo:12 > 0 %}
+                                                    {% for sala in object_list|get_filtrar_setor_tipo:12 %}
+                                                        <div class="col-sm-4 col-md-4 col-lg-4 mt-4 d-flex">
+                                                                
+                                                            <div class="br-card card-border d-flex flex-column" style="{% if sala.id == user.get_unidade_login.sala.id %}border-left-color: #F55252;{% else %}border-left-color: #40C057;{% endif %}; flex-grow: 1;">
+                                                                <div class="card-header text-center">
+                                                                    <div class="text-weight-semi-bold text-up-03 nome-sala" style="color: var(--interactive-light);">{{sala.nome_sala}}</div>
+                                                                </div>
+                                                                <div class="card-content text-center capslock flex-grow-1" style="color: var(--interactive-light); padding-top: 0px !important; margin-top: -10px !important;">
+                                                                    <p><div class="text-weight-semi-bold text-up-01">codigo: {{sala.unidade_setor.codigo}}</div></p>
+                                                                    {% if sala.id == user.get_unidade_login.sala.id %}
+                                                                        <div class="text-weight-semi-bold text-up-01" style="word-break: break-all; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"><i class="fa-solid fa-users mr-2"></i>{{sala|get_usuarios_sala}}</div>
+                                                                    {% elif sala|get_usuarios_sala > 0 %}
+                                                                        <div class="text-weight-semi-bold text-up-01"><i class="fa-solid fa-users mr-2"></i> {{sala|get_usuarios_sala}}</div>
+                                                                    {% else %}
+                                                                        <div class="text-weight-semi-bold text-up-01"><i class="fa-regular fa-circle-check"></i> Sala Livre</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    {% if sala.id == user.get_unidade_login.sala.id %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'sair', null, 'urgencia')" type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">SAIR</button>
+                                                                    {% else %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'entrar', '{{sala.nome_sala}}', 'urgencia')"  type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">ENTRAR</button>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <div class="capslock m-4">Não há salas registradas para Radiologia.</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-panel {% if setor == '3' %} active {% endif %}" id="panel-5-count">
+                                        <div class="container">
+                                            <div class="row" style="justify-content: center;">
+                                                {% if object_list|get_contar_salas_tipo:3 > 0 %}
+                                                    {% for sala in object_list|get_filtrar_setor_tipo:3 %}
+                                                        <div class="col-sm-4 col-md-4 col-lg-4 mt-4 d-flex">
+                                                                
+                                                            <div class="br-card card-border d-flex flex-column" style="{% if sala.id == user.get_unidade_login.sala.id %}border-left-color: #F55252;{% else %}border-left-color: #40C057;{% endif %}; flex-grow: 1;">
+                                                                <div class="card-header text-center">
+                                                                    <div class="text-weight-semi-bold text-up-03 nome-sala" style="color: var(--interactive-light);">{{sala.nome_sala}}</div>
+                                                                </div>
+                                                                <div class="card-content text-center capslock flex-grow-1" style="color: var(--interactive-light); padding-top: 0px !important; margin-top: -10px !important;">
+                                                                    <p><div class="text-weight-semi-bold text-up-01">codigo: {{sala.unidade_setor.codigo}}</div></p>
+                                                                    {% if sala.id == user.get_unidade_login.sala.id %}
+                                                                        <div class="text-weight-semi-bold text-up-01" style="word-break: break-all; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"><i class="fa-solid fa-users mr-2"></i>{{sala|get_usuarios_sala}}</div>
+                                                                    {% elif sala|get_usuarios_sala > 0 %}
+                                                                        <div class="text-weight-semi-bold text-up-01"><i class="fa-solid fa-users mr-2"></i> {{sala|get_usuarios_sala}}</div>
+                                                                    {% else %}
+                                                                        <div class="text-weight-semi-bold text-up-01"><i class="fa-regular fa-circle-check"></i> Sala Livre</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    {% if sala.id == user.get_unidade_login.sala.id %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'sair', null, 'urgencia')" type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">SAIR</button>
+                                                                    {% else %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'entrar', '{{sala.nome_sala}}', 'urgencia')"  type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">ENTRAR</button>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <div class="capslock m-4">Não há salas registradas para Enfermaria.</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-panel {% if setor == '15' %} active {% endif %}" id="panel-6-count">
+                                        <div class="container">
+                                            <div class="row" style="justify-content: center;">
+                                                {% if object_list|get_contar_salas_tipo:15 > 0 %}
+                                                    {% for sala in object_list|get_filtrar_setor_tipo:15 %}
+                                                        <div class="col-sm-4 col-md-4 col-lg-4 mt-4 d-flex">
+                                                                
+                                                            <div class="br-card card-border d-flex flex-column" style="{% if sala.id == user.get_unidade_login.sala.id %}border-left-color: #F55252;{% else %}border-left-color: #40C057;{% endif %}; flex-grow: 1;">
+                                                                <div class="card-header text-center">
+                                                                    <div class="text-weight-semi-bold text-up-03 nome-sala" style="color: var(--interactive-light);">{{sala.nome_sala}}</div>
+                                                                </div>
+                                                                <div class="card-content text-center capslock flex-grow-1" style="color: var(--interactive-light); padding-top: 0px !important; margin-top: -10px !important;">
+                                                                    <p><div class="text-weight-semi-bold text-up-01">codigo: {{sala.unidade_setor.codigo}}</div></p>
+                                                                    {% if sala.id == user.get_unidade_login.sala.id %}
+                                                                        <div class="text-weight-semi-bold text-up-01" style="word-break: break-all; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"><i class="fa-solid fa-users mr-2"></i>{{sala|get_usuarios_sala}}</div>
+                                                                    {% elif sala|get_usuarios_sala > 0 %}
+                                                                        <div class="text-weight-semi-bold text-up-01"><i class="fa-solid fa-users mr-2"></i> {{sala|get_usuarios_sala}}</div>
+                                                                    {% else %}
+                                                                        <div class="text-weight-semi-bold text-up-01"><i class="fa-regular fa-circle-check"></i> Sala Livre</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    {% if sala.id == user.get_unidade_login.sala.id %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'sair', null, 'classificacao')" type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">SAIR</button>
+                                                                    {% else %}
+                                                                        <button class="br-button" onclick="selecionarSala('{{sala.id}}', 'entrar', '{{sala.nome_sala}}', 'classificacao')"  type="button" style="border-radius: 5px !important; border: 1px dashed var(--interactive-light); width: 100%;">ENTRAR</button>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <div class="capslock m-4">Não há salas registradas para classificação de risco.</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block footer %}
+    {% include 'dashboard/includes/saude/footer.html' %}
+{% endblock %}
+    
+{% block script %}
+<script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+<script>
+    function selecionarSala(sala, tipo=null, salaNome=null, modulo=null){
+        if(tipo === 'entrar'){
+            Swal.fire({
+                icon: "warning",
+                title: salaNome,
+                text: "Confirme para adicionar a sala e iniciar os atendimentos?",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Confirmar",
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {atualizarLoginSala(sala, tipo, modulo)}
+            });
+            
+        }else if(tipo === 'substituir'){
+            Swal.fire({
+                title: "Sala ocupada!",
+                text: "Deseja realmente entrar em uma sala ocupada?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Confirmar",
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {atualizarLoginSala(sala, tipo, modulo)}
+            });
+        }else if(tipo === 'sair'){
+            Swal.fire({
+                title: "Sair da sala!",
+                text: "Deseja realmente sair da sala?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Confirmar",
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {atualizarLoginSala(sala, tipo, modulo)}
+            });
+        }  
+    }
+
+    function atualizarLoginSala(sala, tipo, modulo){
+        axios.put("{% url 'saude:api_atualizar_unidade_login_sala' pk=user.profissional_set.first.unidadelogin.pk %}", {"sala_pk": sala, "tipo": tipo})
+        .then((response)=>{
+            let menu = '{{menu}}'
+
+            if(tipo === 'sair'){
+                window.location.href = "{% url 'dashboard:index' %}"
+            }else if(response.data.setor_tipo === 1 || response.data.setor_tipo === '1'){
+                window.location.href = "{% url 'saude_atendimento:atendimento_medico_list' %}"
+            }else if(response.data.setor_tipo === 2 || response.data.setor_tipo === '2'){
+                window.location.href = "{% url 'dashboard:index' %}"
+            }else if(response.data.setor_tipo === 3 || response.data.setor_tipo === '3' && menu === 'medicacao'){
+                window.location.href = "{% url 'saude_enfermagem:administracao_medicacao_list' %}"
+            }else if(response.data.setor_tipo === 7 || response.data.setor_tipo === '7'){
+                window.location.href = "{% url 'saude_enfermagem:exames_laboratoriais_list' %}"
+            }else if(response.data.setor_tipo === 12 || response.data.setor_tipo === '12'){
+                window.location.href = "{% url 'saude_enfermagem:exames_imagem_list' %}"
+            }else if(response.data.setor_tipo === 3 || response.data.setor_tipo === '3' && menu === 'procedimento'){
+                window.location.href = "{% url 'saude_enfermagem:procedimentos_list' %}"
+            }else if(response.data.setor_tipo === 15 || response.data.setor_tipo === '15' && menu === 'classificacao'){
+
+                window.location.href = "{% url 'saude_atendimento:classificacao_risco_list' %}"
+            }
+        });   
+    }
+
+    $('.tab-button').on('click', function(event) {
+        $('.tab-panel').removeClass('active')
+        $('.tab-item').removeClass('is-active')
+
+        var dataPanelValue = $(this).data('panel');
+        $('#'+dataPanelValue).addClass('active')
+        $('.'+dataPanelValue).addClass('is-active')
+    });
+</script>
+
+{% endblock %}

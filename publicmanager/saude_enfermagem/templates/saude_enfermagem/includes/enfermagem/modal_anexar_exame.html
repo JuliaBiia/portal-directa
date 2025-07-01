@@ -1,0 +1,95 @@
+{% load static %}
+
+<div class="br-scrim-util foco" id="modal-anexo" data-scrim="true" style="z-index: 9999999999;">
+    <div class="br-modal" aria-labelledby="titulomodalexemplo" style="width: 900px;">
+        <div class="br-modal-body">
+            
+            <div class="container" style="padding-left: 65px; padding-right: 65px;">
+                <div class="row mt-4 mb-2">
+                    <div class="col-12" style="margin-left: -13px;">
+                        <button type-data="btn-element" :class="type === 'arquivo' ? 'primary' : 'secondary'" @click="type='arquivo'" class="br-button" type="button" style="border-radius: 7px; border-radius: 5px 0px 0px 5px; margin-bottom: 10px;">
+                            Arquivo
+                        </button>
+                        <button type-data="btn-element" :class="type === 'camera' ? 'primary' : 'secondary'" @click="type='camera'" class="br-button" type="button" style="border-radius: 7px; margin-left: -5px; border-radius: 0px 5px 5px 0px; margin-bottom: 10px;">
+                            Câmera
+                        </button>
+                    </div>
+                </div>
+
+                <div :style="type === 'arquivo' ? 'display: block;' : 'display: none;'" class="row br-input mt-2" style="border: 1px solid var(--interactive);">
+                    <div class="col-12 br-input" style="text-align: left;">
+                        <label class="custom-text" style="color: var(--interactive);">Tipo Arquivo:</label>
+                        <input class="form-control input-tab capslock" style="border: 1px solid var(--interactive); height: 34px;" type="text" :value="objectExame.tipo_exame" readonly/>
+                    </div>
+                    <div class="col-12 br-input" style="text-align: left; margin-bottom: 20px;">
+                        <label for="fileInput" class="custom-text" style="color: var(--interactive);">Anexar Arquivo:</label>
+                        <div class="mt-1" id="drop-custom-area">
+                            <label style="border-radius: 6px; padding: 4px; background-color: var(--interactive); color: #fff; cursor: pointer;" for="fileInput">Escolher arquivos</label>
+                            <input type="file" id="fileInput" style="display: none;" @change="onFileChange" multiple>
+                            <span v-if="arquivosNomes.length" style="font-size: 20px;">${arquivosNomes.join(', ')}</span>
+                            <span v-else style="font-size: 18px;">Nenhum arquivo selecionado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div :style="type === 'camera' ? 'display: block;' : 'display: none;'" class="form-group row mt-1 file-upload-container">
+                    <div class="col-12" style="text-align: center;">
+                        <div class="card-photo mb-3">
+                            <span class="sub-page-title color-title"><i class="fas fa-paperclip" style="margin-bottom: 20px;"></i> Foto do Exame </span>
+                            <div class="br-upload text-center" style="margin-top: -12px;">
+                                <label class="upload-label" for="single-file" style="">
+                                    <img src="{% static 'img/saude_undraw/undraw_add_files.png' %}" alt="user-avatar" class="rounded mx-auto d-block" id="accountUploadedAvatar" style="display:block;" />
+                                    <video id="video" autoplay style="margin-left: 15px; display:none; width: 335px;"></video>
+                                    <canvas id="canvas" style="display: none;"></canvas>
+                                </label>
+                                <div class="upload-list" style="display: none;"></div>
+                                <input type="file" class="upload-file account-file-input" id="photoInput" @change="onPhotoChange" style="display: none;">
+                                <span id="feedback" class="feedback warning mt-1" role="alert" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>O arquivo enviado anteriormente foi substituído
+                                </span>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <button v-if="photoCaptured" id="camera-btn" class="br-button primary mt-2 cam-mobile" type="button" aria-label="Ícone ilustrativo" @click="adicionarFoto()"><i class="fa-solid fa-circle-plus" aria-hidden="true"></i> <span class="btn-camera-text">&nbsp;Adicionar</span></button>
+                                    <button v-else id="camera-btn" class="br-button primary mt-2 cam-mobile" type="button" aria-label="Ícone ilustrativo" @click="openCamera"><i class="fas fa-camera" aria-hidden="true"></i> <span class="btn-camera-text">&nbsp;Câmera</span></button>
+                                    <button class="br-button circle warning small account-image-reset trash-mob" type="button" aria-label="Ícone ilustrativo" style="border-radius: 10% !important; display: none; width: 50px; height: 40px; margin-top: 10px;margin-left: 20px;" @click="resetPhoto"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                                </div>
+                                <div class="col-12 d-flex justify-content-center mt-2">
+                                    <button class="br-button primary mr-3 btn-mobile" type="button" id="capture-btn" style="display: none;" @click="capturePhoto"><i class="fas fa-object-group mr-1"></i><span class="btn-capturarfoto">Capturar Foto</span></button>
+                                    <button v-if="cameraStarted" id="switch-camera-btn" class="br-button primary btn-mobile" type="button" aria-label="Ícone ilustrativo" @click="switchCamera"><i class="fas fa-sync-alt mr-1" aria-hidden="true"></i> <span class="btn-trocarcamera">Trocar Câmera</span></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fileupload flex" style="max-height: 300px; overflow-y: auto;">
+                    <div class="files mt10 w100">
+                        <div v-for="file in arquivosFiles" class="file">
+                            <div class="flex space-between">
+                                <p class="my5 pdx10" style="margin-top: 15px;">${file.name}</p>
+                                <button class="br-button circle primary small account-image-reset trash-mob" type="button" aria-label="Ícone ilustrativo" style="border-radius: 10% !important; width: 50px; height: 40px; margin-top: 10px;margin-left: 20px;" @click="onDrop(file)"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                            </div>
+                            <hr>
+                        </div>
+                    </div>
+                    {% comment %} <div class="row br-input mt-4">
+                        <div class="col-12" id="drop-area"  @dragover.prevent="onDragOver" @drop.prevent="onDrop">
+                            <i class="fa-solid fa-file-circle-plus" style="font-size: 33px; margin-right: 19px; margin-top: 20px; color: var(--interactive);"></i>
+                            <p><span class="drop-title" style="color: var(--interactive);">Arraste e solte um arquivo aqui</span></p>
+                            <span v-if="arquivoNome" style="font-size: 18px;">${arquivoNome}</span>
+                        </div>
+                    </div> {% endcomment %}
+                </div>
+            </div>
+        </div>
+
+        <div class="br-modal-footer justify-content-center mt-4">
+          <button class="br-button secondary" @click="modalAnexarAquivo('fecharAnexo')" type="button" data-dismiss="true"><i class="fa-solid fa-xmark mr-2 mt-1"></i> Fechar</button>
+          <button class="br-button primary mt-3 mt-sm-0 ml-sm-3" :class="loadingBtn ? 'btn-disabled' : ''" :disabled="!comAnexo && !justificativa || comAnexo && !arquivosFiles.length" type="button" @click="postExame()"><i class="fa-solid fa-check mr-2 mt-1"></i> Salvar</button>
+        </div>
+        
+      </div>
+    </div>
+</div>

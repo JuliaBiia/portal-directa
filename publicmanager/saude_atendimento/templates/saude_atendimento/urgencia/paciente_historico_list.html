@@ -1,0 +1,174 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Histórico Paciente{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href = "{% static 'css/responsividade_tb.css' %}">
+<link rel="stylesheet" href = "{% static 'css/responsividade.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+        <div class="br-card mt-1">
+
+            <div class="card-header">
+                <div class="row ml-1">
+                    <div class="col-10">
+                        <div class="text-weight-semi-bold text-up-02 color-title pdt-10 font-size18 fontsize15-w"><i class="fa-solid fa-stethoscope font-size20"></i> HISTÓRICO DE ATENDIMENTO DO PACIENTE</div>
+                    </div>
+                    <div class="col-2">
+                        <a href="{% url 'saude_atendimento:admissao_paciente_list' %}?modulo={{modulo}}" class="br-button secondary ml-6 hidden-xs hidden-tb hidden-tb2"> <i class="fas fa-arrow-left"></i> Voltar </a>
+                    </div>
+                </div>
+            </div>
+            <hr class="" style="border-color:#f2f2f2;">
+
+            <div class="card-content">
+                <div class="container mb-4">
+                    <div class="row no-gutters">
+
+                        <div class="box-paciente-01">
+                            <div class="br-avatar mr-3">
+                                <div class="txt-center-tb margin-0">
+                                    {% if slc_paciente.foto_paciente %}
+                                        <img src="{{slc_paciente.foto_paciente.url}}" class="img-paciente-historico img-title" alt="Avatar"/>
+                                    {% else %}
+                                        <span class="br-avatar large" style="margin-top: 15px;"><span class="content"><i class="fas fa-user" aria-hidden="true"></i></span></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="box-paciente-02 mt-15-w mt-15-tb">
+                            <div class="ml-23 mt-n3 font-size18">
+                                <div class="row mt-10">
+                                    <div class="col-title-paciente-left">
+                                        <span class="color-title" >Paciente:</span>
+                                    </div>
+                                    <div class="col-title-paciente-right">
+                                        <span class="capslock">{{slc_paciente.nome_paciente}}</span>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-10">
+                                    <div class="col-title-paciente-left">
+                                        <span class="color-title" >Cartão Sus:</span>
+                                    </div>
+                                    <div class="col-title-paciente-right">
+                                        <span class="capslock">{{slc_paciente.cartao_sus|default:'-----'}}</span>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-10">
+                                    <div class="col-title-paciente-left">
+                                        <span class="color-title" >Idade:</span> 
+                                    </div>
+                                    <div class="col-title-paciente-right">
+                                        <span class="capslock">{{ slc_paciente.calcular_idade }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-40">
+                                    <div class="col-title-paciente-left">
+                                        <span class="color-title" >Situação:</span> 
+                                    </div>
+                                    <div class="col-title-paciente-right">
+                                        <span class="bold">{{slc_paciente.situacao}}</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md">
+                <div class="br-card hover">
+                <div class="card-content">
+                    <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                        data-random="data-random">
+                        
+                        <div class="table-header">
+                            <div class="top-bar">
+                                <div class="table-title color-title fontsize15-w"><i class="fas fa-history"></i> HISTÓRICO DE ATENDIMENTOS ANTERIORES</div><hr>
+                            </div>
+                        </div>
+                        
+                        <table class="mt-2">
+                            <thead>
+                                <tr>
+                                    {% if user.tipo_usuario == 'medico' or user.tipo_usuario == 'desenvolvedor' or user.tipo_usuario == 'administrador' or user.tipo_usuario == 'enfermeiro' or user.tipo_usuario == 'tecnico_enfermagem' %}
+                                    <th style="width:5%;"></th>
+                                    <th style="width:5%;"></th>
+                                    {% endif %}
+                                    <th class="color-title"><b>Data</b></th>
+                                    <th class="color-title"><b>Hora</b></th>
+                                    <th class="color-title"><b>Nº Atendimento</b></th>
+                                    <th class="color-title"><b>Médico</b></th>
+                                    <th class="color-title"><b>Queixa Principal</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dados in object_list %}
+                                    
+                                    <tr>
+                                        {% if user.tipo_usuario == 'medico' or user.tipo_usuario == 'desenvolvedor' or user.tipo_usuario == 'administrador' %}
+                                        <td data-th="Código"><a href="{% url 'saude_atendimento:paciente_historico_ficha' pk=dados.id %}" target="_blank"><i class="fas fa-print" style="font-size:18px;"></i></a></td>
+                                        <td data-th="Código"><a href="{% url 'saude_atendimento:paciente_historico_time_line' pk=dados.id %}" target="_blank"><i class="fas fa-history" style="font-size:18px;"></i></a></td>
+                                        {% endif %}
+                                        <td>{{dados.data_entrada|date:'d/m/Y'}}</td>
+                                        <td>{{dados.data_entrada|time:'H:i'}}</td>
+                                        <td data-th="Código">
+                                            {% if dados.boletim_classificacao_risco_set.first.formatar_numeros_atendimento %}
+                                                {{dados.boletim_classificacao_risco_set.first.formatar_numeros_atendimento}}
+                                            {% else %}
+                                                <p>NÃO INFORMADO</p>
+                                            {% endif %}
+                                        </td>
+                                        <td data-th="Código">
+                                            {% if dados.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.profissionais.all %}
+                                                {% for profissional in dados.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.profissionais.all %}
+                                                    {{profissional.nome_profissional}}
+                                                {% endfor %}
+                                            {% else %}
+                                                <p>NÃO INFORMADO</p>
+                                            {% endif %}
+                                        </td>
+                                        <td class="capslock" data-th="Código">
+                                            {% if dados.boletim_classificacao_risco_set.first.queixa_principal %}
+                                                {{dados.boletim_classificacao_risco_set.first.queixa_principal}}</td>
+                                            {% else %}
+                                                <p>NÃO INFORMADO</p>
+                                            {% endif %}
+                                        </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {% comment %} Paginação {% endcomment %}
+                        {% include 'dashboard/includes/paginacao.html' %}
+                        
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+
+{% endblock %}
+{% block script %}
+
+{% endblock %}

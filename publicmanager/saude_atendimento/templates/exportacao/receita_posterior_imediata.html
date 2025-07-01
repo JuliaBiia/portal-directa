@@ -1,0 +1,363 @@
+{% extends 'dashboard/base/base-pdf.html' %}
+{% load static %}
+{% block title %}RECEITA MÉDICA{% endblock %}
+{% load widget_tweaks %}
+
+{% block css-extra-pdf %}
+<style>
+    .container {max-width: 900px !important;}
+    .title-span-clock {word-wrap: break-word; overflow-wrap: break-word; white-space: normal;}
+    @media print {
+        title, head {display: none;}
+        .logo{ padding-top:15px; }
+        @page {size: auto; margin: 0;}
+        body {margin: 0; padding: 0;}
+        .btn-secondary {display: none;}
+        .container{--grid-maxwidth: antiquewhite; border:none !important; padding-right: 50px;}
+        .footer {background-color: #f8f8f8; position: absolute; bottom: 0; width: 96%;}
+        {% if tipo == "Controlada" %}
+            body {
+                zoom: 0.65;
+            }
+
+            .header {
+                position: fixed;
+            }
+            .footer {
+                position: fixed;
+                width: 78%;
+                {% comment %} display: flex; {% endcomment %}
+                {% comment %} flex-direction: column; {% endcomment %}
+                {% comment %} align-items: left; {% endcomment %}
+            }
+        {% endif %}
+    }
+
+    .page-break {
+        page-break-after: always;
+    }
+ 
+</style>
+{% endblock %}
+
+{% block contentpdf %}
+
+    {% if tipo == "Controlada" %}
+
+    {% for i in range %}
+        <div class="row" style="margin-bottom:5%;"></div>
+        {% if not forloop.first %}
+            <div class="row" style="margin-top: 180px;">
+                <div class="col-6" style="font-size: 20px; color: #1351B4;"><b></b></div>
+                <div class="col-6" style="color: #4F4C4C; text-align: right;"><b>2ª VIA – ORIENTAÇÂO AO PACIENTE</b></div>
+            </div>
+            <div class="row mb-1" style="margin-top: 10px;">
+                <div class="col-6" style="font-size: 20px; color: #1351B4;"><b>Emitente:</b></div>
+                <div class="col-6" style="color: #4F4C4C; text-align: right;"><b></b></div>
+            </div>
+        {% else %}    
+            <div class="row" style="margin-bottom:1%; margin-top: 16% !important;">
+                <div class="col-6" style="font-size: 20px; color: #1351B4;"><b></b></div>
+                <div class="col-6" style="color: #4F4C4C; text-align: right;"><b>1ª VIA – RETENÇÃO NA FARMÁCIA OU DROGARIA</b></div>
+            </div>
+            <div class="row mb-1">
+                <div class="col-6" style="font-size: 20px; color: #1351B4;"><b>Emitente:</b></div>
+                <div class="col-6" style="color: #4F4C4C; text-align: right;"><b></b></div>
+            </div>
+        {% endif %}
+
+        <div class="col-12" style="border: 1px solid #c1c6cc;">
+            <div class="row mt-3" style="width:90%; margin:0 auto;">
+                <div class="col-4" style="text-align:right; color: #4F4C4C;">
+                    <p>Médico:</p>
+                </div>
+                <div class="col capslock">
+                    <p><b>
+                        {{profissional.nome_profissional|default:'SEM INFORMAÇÃO'}}
+                        (CRM:
+                        {{profissional.crm|default:'SEM INFORMAÇÃO'}})
+                        {% if not profissional.nome_profissional and not profissional.crm %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></p>
+                </div>
+            </div>
+            <div class="row" style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>Endereço:</p>
+                </div>
+                <div class="col">
+                    <p><b>
+                        {{ profissional.endereco|default:'SEM INFORMAÇÃO' }} 
+                        {{ profissional.numero|default:'' }}, 
+                        {{ profissional.bairro|default:'' }} - 
+                        {{ profissional.municipio|default:'' }} 
+                        {% if not profissional.endereco and not profissional.numero and not profissional.bairro and not profissional.municipio %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-1 mt-3">
+            <div class="col-6" style="font-size: 20px; color: #1351B4;"><b>Cidadão:</b></div>
+            <div class="col-6" style="color: #4F4C4C; text-align: right;"><b></b></div>
+        </div>
+
+        <div class="col-12" style="border: 1px solid #c1c6cc;">
+            <div class="row mt-3" style="width:90%; margin:0 auto;">
+                <div class="col-3" style="text-align:right; color: #4F4C4C;">
+                    <p>Nome do Paciente:</p>
+                </div>
+                <div class="col-5 capslock">
+                    <p><b>{{atendimento.paciente.nome_paciente|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+                <div class="col-2" style="text-align:right;">
+                    <p>CPF:</p>
+                </div>
+                <div class="col-2">
+                    <p><b>{{atendimento.paciente.cpf|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+            </div>
+            <div class="row" style="width:90%; margin:0 auto;">
+                <div class="col-3" style="text-align:right;">
+                    <p>Município:</p>
+                </div>
+                <div class="col-5 capslock">
+                    <p><b>{{atendimento.paciente.municipio.nome|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+                <div class="col-2" style="text-align:right;">
+                    <p>UF:</p>
+                </div>
+                <div class="col-2">
+                    <p><b>{{atendimento.paciente.estado.sigla|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+            </div>
+            <div class="row" style="width:90%; margin:0 auto;">
+                <div class="col-3" style="text-align:right;">
+                    <p>Telefone de Contato:</p>
+                </div>
+                <div class="col-5 capslock">
+                    <p><b>{{atendimento.paciente.celular|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+                <div class="col-2" style="text-align:right;">
+                    <p>CEP:</p>
+                </div>
+                <div class="col-2 capslock">
+                    <p><b>{{atendimento.paciente.cep|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+            </div>
+        </div>
+    
+        <div class="text-left mt-3">
+            <p style="font-size: 20px; color: #1351B4;"><b>Medicamentos:</b></p>
+        </div>
+    
+        <div class="mt-2 w100" style="background-color:;">
+            {% for receita in receitas %}
+                    <div class="row mt-3 capslock ft-sz14 margin-0" style="color:#413e3e; width:90%;">
+                        <div class="col-4" style="text-align: end;">
+                            <span>{{receita.medicacao.nome_medicamento}} - {{receita.dosagem}}</span>
+                        </div>
+                        <div class="col-4" style="text-align: center;">
+                            ----------------------------------
+                        </div>
+                        <div class="col-4" style="text-align: start;">
+                            {% if receita.dose_unica %}Dose Única{% else %}<span>{{receita.posologia}} / {{receita.posologia}} {{receita.get_tipo_posologia_display}} por {{receita.duracao_tratamento}} dias</span>{% endif %}
+                        </div>
+            
+                        <div class="col-4" style="text-align: end;">
+                            Uso:
+                        </div>
+                        <div class="col-8 title-span-clock" style="text-align: start;">
+                            {{receita.get_admin_medicamentosa_display}}
+                            {% if receita.admin_medicamentosa == 1 %}
+                                - {{receita.get_tipo_parenteral_display}}
+                            {% endif %}
+                        </div>
+            
+                        <div class="col-4" style="text-align: end;">
+                            <b>Observação:</b>
+                        </div>
+                        <div class="col-8 title-span-clock" style="text-align: start;">
+                            {{receita.observacao}}
+                        </div>
+                    </div> 
+            {% endfor %}
+        </div>
+
+        <div class="footer col-12">
+            <div class="contentAssinaturas" style="margin-bottom: 18%;">
+                <div class="text-center" style="margin-top:5%;">
+                    <hr style="border:1px solid gray; width:40%; margin:0 auto; margin-bottom: 0;"><br/>
+                    <p style="margin-top: -10px;"><b>Dr. {{profissional.nome_profissional}} CRM: {{profissional.crm}}</b></p>
+                </div>
+
+                <p style="text-align: center; margin-top: -10px;">Impresso em {{data_impressao}}</p>
+        
+                <div class="row mb-2" style="margin-top: -5px;">
+                    <div class="col-6" style="font-size: 20px; color: #1351B4;"><b>Identificação do Comprador:</b></div>
+                    <div class="col-6" style="color: #4F4C4C; text-align: right;"><b></b></div>
+                </div>
+
+                <div class="col-12 mb-6">
+                    <div class="row">
+                        <div class="col-3" style="text-align: right; color: #4F4C4C; border: 1px solid #c1c6cc;"><p>Nome:</p></div>
+                        <div class="col-9 capslock" style="border: 1px solid #c1c6cc;"><p><b></b></p></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3" style="text-align: right; border: 1px solid #c1c6cc;"><p>Ident:</p></div>
+                        <div class="col-3" style="border: 1px solid #c1c6cc;"><p><b></b></p></div>
+                        <div class="col-3" style="border: 1px solid #c1c6cc;"><p>Org Emissor:</p></div>
+                        <div class="col-3" style="border: 1px solid #c1c6cc;"><p><b></b></p></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3" style="text-align: right; border: 1px solid #c1c6cc;"><p>End:</p></div>
+                        <div class="col-9" style="border: 1px solid #c1c6cc;"><p><b></b></p></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3" style="text-align: right; border: 1px solid #c1c6cc;"><p>Cidade:</p></div>
+                        <div class="col-3" style="border: 1px solid #c1c6cc;"><p><b></b></p></div>
+                        <div class="col-3" style="border: 1px solid #c1c6cc;"><p>UF:</p></div>
+                        <div class="col-3" style="border: 1px solid #c1c6cc;"><p><b></b></p></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3" style="text-align: right; border: 1px solid #c1c6cc;"><p>Telefone:</p></div>
+                        <div class="col-9" style="border: 1px solid #c1c6cc;"><p><b></b></p></div>
+                    </div>
+                </div>
+
+                <div class="row mb-1" style="margin-top: -10px;">
+                    <div class="col-6" style="font-size: 20px; color: #1351B4;"><b>Identificação Fornecedor:</b></div>
+                    <div class="col-6" style="color: #4F4C4C; text-align: right;"><b></b></div>
+                </div>
+                    
+                <div class="row">
+                    <div class="col text-left">
+                        <p><b>Assinatura do farmacêutico</b></p>
+                        <hr class="mt-5" style="border:1px solid gray; width:100%; margin:0;"><br/>
+                    </div>
+                
+                    <div class="col text-left">
+                        <p><b>Data de Fornecimento</b></p>
+                        <hr class="mt-5" style="border:1px solid gray; width:95%; margin:0;"><br/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if forloop.counter0 == 1 %}
+        {% else %}
+            <div class="page-break"></div>    
+        {% endif %}
+    {% endfor %}
+
+    {% else %}
+        <div class="row" style="margin-top:5%;">
+            <div class="col-6" style="font-size: 20px; color: #1351B4;"><b>Uso de Medicamentos</b></div>
+            <div class="col-6" style="color: #4F4C4C; text-align: right;"><b>{{user.get_unidade_login.unidade.formatar_nome_municipio}} - {{user.get_unidade_login.unidade.estado.sigla}}, {{data_impressao|date:'d/m/Y'}}</b></div>
+        </div>
+
+        <div class="col-12" style="border: 1px solid #c1c6cc;">
+            <div class="row mt-3" style="width:90%; margin:0 auto;">
+                <div class="col-4" style="text-align:right; color: #4F4C4C;">
+                    <p>Nome do Paciente:</p>
+                </div>
+                <div class="col capslock">
+                    <p><b>{{atendimento.paciente.nome_paciente|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+            </div>
+            <div class="row" style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>CPF:</p>
+                </div>
+                <div class="col">
+                    <p><b>{{atendimento.paciente.cpf|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+            </div>
+            <div class="row" style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>Município:</p>
+                </div>
+                <div class="col">
+                    <p><b>{{atendimento.paciente.municipio.nome|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+            </div>
+            <div class="row" style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>UF:</p>
+                </div>
+                <div class="col">
+                    <p><b>{{atendimento.paciente.estado.sigla|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+            </div>
+            <div class="row" style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>CEP:</p>
+                </div>
+                <div class="col">
+                    <p><b>{{atendimento.paciente.cep|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+            </div>
+            <div class="row" style="width:90%; margin:0 auto; ">
+                <div class="col-4" style="text-align:right;">
+                    <p>Telefone de Contato:</p>
+                </div>
+                <div class="col">
+                    <p><b>{{atendimento.paciente.celular|default:'SEM INFORMAÇÃO'}}</b></p>
+                </div>
+            </div>
+        </div>
+    
+        <div class="text-center" style="margin-top:8%;">
+            <p style="font-size: 20px; color: #1351B4;"><b>Medicação {{tipo}}</b></p>
+        </div>
+    
+        <div class="mt-2 w100" style="background-color:;">
+            {% for receita in receitas %}
+                <div class="row mt-3 capslock ft-sz14 margin-0" style="color:#413e3e; width:90%;">
+                    <div class="col-4" style="text-align: end;">
+                        <span>{{receita.medicacao.nome_medicamento}} - {{receita.dosagem}}</span>
+                    </div>
+                    <div class="col-4" style="text-align: center;">
+                        ----------------------------------
+                    </div>
+                    <div class="col-4" style="text-align: start;">
+                        {% if receita.dose_unica %}Dose Única{% else %}<span>{{receita.posologia}} / {{receita.posologia}} {{receita.get_tipo_posologia_display}} por {{receita.duracao_tratamento}} dias</span>{% endif %}
+                    </div>
+    
+                    <div class="col-4" style="text-align: end;">
+                        Uso:
+                    </div>
+                    <div class="col-8 title-span-clock" style="text-align: start;">
+                        {{receita.get_admin_medicamentosa_display}}
+                        {% if receita.admin_medicamentosa == 1 %}
+                            - {{receita.get_tipo_parenteral_display}}
+                        {% endif %}
+                    </div>
+    
+                    <div class="col-4" style="text-align: end;">
+                        <b>Observação:</b>
+                    </div>
+                    <div class="col-8 title-span-clock" style="text-align: start;">
+                        {{receita.observacao}}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    
+        <div class="footer col-12">
+            <div class="contentAssinaturas" style="margin-bottom: 6%;">
+                <div class="text-center" style="margin-top:20%; ">
+                    <hr style="border:1px solid gray; width:40%; margin:0 auto;"><br/>
+                    <p><b>Dr. {{profissional.nome_profissional}} </br> CRM: {{profissional.crm}}</b></p>
+                </div>
+            
+                <div class="" style="margin-top:10%;">
+                    <p>.<p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

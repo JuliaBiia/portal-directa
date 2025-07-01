@@ -1,0 +1,220 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Histórico de Requisições de Materiais{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+    <style>
+        .select2-selection {
+            border-color: var(--blue-vivid-60) !important;
+        }
+        .select2-selection > .select2-selection__rendered{
+            color: var(--blue-vivid-60) !important;
+        }
+        .select2-selection__arrow > [role=presentation]{
+            border-color: var(--blue-vivid-60) transparent transparent transparent !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header pr-0 pl-0 pt-2">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                                <img src="{% static 'img/icons/icone-requisicao-material-farmacia-grid.svg' %}" alt="Ícone do requisição material" title="Ícone do requisição material" style="display: block;">
+                                <span class="mt-1 ml-4" style="display: block;">REQUISIÇÃO DE MATERIAIS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="br-divider mt-1 divider-grid mb-3 col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                </div>
+
+                <div class="card-content">
+                    <form id="formSubmit" method="get" onsubmit="setDate()">
+                        <div class="card-body d-flex justify-content-center flex-column">
+                            <div class="form-group row d-flex justify-content-center col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                    <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                      <div class="br-input has-icon">
+                                        <label for="id_data_solicitacao_inicial_filtro" class="text-color-blue-1gov">Data da Solicitação Inicial</label>
+                                        <input id="id_data_solicitacao_inicial_filtro" class="input-busca-grid" type="text" data-input="data-input"/>
+                                        <button class="br-button circle small input-busca-grid" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn" tabindex="-1" aria-hidden="true"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                        </button>
+                                      </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                    <div class="br-datetimepicker" data-mode="single" data-type="text">
+                                      <div class="br-input has-icon">
+                                        <label for="id_data_solicitacao_final_filtro" class="text-color-blue-1gov">Data da Solicitação Final</label>
+                                        <input id="id_data_solicitacao_final_filtro" class="input-busca-grid" type="text" data-input="data-input"/>
+                                        <button class="br-button circle small" type="button" aria-label="Abrir Timepicker" data-toggle="data-toggle" id="simples-input-btn" tabindex="-1" aria-hidden="true"><i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                        </button>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center mt-3 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input">
+                                        <label for="id_numero_pedido_filtro" class="text-color-blue-1gov">N° Pedido</label>
+                                        <input type="text" name="nome_filtro" maxlength="14" class="input-busca-grid form-control" value="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center mt-3 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input">
+                                        <label for="id_farmaceutico_solicitante_filtro" class="text-color-blue-1gov">Solicitante</label>
+                                        <select class="select-busca-grid campo-select" style="width: 100%" name="situacao_filtro" id="id_farmaceutico_solicitante_filtro">
+                                            {% for farmaceutico_solicitante in listagem_select_farmaceutico_solicitante_busca %}
+                                                <option value="id_farmaceutico_solicitante_filtro_{{forloop.counter0}}">{{farmaceutico_solicitante}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center mt-3 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input">
+                                        <label for="id_farmacia_filtro" class="text-color-blue-1gov">Farmácia</label>
+                                        <select class="select-busca-grid campo-select" style="width: 100%" name="situacao_filtro" id="id_farmacia_filtro">
+                                            {% for farmacia in listagem_select_farmacia_busca %}
+                                                <option value="id_farmacia_filtro_{{forloop.counter0}}">{{farmacia}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center mt-3 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input">
+                                        <label for="id_situacao_filtro" class="text-color-blue-1gov">Situação</label>
+                                        <select class="select-busca-grid campo-select" style="width: 100%" name="situacao_filtro" id="id_situacao_filtro">
+                                            {% for situacao in situacoes %}
+                                                <option value="id_situacao_filtro_{{forloop.counter0}}">{{situacao}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-6 ml-6">
+                            <button type="submit" class="br-button primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+                
+                <div class="card-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card hover">
+                <div class="card-content">
+                    <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                        <div class="table-header">
+                            <div>
+                                <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                            </div>
+                            <div class="top-bar mt-2">
+                                <div class="d-flex table-title">
+                                    <img src="{% static 'img/icons/icone-requisicao-material-farmacia-grid.svg' %}" alt="Ícone da requisição de material de farmácia" title="Ícone da requisição de material de farmácia" style="display: block; height: 38px;"> 
+                                    <span class="mt-1 ml-4" style="display: block;">Histórico de Requisições de Materiais</span>
+                                </div>
+                                <div class="search-trigger">
+                                    <a href="{% url 'saude_farmacia:requisicao_material_farmacia_add' %}" class="br-button primary"><i class="fas fa-plus-circle"></i> Adicionar</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="mt-2">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th><b class="text-color-blue-1gov">Data da Solicitação</b></th>
+                                    <th><b class="text-color-blue-1gov">Data de Entrada</b></th>
+                                    <th><b class="text-color-blue-1gov">N° Pedido</b></th>
+                                    <th><b class="text-color-blue-1gov">Unidade de Saúde</b></th>
+                                    <th><b class="text-color-blue-1gov">Farmácia</b></th>
+                                    <th><b class="text-color-blue-1gov">Solicitante</b></th>
+                                    <th><b class="text-color-blue-1gov">Situação</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% if requisicoes %}
+                                {% for requisicao in requisicoes %}
+                                    <tr>
+                                        <td>
+                                            <a data-th="Editar" href="{% url 'saude_farmacia:requisicao_material_farmacia_update' pk=requisicao.id %}" class="br-button circle "><i class="fas fa-edit" aria-hidden="true"></i></a>
+                                        </td>
+                                        <td data-th="Excluir">
+                                            <a href="javascript:void(0)" class="br-button circle" onclick="confirmCancel('{% url 'saude_farmacia:requisicao_material_farmacia_delete' requisicao.id %}', 'requisição de material')">
+                                                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                        <td data-th="Código">{{ requisicao.data_solicitacao|date:'d/m/Y' }}</td>
+                                        <td data-th="Nome Longo">{{ requisicao.data_entrada|date:'d/m/Y'|default:"--" }}</td>
+                                        <td>{{ requisicao.numero_pedido }}</td>
+                                        <td>{{ requisicao.unidade_saude }}</td>
+                                        <td>{{ requisicao.farmacia }}</td>
+                                        <td>{{ requisicao.farmaceutico_solicitante }}</td>
+
+                                        
+
+                                        {% if requisicao.situacao_requisicao|return_situacao_requisicao_choice_option_text == 'SOLICITADO' %}
+                                            <td><span class="situacao-grid" style="background-color: #007bff;">{{requisicao.situacao_requisicao|return_situacao_requisicao_choice_option_text}}</span></td>
+                                        {% elif requisicao.situacao_requisicao|return_situacao_requisicao_choice_option_text == 'DEFERIDO' %}
+                                            <td><span class="bg-warning situacao-grid">{{requisicao.situacao_requisicao|return_situacao_requisicao_choice_option_text}}</span></td>
+                                        {% elif requisicao.situacao_requisicao|return_situacao_requisicao_choice_option_text == 'CONCLUIDO' %}
+                                            <td><span class="bg-situacao-ativo situacao-grid">{{requisicao.situacao_requisicao|return_situacao_requisicao_choice_option_text}}</span></td>
+                                        {% elif requisicao.situacao_requisicao|return_situacao_requisicao_choice_option_text == 'REJEITADO' %}
+                                            <td><span class="bg-situacao-inativo situacao-grid">{{requisicao.situacao_requisicao|return_situacao_requisicao_choice_option_text}}</span></td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                        {% comment %} Paginação {% endcomment %}
+                        {% include 'dashboard/includes/paginacao.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

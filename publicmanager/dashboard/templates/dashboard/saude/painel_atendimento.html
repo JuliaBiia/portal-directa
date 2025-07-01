@@ -1,0 +1,299 @@
+
+{% extends 'dashboard/base/base_fixed.html' %}
+{% block title %}Painel Chamado{% endblock %}
+{% load static %}
+
+{% block css %}
+    <style>
+        .tag-amarelo { background-color: #eae451; }
+        .tag-azul { background-color: #4c9fe4; }
+        .tag-verde { background-color: #3ec86d; }
+        .tag-laranja { background-color: #ff9d29; }
+        .tag-roxo { background-color: #5942D2; }
+        .tag-cinza { background-color: #999; }
+        .tag-vermelho { background-color: #e52207; }
+        .tag-preto { background-color: rgba(0, 0, 0, 0.9); }
+        .tag-none { display: none; }
+
+        @keyframes efeito-card {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 0; }
+        }
+        .efeito-card {-webkit-animation: efeito-card .80s linear infinite; -moz-animation: efeito-card .80s linear infinite; -ms-animation: efeito-card .80s linear infinite; -o-animation: efeito-card .80s linear infinite; animation: efeito-card .80s linear infinite;}
+        .modal {display: none; position: fixed;z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);}
+        .modal-content {background-color: #fefefe; padding: 20px; border: 1px solid #888; width: 700px; border-radius: 10px;}
+        .modal h2 {margin-top: 0;}
+        .modal p {margin-bottom: 20px;}
+        .modal button {background-color: #007bff; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;}
+        .br-tag {font-size: 15px; width: 46px !important; height: 27px;}
+    </style>
+{% endblock %}
+{% block header %}
+
+    <header class="br-header">
+        <div class="container-lg">
+            <div class="header-top">
+                {% if unidade_saude.logo %}
+                <img src="{{unidade_saude.logo.url}}" style="width:80px;" alt="logo" />
+                {% endif %}
+                <div class="header-logo">
+                </div>
+                <div class="header-actions">
+                    <div class="header-functions dropdown">
+                        <div class="br-list" style="color: var(--interactive-light);">
+                            <div class="mr-3" id="hora" style="font-size: 35px; font-weight: 800;"></div>
+                            <span class="br-divider vertical mx-half mx-sm-1"></span>
+                            <div class="ml-3" id="data" style="font-size: 35px; font-weight: 800;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button style="display: none;" class="br-button small circle" type="button" aria-label="Menu" data-toggle="menu" data-target="#main-navigation" id="navigation"></button>
+        </div>
+    </header>
+
+{% endblock %}
+{% block content %}
+    <template>
+        <div class="container-fluid" style="padding: 0px; margin-top: 30px; width: 100%">
+            <div id="chamada-efeito" class="row" style="margin-top: 30px;">    
+                <div class="col-12 text-center">
+                    <label for="paciente" class="form-label" style="font-size: 40px;">Paciente Chamado</label>
+                    <div class="mt-2">
+                        <span v-if="chamadaPrincipal.classicicacao_cor !== ''" :class="
+                            chamadaPrincipal.classicicacao_cor === 0 ? 'tag-azul' :
+                            chamadaPrincipal.classicicacao_cor === 1 ? 'tag-verde' :
+                            chamadaPrincipal.classicicacao_cor === 2 ? 'tag-amarelo' :
+                            chamadaPrincipal.classicicacao_cor === 3 ? 'tag-vermelho' :
+                            chamadaPrincipal.classicicacao_cor === 4 ? 'tag-laranja' :
+                            chamadaPrincipal.classicicacao_cor === 5 ? 'tag-preto' :
+                            chamadaPrincipal.classicicacao_cor === 6 ? 'tag-roxo' :
+                            chamadaPrincipal.classicicacao_cor === 7 ? 'tag-cinza' : 'tag-none'"
+                            class="br-tag small" style="width: 110px !important; height: 44px !important;"
+                        ></span>
+                    </div>
+                    <div class="capslock mt-1" style="font-size: 60px; color: var(--interactive-light);">
+                        <b>
+                            <template v-if="chamadaPrincipal">${chamadaPrincipal.paciente_nome}</template>
+                            <template v-else="chamadaPrincipal">Sem chamada</template>
+                        </b>
+                    </div>
+                </div>
+
+                {% comment %} <div class="col-12 text-center" style="margin-top: 40px;">
+                    <label for="paciente" class="form-label" style="font-size: 40px;">PROFISSIONAL</label>
+                    <div class="capslock" style="font-size: 60px; color: var(--interactive-light);">
+                        <b>
+                            <template v-if="chamadaPrincipal">${chamadaPrincipal.profissional_nome}</template>
+                            <template v-else="chamadaPrincipal">Sem chamada</template>
+                        </b>
+                    </div>
+                </div> {% endcomment %}
+                <div class="col-12 text-center text-break" style="margin-top: 60px;">
+                    <label for="paciente" class="form-label" style="font-size: 40px;">Local de Atendimento</label>
+                    <div class="capslock" style="font-size: 60px; color: var(--interactive-light);">
+                        <b>
+                            <template v-if="chamadaPrincipal">${chamadaPrincipal.setor_nome} - ${chamadaPrincipal.sala_nome}</template>
+                            <template v-else="chamadaPrincipal">Sem chamada</template>
+                        </b>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 40px;">
+                {% comment %} <div class="col-2">
+                    <img src="{% static 'img/logo-1gov.png' %}" style="width:100%; padding-top: 20px;"/>
+                </div> {% endcomment %}
+                <div class="col-12">
+                    <div class="br-table">
+                        <div class="table-header">
+                            <div class="top-bar">
+                                <div class="table-title text-center"><h3><b>Últimas Chamadas</b></h3></div>
+                            </div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="text-align: center; font-size: 20px;"></th>
+                                    <th scope="col" style="text-align: center; font-size: 20px;"><b>Paciente Chamado</b></th>
+                                    <th scope="col" style="text-align: center; font-size: 20px;"><b>Local de Atendimento</b></th>
+                                    <th scope="col" style="text-align: center; font-size: 20px;"><b>Horário da Chamada</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template v-if="listagemChamados.length > 0">
+                                    <tr v-for="lista in listagemChamados">
+                                        <td>
+                                            <span v-if="lista.classicicacao_cor !== ''" :class="
+                                                lista.classicicacao_cor === 0 ? 'tag-azul' :
+                                                lista.classicicacao_cor === 1 ? 'tag-verde' :
+                                                lista.classicicacao_cor === 2 ? 'tag-amarelo' :
+                                                lista.classicicacao_cor === 3 ? 'tag-vermelho' :
+                                                lista.classicicacao_cor === 4 ? 'tag-laranja' :
+                                                lista.classicicacao_cor === 5 ? 'tag-preto' :
+                                                lista.classicicacao_cor === 6 ? 'tag-roxo' :
+                                                lista.classicicacao_cor === 7 ? 'tag-cinza' : 'tag-none'"
+                                                class="br-tag small" style="width: 110px !important; height: 44px !important;"
+                                            ></span>
+                                        </td>
+                                        <td class="capslock text-center" style="font-size: 23px;">${lista.paciente_nome}</td>
+                                        <td class="capslock text-center" style="font-size: 23px;">${lista.setor_nome} - ${lista.sala_nome}</td>
+                                        <td class="capslock text-center" style="font-size: 23px;">${convertDate(lista.updated_at, 'H:mm:ss')}</td>
+                                    </tr>
+                                </template>
+                                <tr v-else>
+                                    <td colspan="7" style="text-align: center;">
+                                        <span>Ainda não existe chamadas!</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content text-center">
+            <h2 style="color: #1351b4;">Permissão para reproduzir discurso</h2>
+            <p style="margin-bottom: 50px; font-size: 20px;">Este site deseja reproduzir o discurso.<br/>Você autoriza a reprodução?</p>
+            <div class="col-12 text-center mt-4">
+                <button type="submit" @click="allowSpeech(true)" class="br-button primary" style="border-radius: 30px;">
+                    <i class="fa-solid fa-volume-high mr-2"></i> Permitir
+                </button>
+                <a class="br-button secondary ml-2" type="button" @click="allowSpeech(false)">
+                    <i class="fa-solid fa-volume-xmark mr-2"></i> Cancelar
+                </a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+
+    <script src="{% static 'js/moment.locale.min.js' %}"></script>
+    <script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+    <script src="{% static 'js/responsivevoice.js' %}"></script>
+    <script src="{% static 'js/howler.min.js' %}"></script>
+
+    <script>
+        moment.locale('pt-br');
+
+        var app = new Vue({
+            delimiters: ['${', '}'],
+            el: '#base-vue',
+            data: {
+                listagemChamados: [],
+                chamadaPrincipal: '',
+                horaAtual: moment().format('LTS'),
+                slug: '{{slug1}}',
+                speechPermissionGranted: false,
+            },
+            methods: {
+                getListagemChamadas(metodo){
+                    axios.get(`{% url 'dashboard:saude_painel_chamada_listagem' pk=object.unidade_saude.pk %}?slug=${this.slug}`)
+                    .then((response)=>{
+                        this.listagemChamados = response.data
+                        this.chamadaPrincipal = response.data[0]
+                        
+                        $('#chamada-efeito').addClass('efeito-card')
+                        setTimeout(function () {
+                            $('#chamada-efeito').removeClass('efeito-card')
+                        }, 900); 
+                    });
+                },
+                convertDate(originalDate, format) {
+                    const convertedDate = moment(originalDate).format(format);
+                
+                    return convertedDate;
+                },
+                chamarVoz(message){
+                    responsiveVoice.speak(message, "Brazilian Portuguese Female", {rate: 0.9});
+                },
+                allowSpeech(allow){
+                    document.getElementById('myModal').style.display = 'none';
+                    if (allow) {
+                        this.speechPermissionGranted = true
+                        responsiveVoice.init();
+                        responsiveVoice.speak('Painel iniciado', "Brazilian Portuguese Female", {rate: 0.9});
+                    }else{
+                        this.speechPermissionGranted = false
+                    }
+                },
+            },
+            mounted() {
+                const self = this;
+                self.getListagemChamadas();
+
+                responsiveVoice.enableEstimationTimeout = false;
+                var modal = document.getElementById('myModal');
+                modal.style.display = 'block';
+
+                $("#data").text(moment().format('DD/MM'));
+
+                let url = {% if DEVELOPMENT %}'ws://'{% else %}'wss://'{% endif %}
+
+                var websocket_url = url + '{{SITE_URL}}/saude/painel/{{ slug2 }}/{{ slug1 }}/';
+
+                var socket;
+                var reconnectAttempts = 0;
+                const maxReconnectAttempts = 10;
+
+                function connect() {
+                    socket = new WebSocket(websocket_url);
+
+                    socket.onopen = function () {
+                        console.log("Conexão WebSocket aberta");
+                        reconnectAttempts = 0;
+                    };
+
+                    socket.onmessage = function(e) {
+                        var data = JSON.parse(e.data);
+
+                        if (data.ping === 'ping') {
+                            console.log("Ping recebido:", data.ping);
+                            socket.send(JSON.stringify({ 'pong': 'pong' }));
+                        } else {
+                            self.getListagemChamadas();
+
+                            if(self.speechPermissionGranted){
+                                var campainha = new Howl({src: ["{% static 'audio/Mensagem-Do-Outlook.mp3' %}"]});
+                                campainha.play();
+
+                                let chamadaText = `${data['paciente']} comparecer ao setor ${data['tipo_setor']} sala ${data['sala']}`;
+                                self.chamarVoz(chamadaText);
+                            }
+                        }
+                    };
+
+                    socket.onclose = function (e) {
+                        console.log('Conexão WebSocket perdida. Tentando reconectar...', e.code, e.reason);
+                        if (reconnectAttempts < maxReconnectAttempts) {
+                            reconnectAttempts++;
+                            setTimeout(connect, 5000);  // Tenta reconectar após 5 segundos
+                        } else {
+                            console.log("Número máximo de tentativas de reconexão atingido.");
+                        }
+                    };
+
+                    socket.onerror = function (error) {
+                        console.log('Erro no WebSocket:', error);
+                    };
+                }
+
+                // Inicializa a conexão
+                connect();
+            },
+        });
+
+        function atualizarHora() {
+            $("#hora").text(moment().format('H:mm:ss'));
+        }
+        setInterval(atualizarHora, 1000);
+
+    </script>
+
+{% endblock %}

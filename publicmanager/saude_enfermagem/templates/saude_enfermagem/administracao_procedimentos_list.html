@@ -1,0 +1,277 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de atendimento{% endblock %}
+
+{% load static %}
+{% load saude_extras %}
+
+{% block css %}
+<style>
+    .br-tag {font-size: 15px; width: 46px !important; height: 27px;}
+    .tag-amarelo { background-color: #eae451; }
+    .tag-azul { background-color: #4c9fe4; }
+    .tag-verde { background-color: #3ec86d; }
+    .tag-laranja { background-color: #ff9d29; }
+    .tag-roxo { background-color: #5942D2; }
+    .tag-cinza { background-color: #999; }
+    .tag-vermelho { background-color: #e52207; }
+    .tag-preto { background-color: rgba(0, 0, 0, 0.9); }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.35em 0.65em;
+        font-size: .75em;
+        font-weight: 700;
+        line-height: 1;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+    }
+    .responsive-table {overflow-x: auto;}
+
+    @media screen and (max-width: 600px) {
+        .responsive-table {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+
+        <!-- TESTE -->
+        <div class="row">
+            <div class="col-md">
+                <div class="br-card">
+
+                    <div class="card-header pr-0 pl-0 pt-2">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                                    <i class="fas fa-band-aid font-size25 mr-1 mt-2"></i>
+                                    <span class="mt-1 ml-4" style="display: block;">ADMINISTRAÇÃO DE PROCEDIMENTOS</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="br-divider mt-1 divider-grid mb-3 col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                    </div>
+
+                    <div class="card-content mt-10-nmb">
+                        <form id="formSubmit" method="get" onsubmit="setDate()">
+                            <div class="container card-body">
+                                <div class="row form-group">
+                                    <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9">
+                                        <div class="br-input">
+                                            <label for="id_nome" class="text-color-blue-1gov">Dados da Busca</label>
+                                            <input type="text" name="buscar_nome" maxlength="255" class="input-busca-grid form-control input-com-alfanumericas" value="{{buscar_nome}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 mt-10-w">
+                                        <div class="br-select">
+                                            <div class="br-input">
+                                            <label for="select-simple" class="text-color-blue-1gov">Opção de Busca</label>
+                                            <input class="input-busca-grid" id="select-simple" type="text" placeholder="Selecione o item"/>
+                                            <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1" data-trigger="data-trigger">
+                                                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                            </button>
+                                            </div>
+                                            <div class="br-list" tabindex="0">
+                                                <div class="br-item {% if opcao_filtro == 'paciente' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                    <input id="rb0" type="radio" name="opcao_filtro" value="paciente"/>
+                                                    <label for="rb0">Paciente</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item {% if opcao_filtro == 'cpf' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                    <input id="rb1" type="radio" name="opcao_filtro" value="cpf"/>
+                                                    <label for="rb1">CPF</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item {% if opcao_filtro == 'rg' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                    <input id="rb2" type="radio" name="opcao_filtro" value="rg"/>
+                                                    <label for="rb2">RG</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item {% if opcao_filtro == 'sus' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                    <input id="rb3" type="radio" name="opcao_filtro" value="sus"/>
+                                                    <label for="rb3">Cartão Sus</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer mt-3 ml-4">
+                                <button type="submit" class="br-button primary"><i class="fas fa-search"></i> Buscar</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="card-footer"></div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- table 01 -->
+        <div class="row mt-2">
+            <div class="col-md">
+                <div class="br-card hover">
+                    <div class="card-content">
+                        <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                            
+                            <div class="table-header">
+                                <div>
+                                    <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                                </div>
+                                <div class="top-bar mt-2">
+                                    <div class="d-flex table-title">
+                                        <i class="fa-brands fa-letterboxd" style="display: block; height: 38px; font-size: 25px; color: var(--interactive); margin-top: 5px;"></i>
+                                        <span class="mt-1 ml-4" style="display: block;">PACIENTES EM ESPERA PARA PROCEDIMENTOS</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <table class="mt-3">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th style="width:5%;"></th>
+                                        <th><b>Nome do Paciente</b></th>
+                                        <th><b>Idade</b></th>
+                                        <th><b>Chegada</b></th>
+                                        <th class="text-center"><b>Tempo de espera</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" style="background-color: var(--interactive); color: #fff;"><b>Situação:</b> EM ESPERA</td>
+                                    </tr>
+                                    {% if aguardando_atendimento %}
+                                        {% for dados in aguardando_atendimento %}
+                                            <tr class="capslock">
+                                                <td style="width:10%;">
+                                                    <a href="{% url 'saude_enfermagem:administracao_procedimento_update' pk=dados.id %}" class="br-button primary small" type="button" style="width:115px; font-size:15px; margin-top:2px;">
+                                                        <i class="fa-solid fa-volume-high mr-2"></i> CHAMAR
+                                                    </a>
+                                                </td>
+                                                <td style="padding: 5px;"></td>
+                                                <td style="padding: 5px;">{{dados.classificacao_risco.paciente.nome_paciente}}</td>
+                                                <td>{{dados.classificacao_risco.paciente.calcular_idade}}</td>
+                                                <td>{{dados.classificacao_risco.boletim.data_entrada|date:'d/m/Y' }} ás {{dados.classificacao_risco.boletim.data_entrada|time:'H:i'}}</td>
+                                                <td class="text-center">{{dados.updated_at|tempo_medio_espera_hora}}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="7"><p style="text-align: center" class="my-2">Não existem pacientes em espera no momento!</p></td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                            
+                            <div class="table-footer"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        <!-- table 02 -->
+        <div class="row mt-4">
+            <div class="col-md">
+                <div class="br-card hover">
+                    <div class="card-content">
+                        <div class="br-table table-responsive" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                            data-random="data-random">
+                            
+                            <div class="table-header">
+                                <div>
+                                    <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                                </div>
+                                <div class="top-bar mt-2">
+                                    <div class="d-flex table-title">
+                                        <i class="fa-brands fa-letterboxd" style="display: block; height: 38px; font-size: 25px; color: var(--interactive); margin-top: 5px;"></i>
+                                        <span class="mt-1 ml-4" style="display: block;">PACIENTES DESIGNADOS</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table class="table mt-3">
+                                <thead>
+                                    <tr>
+                                        <th style="width:5%;"></th>
+                                        <th style="width:5%;"></th>
+                                        <th style="width:5%;"></th>
+                                        <th><b>Nome do Paciente</b></th>
+                                        <th><b>Idade</b></th>
+                                        <th><b>Chegada</b></th>
+                                        <th><b>Situação</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" style="background-color: #00b0e4; color: #fff;"><b>Situação:</b> PACIENTES DESIGNADOS</td>
+                                    </tr>
+                                    {% if paciente_designado %}
+                                        {% for dados in paciente_designado %}
+                                            <tr class="capslock">
+                                                <td style="width:10%;">
+                                                    <button {% if dados.solicitacaoatendimento %}disabled{% endif %} onclick="atualizarChamado('{{dados.pk}}', {{ forloop.counter }}, 'admin_procedimento')" class="br-button primary small" type="button" style="font-size:15px; margin-top:2px;">
+                                                        <i class="fa-solid fa-volume-high mr-2" style="margin-left: -13px;"></i> CHAMAR <span id="chamado-{{ forloop.counter }}" class="badge" style="margin-left: 10px; background-color: #888;">{{dados.contagem}}</span>
+                                                    </button>
+                                                </td>
+                                                <td style="width:10%;">
+                                                    <a id="linkRecarregar" href="{% url 'saude_enfermagem:administracao_procedimento_create' dados.pk %}" class="br-button primary small" type="button" style="width:115px; font-size:15px; margin-top:2px;">
+                                                        <i class="fas fa-band-aid mr-2"></i> ATENDER
+                                                    </a>
+                                                </td>
+                                                <td style="padding: 5px;"></td>
+                                                <td style="padding: 5px;">{{dados.classificacao_risco.paciente.nome_paciente}}</td>
+                                                <td>{{dados.classificacao_risco.paciente.calcular_idade}}</td>
+                                                <td>{{dados.classificacao_risco.data_entrada|date:'d/m/Y' }} ás {{dados.classificacao_risco.data_entrada|time:'H:i'}}</td>
+                                                <td class="text-center">{{dados.updated_at|tempo_medio_espera_hora}}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="7"><p style="text-align: center" class="my-2">Não existem pacientes em espera no momento!</p></td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+
+                            <div class="table-footer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <script>
+        function atualizarChamado(id, index, tipo=null){
+            url = `{% url 'saude_enfermagem:api_atualizar_chamado' pk='00000000-0000-0000-0000-000000000000' %}?tipo=${tipo}`
+            axios.put(url.replace("00000000-0000-0000-0000-000000000000", id))
+            .then((response) =>  {
+                $('#chamado-'+index).html(response.data.contagem)
+    
+            }).catch((error) => {
+                console.error("Erro na requisição:", error);
+            });
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,677 @@
+{% extends 'dashboard/base/base-pdf.html' %}
+{% load static %}
+
+{% block title %}Procedimento Solicitação{% endblock %}
+
+{% load widget_tweaks %}
+{% load custom_filters %}
+
+{% block css-extra-pdf %}
+    <style>
+        @media print {
+            .linha-secao {
+                border-color: var(--interactive);
+                border-top-width: 0.9px !important;
+            }
+            .remove-top {
+                margin-top: 4px !important;
+            }
+            .info {
+                padding: 0px;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .footer {
+                position: fixed;
+                bottom: 0;
+                text-align: center;
+                background-color: #f8f8f8;
+                padding: 10px 0;
+            }
+            @page {
+                size: auto;
+                margin: 0;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                --grid-maxwidth: antiquewhite;
+                border: none !important;
+            }
+        }
+        
+        .titulo-secao{
+            font-size: 18px;
+            color: var(--interactive);
+        }
+        .secao-pagina{
+            margin-top: 30px;
+        }
+        .linha-secao{
+            border-color: var(--interactive);
+            border-top-width: 0.9px;
+        }
+        .identificacao-dado{
+            color: #4F4C4C;
+        }
+    </style>
+{% endblock %}
+
+
+{% block contentpdf %}
+
+<div class="" style=" font-size:18px; width:100%;">
+    <div class="secoes">
+
+        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 mt-4">
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6" style="text-align:right;">
+                    <span class="identificacao-dado">Estabelecimento de Saúde Solicitante:</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b>
+                        {% if user.get_unidade_login.unidade.nome %}
+                            {{user.get_unidade_login.unidade.nome}}
+                        {% else %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado justify-content-end">CNES:</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b>
+                        {% if justificativa.profissional.cns %}
+                            {{justificativa.profissional.cns}}
+                        {% else %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Data Solicitação:</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b>
+                        {{justificativa.created_at|date:'d/m/Y'}}
+                    </b></span>
+                </div>
+            </div>
+        </div>
+
+        {% comment %} 01:identificacao {% endcomment %}
+        <div class="mt-3">
+            <p class="d-flex align-items-center mb-1 ml-4 titulo-secao">
+                <span><b>Identificação do Paciente</b></span>
+                <span class="br-divider linha-secao ml-3 col-xl-9 col-lg-9 col-md-8 col-sm-9 col-7"></span>
+            </p>
+        </div>
+        <div class="documentacao d-flex mt-0 col-xl-11 col-lg-11 col-md-11 col-sm-12">
+            <div class="container-campos ml-2 col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8">
+
+                <div class="row mt-3 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Nome do Paciente:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-5 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.nome_paciente %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.nome_paciente}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Numero do Protuário:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b></b></span>
+                    </div>
+                </div>
+                
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Cartão Nacional de Saúde (SUS):</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.cartao_sus %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.cartao_sus}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Data de Nascimento :</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.data_nascimento %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.data_nascimento}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Sexo:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.get_sexo_display %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.get_sexo_display}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Raça/Cor:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.get_raca_display %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.get_raca_display}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Nome da Mãe:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.nome_mae %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.nome_mae}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Telefone de Contato:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.telefone_fixo %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.telefone_fixo}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Nome Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.nome_responsavel %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.nome_responsavel}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Telefone Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.telefone_responsavel %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.telefone_responsavel}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Endereço:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.endereco %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.endereco}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Municipio:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.municipio.nome %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.municipio.nome}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">UF:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.estado.nome %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.estado.nome}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Código IBGE:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+
+                        </b></span>
+                    </div>
+                </div>
+
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">CEP:</span>
+                    </div>
+                    <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        <span><b>
+                            {% if justificativa.atendimento.lista_chamada.classificacao_risco.paciente.cep %}
+                                {{justificativa.atendimento.lista_chamada.classificacao_risco.paciente.cep}}
+                            {% else %}
+                                SEM INFORMAÇÃO
+                            {% endif %}
+                        </b></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container-foto-paciente d-flex justify-content-end align-items-start mr-6 col-xl-4 col-lg-4 col-md-4 col-sm-4 col-4">
+                <div class="row">
+                    <div class="d-flex justify-content-start col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 pr-6">
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% comment %} 02:procedimentos {% endcomment %}
+        <div class="mt-3 page-break">
+            <p class="d-flex align-items-center mb-1 ml-4 titulo-secao secao-pagina">
+                <span><b>Procedimentos Solicitados</b></span>
+                <span class="br-divider linha-secao ml-3 col-xl-9 col-lg-9 col-md-8 col-sm-9 col-7"></span>
+            </p>
+        </div>
+        <div class="divider-text divider-text-justificativa title-hr box-card-border mt-4 documentacao container-campos" style="border: 0.26px solid #b3b3b3; border-radius: 1px; width:96%; margin:0 auto;">
+            <div class="row mt-4">                    
+                <div class="col-4 col-left">
+                    <span class="col-form-label">Descrição do Diagnóstico:</span>
+                </div>
+                <div class="col-6 br-input input-highlight">
+                    
+                </div>
+                <div class="col-2 br-input input-highlight text-center">
+                    <span>Quantidade</span>
+                </div>
+            </div>
+
+            {% for dados in justificativa.procedimentos.all %}
+                {% if dados.classificacao == 0 %}
+                    <div class="row mt-4 font-size16">                    
+                        <div class="col-3 col-left">
+                            <span class="col-form-label">
+                                {% if justificativa.procedimentos.first.procedimento.codigo %}
+                                    {{justificativa.procedimentos.first.procedimento.codigo}}
+                                {% else %}
+                                    SEM INFORMAÇÃO
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="col-7 br-input input-highlight">
+                            <span class="bold">
+                                {% if justificativa.procedimentos.first.procedimento.nome %}
+                                    {{justificativa.procedimentos.first.procedimento.nome}}
+                                {% else %}
+                                    SEM INFORMAÇÃO
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="col-2 br-input input-highlight text-center">
+                            <span>
+                                {% if justificativa.procedimentos.first.quantidade %}
+                                    {{justificativa.procedimentos.first.quantidade}}
+                                {% else %}
+                                    SEM INFORMAÇÃO
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <div class="row mt-4">                    
+                <div class="col-4 col-left">
+                    <span class="col-form-label">Procedimento Secundários:</span>
+                </div>
+                <div class="col-6 br-input input-highlight">
+                    
+                </div>
+                <div class="col-2 br-input input-highlight text-center">
+                    <span>Quantidade</span>
+                </div>
+            </div>
+
+            {% for dados in justificativa.procedimentos.all %}
+                {% if dados.classificacao == 1 %}
+                <div class="row mt-4 mb-3 font-size16">                    
+                    <div class="col-3 col-left">
+                        <span class="col-form-label">
+                            {{dados.procedimento.codigo|default:'SEM INFORMAÇÃO'}}
+                        </span>
+                    </div>
+                    <div class="col-7 br-input input-highlight">
+                        <span class="bold">
+                            {{dados.procedimento.nome|default:'SEM INFORMAÇÃO'}}
+                        </span>
+                    </div>
+                    <div class="col-2 br-input input-highlight text-center">
+                        <span>
+                            {{dados.quantidade|default:'SEM INFORMAÇÃO'}}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+
+        </div>
+
+        {% comment %} 03:justificativa {% endcomment %}
+        <div class="infos-pessoais mt-4">
+            <p class="d-flex align-items-center mt-2 mb-1 ml-4 titulo-secao">
+                <span class=""><b>Justificativa</b></span>
+                <span class="br-divider linha-secao ml-3 col-xl-9 col-lg-8 col-md-7 col-sm-8 col-5"></span>
+            </p>
+        </div>
+        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 mt-4">
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Descrição do Diagnóstico:</span>
+                </div>
+                <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                    <span><b>
+                        {% if justificativa.diagnostico %}
+                            {{justificativa.diagnostico}}
+                        {% else %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">CID 10 Principal:</span>
+                </div>
+                <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                    <span><b>
+                        {% if justificativa.cid_10_principal %}
+                            {{justificativa.cid_10_principal}}
+                        {% else %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">CID 10 Secundário:</span>
+                </div>
+                <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                    <span><b>
+                        {% if justificativa.cid_10_secundario %}
+                            {{justificativa.cid_10_secundario}}
+                        {% else %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">CID 10 Causas Associadas:</span>
+                </div>
+                <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                    <span><b>
+                        {% if justificativa.cid_10_causa_associada %}
+                            {{justificativa.cid_10_causa_associada}}
+                        {% else %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Observação:</span>
+                </div>
+                <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                    <span><b>
+                        {% if justificativa.observacao %}
+                            {{justificativa.observacao}}
+                        {% else %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></span>
+                </div>
+            </div>
+        </div>
+
+        {% comment %} 04:solicitante {% endcomment %}
+         
+        <div class="">
+            <p class="d-flex align-items-center mt-2 mb-1 ml-4 titulo-secao mt-4">
+                <span class=""><b>Solicitante</b></span>
+                <span class="br-divider linha-secao ml-3 col-xl-9 col-lg-9 col-md-9 col-sm-10 col-8"></span>
+            </p>
+        </div>
+        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 mt-4">
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Profssional Solicitante:</span>
+                </div>
+                <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                    <span><b>
+                        {{justificativa.profissional}}
+                    </b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Data Solicitação:</span>
+                </div>
+                <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                    <span><b>
+                        {{justificativa.created_at|date:'d/m/Y'}}
+                    </b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Documento (CNS/CPF):</span>
+                </div>
+                <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                    <span><b>
+                        {% if justificativa.profissional.cns %}
+                            CNS
+                        {% elif justificativa.profissional.cpf %}
+                            CPF
+                        {% else %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Nº do documento (CNS/CPF) do Solicitante:</span>
+                </div>
+                <div class="pl-1 col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                    <span><b>
+                        {% if justificativa.profissional.cns %}
+                            {{justificativa.profissional.cns}}
+                        {% elif justificativa.profissional.cpf %}
+                            {{justificativa.profissional.cpf}}
+                        {% else %}
+                            SEM INFORMAÇÃO
+                        {% endif %}
+                    </b></span>
+                </div>
+            </div>
+        </div>
+
+        {% comment %} 04:autorizacao {% endcomment %}
+        <div class="mt-3 page-break">
+            <p class="d-flex align-items-center mt-2 mb-1 ml-4 titulo-secao secao-pagina mt-4">
+                <span class=""><b>Autorização</b></span>
+                <span class="br-divider linha-secao ml-3 col-xl-9 col-lg-9 col-md-9 col-sm-10 col-8"></span>
+            </p>
+        </div>
+        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 mt-4">
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Profissional Autorizador:</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b></b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Cód. Orgão Emissor:</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b></b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Documento (CNS/CPF):</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b></b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Nº do documento (CNS/CPF) do Autorizador:</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b></b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Assinatura e Carimbo (Nº Registro do Conselho):</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b></b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Nº da Autorização (APAC):</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b></b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Período de Validade da APAC:</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b></b></span>
+                </div>
+            </div>
+        </div>
+
+        {% comment %} 05: Estabelecimento {% endcomment %}
+        <div class="">
+            <p class="d-flex align-items-center mt-2 mb-1 ml-4 titulo-secao mt-4">
+                <span class=""><b>Estabelecimento de Saúde Executante</b></span>
+                <span class="br-divider linha-secao ml-3 col-xl-7 col-lg-6 col-md-5 col-sm-7 col-2"></span>
+            </p>
+        </div>
+        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 mt-4">
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">Nome Fantasia do Estabelecimento de Saúde Executante:</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b></b></span>
+                </div>
+            </div>
+            <div class="row mt-3 mt-md-1 ml-6">
+                <div class="d-flex justify-content-start col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                    <span class="identificacao-dado">CNES:</span>
+                </div>
+                <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <span><b></b></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.print()
+</script>
+
+
+{% endblock %}

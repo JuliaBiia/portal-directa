@@ -1,0 +1,9 @@
+<!-- filepath: /home/kelvin/Documentos/sistemas/publicmanager/publicmanager/saude_atendimento/templates/admin/exportar_relatorio_atendimentos.html -->
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h1>Exportar Relatório dos Atendimentos</h1>
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Exportar</button>
+  </form>
+{% endblock %}

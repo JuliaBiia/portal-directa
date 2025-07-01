@@ -1,0 +1,554 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Paciente - Registro de Novo Boletim{% endblock %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/sweetalert-custom-alta-hospitalar.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<style>
+    .swal2-modal {width: 550px;height: 420px;}
+    .swal2-validation-message{ margin-top:20px !important; }
+    .btn-warning {background-color: var(--warning); color: var(--color-light);}
+    .custom-actions-atendimento-retorno-medicacao {height: 90px !important;}
+    .custom-title-atendimento-retorno-medicacao {margin-top: -65px !important;}
+    .custom-popup-view-atendimento-retorno-medicacao .swal2-html-container {margin-top: -65px !important; padding: 30px !important;}
+    .custom-swal-container {z-index: 999999999;}
+    .custom-swal-title {font-size: 20px;}
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-lg">
+
+        {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+        <div class="row mt-1">
+            <div class="col-md">
+                <div class="br-card">
+                    
+                    <div class="card-header">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="text-weight-semi-bold text-up-02 color-title font-size20"><i class="fa-regular fa-paste"></i> REGISTRAR NOVO BOLETIM</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    
+                    <div class="card-content">
+                        
+                        <form method="post" action="
+                            {% if not boletim_filtro %}
+                                {% url 'saude_atendimento:add_boletim' %}?paciente={{paciente.id}}
+                            {% else %}
+                                {% url 'saude_atendimento:novo_boletim_update' pk=boletim_filtro.pk %}?paciente={{paciente.id}}
+                            {% endif %}
+                        " onsubmit="return enviarFormulario()">    
+                            {% csrf_token %}
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                        <div class="br-input">
+                                            <div class="br-input">
+                                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                    <label for="id_nome_paciente">Nome do paciente:</label>
+                                                </div>
+                                                <div class="col">
+                                                    <input type="text" class="form-control capslock mt-2" value="{{paciente.nome_paciente}}" style="height: 43px !important;" readonly >
+                                                    <input type="hidden" name="paciente" class="form-control" id="exampleFormControlInput1" value="{{paciente.id}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="br-input">
+                                            <div class="br-input mt-3">
+                                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                    <label for="id_idade_paciente">Idade:</label>
+                                                </div>
+                                                <div class="col">
+                                                    <input type="text" class="form-control mt-2" id="idade_paciente" style="height: 43px !important;" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                        <div class="br-input mt-3">
+                                            <div class="br-input">
+                                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                    <label for="id_nome_paciente">Data de Entrada:</label>
+                                                </div>
+                                                <div class="col">
+                                                    {% if not boletim_filtro %}
+                                                        <input type="text" class="form-control mt-2" value="{{data_atual|date:'d/m/Y'}}" style="height: 43px !important;" readonly>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                        <div class="br-input mt-3">
+                                            <div class="br-input">
+                                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                    <label for="id_nome_paciente">Hora de Entrada:</label>
+                                                </div>
+                                                <div class="col">
+                                                    <input type="text" class="form-control mt-2" value="{{data_atual|time:'H:i'}}" style="height: 43px !important;" readonly>
+
+                                                    {% if not boletim_filtro %}
+                                                        <input type="hidden" name="data_entrada" value="{{data_atual | date:'Y-m-d H:i:s.u'}}">
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                        <div class="text-weight-semi-bold text-up-02 color-title font-size18 mt-3 mb-1 pl-4">ACOMPANHANTE RESPONSÁVEL</div>
+                                    </div>
+                                    
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                        <div class="br-input mt-3">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <label for="id_nome_paciente">Nome do Responsável:</label>
+                                            </div>
+                                            <div class="col">
+                                                <input type="text" name="nome_responsavel" style="height: 43px !important;" value="{% if boletim_filtro %}{{boletim_filtro.nome_responsavel}} {% endif %}" class="form-control input-com-alfanumericas mt-2" id="exampleFormControlInput1">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                        <div class="br-input mt-3">
+                                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                <label for="id_nome_paciente">RG do Responsável:</label>
+                                            </div>
+                                            <div class="col">
+                                                <input type="text" name="rg_responsavel" style="height: 43px !important;" value="{% if boletim_filtro %}{{boletim_filtro.rg_responsavel}}{% endif %}" class="form-control input-com-alfanumericas mask-rg mt-2" id="exampleFormControlInput1">
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                        <div class="br-select mt-10-w mt-10-tb" style="min-width: 100%;">
+                                            <div class="br-input mt-3">
+                                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                                    <label for="select-simple">Tipo de atendimento <span class="text-danger">*</span></label>
+                                                    <input class="mt-2" id="select-simple" type="text" placeholder="Selecione o tipo de atendimento" autocomplete="off" autocorrect="off" spellcheck="false"/>
+                                                    <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1" data-trigger="data-trigger">
+                                                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="br-list" tabindex="0">
+                                                <div class="br-item" tabindex="-1">
+                                                    <div class="br-radio">
+                                                        <input id="rb0" type="radio" name="tipo" value="0"/>
+                                                        <label for="rb0">Atendimento de Urgência</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item" tabindex="-1">
+                                                    <div class="br-radio">
+                                                        <input id="rb1" type="radio" name="tipo" value="1"/>
+                                                        <label for="rb1">Administração de Medicação</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="tipo-atendimento-error" class="text-danger mt-2 ml-3" style="display: none;">Por favor, selecione o tipo de atendimento.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer mt-4">
+                                {{ form.errors }}
+                                    <a href="{% url 'saude_atendimento:admissao_paciente_list' %}?modulo=urgencia" class="br-button secondary mr-3"> <i class="fas fa-arrow-left"></i> Voltar </a>
+                                {% if not boletim or boletim_filtro %}
+                                    <button id="botaoSubmit" type="submit" class="br-button primary mt-10-w">{% if boletim_filtro %}Editar{% else %}Criar{% endif %} Novo Boletim</button>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        {% include 'dashboard/includes/mensagens.html' %}
+
+        <div class="row">
+            <div class="col-md">
+                <div class="br-card hover">
+                    <div class="card-content">
+                    <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+
+                        <div class="table-header">
+                            {% if boletim %}
+                                <div class="top-bar">
+                                    <div class="table-title"><i class="fa-solid fa-square-check color-title mr-1"></i> EM ABERTO</div>
+                                </div>
+                            {% else %}
+                                <div class="top-bar">
+                                    <div class="table-title">NENHUM REGISTRO:</div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <table class="mt-2">
+                            <thead>
+                                <tr>
+                                    <th class="hidden-xs" style="width:3%;"></th>
+                                    <th class="hidden-xs" style="width:5%;"></th>
+                                    <th class="th-color" style="width:23%;"><b>Nome do Paciente</b></th>
+                                    <th class="th-color hidden-xs"><b>Data/Hora de Entrada</b></th>
+                                    <th class="th-color hidden-xs"><b>Nome do Responsável</b></th>
+                                    <th class="th-color hidden-xs"><b>RG do Responsável</b></th>
+                                    <th class="th-color hidden-xs" style="text-align: center;"><b>Tipo</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if boletins %}
+                                    {% for boletim in boletins %}
+                                    <tr {% if boletim.tipo == 1 %} style="background-color: #e3d0326b;" {% elif boletim.tipo == 2 %} style="background-color:#ccd9ff;" {% endif %}>                                        
+
+                                        <td class="hidden-xs" style="padding: 5px; text-align: center;">
+                                            {% if not boletim.boletim_classificacao_risco_set.all and boletim.tipo == 0 %}
+                                                <a data-th="Editar" href="{% url 'saude_atendimento:paciente_boletim_listagem' pk=boletim.paciente.id %}?boletim={{boletim.id}}" class="br-button circle"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                                            {% endif %}
+                                            {% if boletim.tipo == 1 %}
+                                                {% if boletim.listachamadoadministracaomedicamento_set.first and boletim.listachamadoadministracaomedicamento_set.first.situacao == 3 or boletim.listachamadoadministracaomedicamento_set.first.situacao == 2 %}
+                                                <a class="br-button warning small" type="button" onclick="atendimentoRetornoMedicacaoBoletim('{{boletim.id}}')" style="width: 120px; font-size:15px; margin-top:2px;">
+                                                    <i class="fas fa-person-walking-arrow-loop-left"></i></i> &nbsp;RETORNO
+                                                </a>
+                                                {% else %}
+                                                    <a data-th="Em atendimento" href="javascript:void(0)" class="br-button primary circle"><i class="fas fa-user-nurse" aria-hidden="true"></i></a>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td class="hidden-xs" style="padding: 5px;">
+                                            {% if boletim.boletim_classificacao_risco_set.classificacao_risco_lista_chamada_set %}
+                                                <a class="br-button primary small" type="button" onclick="alertFinalizarBoletim('{{boletim.pk}}', '{{paciente.nome_paciente}}', '{{boletim.boletim_classificacao_risco_set.classificacao_risco_lista_chamada_set.pk}}', '7')" style="width: 152px; font-size:15px; margin-top:2px;">
+                                                    <i class="fas fa-clipboard-list"></i> &nbsp;FINALIZAR BAU
+                                                </a>
+                                            {% else %}
+                                                <a class="br-button primary small" type="button" onclick="alertFinalizarBoletim('{{boletim.pk}}', '{{paciente.nome_paciente}}', null, '7')" style="width: 152px; font-size:15px; margin-top:2px;">
+                                                    <i class="fas fa-clipboard-list"></i> &nbsp;FINALIZAR BAU
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="capslock txt-center-w">{{boletim.paciente}}</span>
+                                            <br/>
+                                            <div class="row visible-xs txt-center" style="background-color:;">
+                                                <div class="col mt-3" style="background-color:;">
+                                                    <button class="br-button primary small" style="width: 152px; font-size:15px;" onclick="modalInfo('{{boletim.id}}', '{{boletim.paciente.id}}', '{{boletim.paciente}}', '{{boletim.data_entrada}}', '{{boletim.nome_responsavel}}', '{{boletim.rg_responsavel}}')"><i class="fa-solid fa-circle-plus"></i> &nbsp;Informações</button>
+                                                </div>
+                                                <div class="col mt-2">
+                                                    {% if boletim.boletim_classificacao_risco_set.classificacao_risco_lista_chamada_set %}
+                                                        <a class="br-button primary small" type="button" onclick="alertFinalizarBoletim('{{boletim.pk}}', '{{paciente.nome_paciente}}', '{{boletim.boletim_classificacao_risco_set.classificacao_risco_lista_chamada_set.pk}}', '7')" style="width: 152px; font-size:15px;">
+                                                            <i class="fas fa-clipboard-list"></i> &nbsp;Finalizar Bau
+                                                        </a>
+                                                    {% else %}
+                                                        <a class="br-button primary small" type="button" onclick="alertFinalizarBoletim('{{boletim.pk}}', '{{paciente.nome_paciente}}', null, '7')" style="width: 152px; font-size:15px;">
+                                                            <i class="fas fa-clipboard-list"></i> &nbsp;Finalizar Bau
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                        </td>
+                                        <td class="hidden-xs">{{boletim.data_entrada|date:'d/m/Y H:i'}}</td>
+                                        <td class="hidden-xs">{{boletim.nome_responsavel}}</td>
+                                        <td class="hidden-xs">{{boletim.rg_responsavel}}</td>
+                                        <td class="hidden-xs" style="text-align: center;">
+                                            <span class="br-tag bg-primary">
+                                                {% if boletim.tipo == 0 %}Urgência{% elif boletim.tipo == 1 %}Medicação{% elif boletim.tipo == 2 %}Vacina{% endif %}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <p style="text-align: center" class="my-2">Ainda não existe nenhum boletim vinculado a esse paciente!</p>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+{% endblock %}
+
+{% block script %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+    <script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+    <script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+    <script src="{% static 'js/jquery.mask.min.js' %}"></script>
+    <script src="{% static 'js/mask.js' %}"></script>
+    <script src="{% static 'js/utils_forms.js' %}"></script>
+    <script src="{% static 'js/moment.locale.min.js' %}"></script>
+    <script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+    <script>
+        function modalInfo(id_boletim, id_paciente, paciente, entrada, responsavel, rg_responsavel){
+
+            let modulo = '{{modulo}}'
+            let urlEditar  = `{% url 'saude_atendimento:paciente_boletim_listagem' pk='00000000-0000-0000-0000-000000000000' %}?boletim=${id_boletim}&modulo=${modulo}`
+            
+            Swal.fire({
+                html: `
+                <div class="container">
+    
+                    <div class="swal2-title swal2-title-custom text-left mt-1" id="swal2-title">
+                        <div class="row">
+                            <div class="col-9">
+                                <h2 class="ml-3 mt-n1"><label class="text-color-blue-1gov custom-text font-size18">Detalhes do Paciente</label></h2>
+                            </div>
+                            <div class="col-3">
+                                <button type="button" class="close" style="background-color:#0459A1; border:none; color:white; font-size:15px; width:30px; height:30px;" aria-label="Close" onclick="Swal.close()">X</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row font-size16 mt-3">
+                        <div class="col-3 color-title">
+                            <span class="">Paciente:</span>
+                        </div>
+                        <div class="col-9">
+                            <span>${paciente}<span/>
+                        </div>
+                    </div><hr/>
+    
+                    <div class="row font-size16 mt-2">
+                        <div class="col-3 color-title">
+                            <span>Entrada:</span>
+                        </div>
+                        <div class="col-9">
+                            <span>${entrada}</span>
+                        </div>
+                    </div><hr/>
+    
+                    <div class="row font-size16 mt-2">
+                        <div class="col-5 color-title">
+                            <span>Responsável:</span>
+                        </div>
+                        <div class="col-7">
+                            <span>${responsavel}</span>
+                        </div>
+                    </div><hr/>
+    
+                    <div class="row font-size16 mt-2">
+                        <div class="col-5 color-title">
+                            <span>RG Responsável:</span>
+                        </div>
+                        <div class="col-7">
+                            <span>${rg_responsavel}</span>
+                        </div>
+                    </div><hr/>
+
+                    <div class="mt-3 mb-3">
+                        <a data-th="Editar" href="${urlEditar.replace('00000000-0000-0000-0000-000000000000', id_paciente)}" class="br-button circle"><i class="fas fa-edit" aria-hidden="true" style="font-size:23px;"></i></a>
+                    </div>
+    
+                </div>
+                `,
+                confirmButtonColor: "#1250b4",
+                confirmButtonText: '<i class="fa-regular fa-floppy-disk mr-2"></i>Salvar',
+                cancelButtonText: '<i class="fa-solid fa-xmark mr-2"></i> Fechar',
+                showCancelButton: false,
+                showConfirmButton: false,
+                //reverseButtons: true,
+                allowOutsideClick: true,
+            });
+    
+        }
+        function finalizarBoletim(boletimPk, situacaoAltaPaciente, chamadoId, situacaoChamado){
+
+            let url  = "{% url 'saude_atendimento:api_finalizar_boletim' pk='00000000-0000-0000-0000-000000000000' %}"
+            axios.put(url.replace('00000000-0000-0000-0000-000000000000', boletimPk), {"situacao": situacaoAltaPaciente, "chamado_id": chamadoId, 'situacao_chamado': situacaoChamado})
+            .then((response)=>{
+                window.location.replace("{% url 'saude_atendimento:paciente_boletim_listagem' pk=object.id %}?paciente={{paciente.id}}&modulo=urgencia");
+            });
+        }
+        function alertFinalizarBoletim(boletimPk, pacienteNome, chamadoId=null, situacaoChamado=null){
+            Swal.fire({
+                html: `
+                <div class="swal2-title swal2-title-custom text-left" id="swal2-title" style="background-color:red;">
+                    <h2 class="ml-3">
+                        <i class="fas fa-clipboard-list text-color-blue-1gov"></i>
+                        <label class="text-color-blue-1gov custom-text">Alta do Paciente</label>
+                        <button type="button" class="close mr-2" aria-label="Close" onclick="Swal.close()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </h2>
+                </div>
+            
+                <div class="container">
+                    <div class="row br-input justify-content-center mt-2">
+                        <div class="col-11 br-input">
+                            <label class="text-color-blue-1gov">Paciente:</label>
+                            <input class="input-highlight-labeless input-tab capslock" type="text" value="${pacienteNome}" readonly/>
+                        </div>
+                    </div>
+                    <div class="row br-input justify-content-center mt-2">
+                        <div class="col-6 br-input">
+                            <label class="text-color-blue-1gov">Data:</label>
+                            <input class="input-highlight-labeless input-tab capslock" type="text" value="${moment().format('DD/MM/YYYY')}" readonly/>
+                        </div>
+                        <div class="col-5 br-input">
+                            <label class="text-color-blue-1gov">Hora:</label>
+                            <input class="input-highlight-labeless input-tab capslock" type="text" value="${moment().format('H:mm')}" readonly/>
+                        </div>
+                    </div>
+                    <div class="row br-input justify-content-center mt-2">
+                        <div class="col-11">
+                            <label class="text-color-blue-1gov">Tipo:</label>
+                            <div class="br-input mt-1">
+                                <select id="tipoSelect" class="select-custom modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="swal2-container">
+                                    <option value="">SELECIONE UMA OPÇÃO</option>
+                                    <option value="2">CURADO</option>
+                                    <option value="3">ÓBITO</option>
+                                    <option value="4">REVELIA</option>
+                                    <option value="5">MELHORADO</option>
+                                    <option value="6">INALTERADO</option>
+                                    <option value="7">TRANSFERÊNCIA</option>
+                                    <option value="8">DECISÃO MÉDICA</option>
+                                    <option value="9">ENCERRAMENTO ADMINISTRATIVO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `,
+                confirmButtonColor: "#1250b4",
+                confirmButtonText: '<i class="fa-regular fa-floppy-disk mr-2"></i>Salvar',
+                cancelButtonText: '<i class="fa-solid fa-xmark mr-2"></i> Fechar',
+                showCancelButton: true,
+                showConfirmButton: true,
+                reverseButtons: true,
+                allowOutsideClick: false,
+                preConfirm: () => {
+                    const selectElement = document.getElementById('tipoSelect');
+                    const selectedValue = selectElement.value;
+
+                    if (selectedValue === '') {
+                        Swal.showValidationMessage('Selecione o tipo da alta!');
+                        var modal = document.querySelector(".swal2-modal");
+                        var validate = document.querySelector(".swal2-validation-message");
+
+                        validate.style.setProperty("background-color", "transparent", "important");
+                        validate.style.setProperty("z-index", "1", "important");
+                        validate.style.setProperty("font-size", "20px", "important");
+                        validate.style.setProperty("height", "80px", "important");
+                        validate.style.setProperty("margin-top", "-50px", "important");
+                        validate.style.setProperty("opacity", "1", "important");
+                        validate.style.setProperty("color", "black", "important");
+                        validate.style.setProperty("margin-left", "-18px", "important");
+                        modal.style.setProperty("height", "480px", "important");
+                    } else {
+                        finalizarBoletim(boletimPk, selectedValue, chamadoId, situacaoChamado)
+                    }
+                },
+            });
+
+            document.querySelector(".swal2-container").setAttribute('id', 'swal2-container');
+            ajustarSelectModal();
+        }
+        function atendimentoRetornoMedicacaoBoletim(boletimId){
+            Swal.fire({
+                title: "Atendimento de Retorno Medicação",
+                text: "Ao confirmar, o paciente será retornado à lista de chamada para um novo atendimento.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Confirmar",
+                customClass: {popup: 'custom-popup-view-atendimento-retorno-medicacao', container: 'custom-container-atendimento-retorno-medicacao', title: 'custom-title-atendimento-retorno-medicacao', actions: 'custom-actions-atendimento-retorno-medicacao'},
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    url = "{% url 'saude_atendimento:api_atendimento_retorno_boletim_medicacao_update' pk='00000000-0000-0000-0000-000000000000' %}"
+                    axios.put(url.replace("00000000-0000-0000-0000-000000000000", boletimId), {situacao: 0})
+                    .then((response)=>{  
+                        window.location.reload();
+                    });   
+                }
+            });
+        }
+        function enviarFormulario() {
+            const tipoAtendimento = document.querySelector('input[name="tipo"]:checked');
+            const errorElement = document.getElementById('tipo-atendimento-error');
+            
+            if (!tipoAtendimento) {
+                errorElement.style.display = 'block';
+                return false;
+            }
+            
+            errorElement.style.display = 'none';
+            document.getElementById("botaoSubmit").disabled = true;
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const radioButtons = document.querySelectorAll('input[name="tipo"]');
+            const errorElement = document.getElementById('tipo-atendimento-error');
+    
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    errorElement.style.display = 'none';
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            function calculateAge(dateString) {
+                const months = {
+                    'Janeiro': 0,
+                    'Fevereiro': 1,
+                    'Março': 2,
+                    'Abril': 3,
+                    'Maio': 4,
+                    'Junho': 5,
+                    'Julho': 6,
+                    'Agosto': 7,
+                    'Setembro': 8,
+                    'Outubro': 9,
+                    'Novembro': 10,
+                    'Dezembro': 11
+                };
+        
+                const parts = dateString.split(' de ');
+                const day = parseInt(parts[0], 10);
+                const month = months[parts[1]];
+                const year = parseInt(parts[2], 10);
+        
+                const birthDate = new Date(year, month, day);
+                const today = new Date();
+                let ageYears = today.getFullYear() - birthDate.getFullYear();
+                let ageMonths = today.getMonth() - birthDate.getMonth();
+        
+                if (ageMonths < 0 || (ageMonths === 0 && today.getDate() < birthDate.getDate())) {
+                    ageYears--;
+                    ageMonths += 12;
+                }
+        
+                if (today.getDate() < birthDate.getDate()) {
+                    ageMonths--;
+                }
+        
+                if (ageYears > 0) {
+                    return ageYears + ' ANOS ';
+                } else {
+                    return ageMonths + ' MESES';
+                }
+            }
+        
+            const birthDateString = "{{paciente.data_nascimento}}";
+            const age = calculateAge(birthDateString);
+            document.getElementById('idade_paciente').value = age;
+        });
+    </script>
+{% endblock %}

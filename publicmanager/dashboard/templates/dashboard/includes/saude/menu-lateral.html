@@ -1,0 +1,418 @@
+{% load saude_extras %}
+<nav class="menu-body">
+
+    <div class="menu-folder drop-menu urgencia">
+        {% if user.tipo_usuario == 'recepcionista' or user.tipo_usuario == 'enfermeiro' or user.tipo_usuario == 'tecnico_enfermagem' or user.tipo_usuario == 'medico' or user.tipo_usuario == 'desenvolvedor' or user.tipo_usuario == 'administrador' %}
+            <a class="menu-item" href="javascript: void(0)">
+                <span class="icon"><i class="menu-icon me-2 fas fa-user-lock"></i></span>
+                <span class="content">Administração</span>
+            </a>
+            <ul>
+                <li>
+                    <a href="http://127.0.0.1:8000/atendimento/paciente/admissao/criar/?modulo=urgencia" class="menu-item {% if request.get_full_path == '/atendimento/pacientes/admissao/?modulo=urgencia' or request.path|comparar_urls:'/atendimento/paciente/admissao/criar/' or request.path|comparar_urls:'/atendimento/paciente/admissao/atualizar/' or request.path|comparar_urls:'/cadastro/anamnese/' or request.path|comparar_urls:'/atendimento/paciente/historico-atendimento/' or request.path|comparar_urls:'/atendimento/paciente/novoboletim/' or request.path|comparar_urls:'/atendimento/anamnese/atualizar/' %}active{% endif %}">
+                        <span class="icon"> <i class="fas fa-file-invoice"></i> </span>
+                        <span class="content">Processo Eletronico</span>
+                    </a>
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+
+    {% if user.tipo_usuario == 'enfermeiro' or user.tipo_usuario == 'tecnico_enfermagem' or  user.tipo_usuario == 'radiologista' or user.tipo_usuario == 'desenvolvedor' or user.tipo_usuario == 'administrador' %}
+        <div class="menu-folder enfermagem">
+            <a class="menu-item" href="javascript: void(0)">
+                <span class="icon">
+                    <i class="menu-icon me-2 fas fa-money-bill-trend-up" aria-hidden="true"></i>
+                </span><span class="content">Arrecadação</span>
+            </a>
+            <ul>
+                <li>
+                    <a href="{% url 'saude_enfermagem:exames_laboratoriais_list' %}" class="menu-item {% if request.path == '/enfermagem/exames-laboratoriais/listagem/' or request.path|comparar_urls:'/enfermagem/exames-laboratoriais/detalhes/' %}active{% endif %}">
+                        <span class="icon">
+                            <i class="fa-solid fa-flask-vial"></i>
+                        </span><span class="content">Item 1</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if user.tipo_usuario == 'desenvolvedor' %}
+        <div class="menu-folder consultorio">
+            <a class="menu-item" href="javascript: void(0)">
+                <span class="icon"><i class="menu-icon me-2 fas fa-person-military-pointing" aria-hidden="true"></i></span>
+                <span class="content">Auto de Infração</span>
+            </a>
+            <ul>
+                <li>
+                    <a class="menu-item 
+                        {% if request.get_full_path|comparar_urls:'/atendimento/pacientes/admissao/?modulo=consultorio' or request.get_full_path|comparar_urls:'/atendimento/paciente/admissao/criar/?modulo=consultorio' or request.get_full_path|comparar_urls:'/atendimento/paciente/historico-atendimento/?modulo=consultorio' or request.get_full_path|comparar_urls:'/atendimento/paciente/admissao/atualizar/?modulo=consultorio'%}active{% endif %}" href="{% url 'saude_atendimento:admissao_paciente_list' %}?modulo=consultorio">
+                        <span class="icon">
+                            <i class="fas fa-users" aria-hidden="true"></i>
+                        </span><span class="content">Consultas</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if user.tipo_usuario == 'farmaceutico' or user.tipo_usuario == 'desenvolvedor' or user.tipo_usuario == 'administrador' %}
+        <div class="menu-folder farmacia">
+            <a class="menu-item">
+                <span class="icon">
+                    <i class="menu-icon me-2 fas fa-file-lines" aria-hidden="true"></i>
+                </span><span class="content">Certidões</span>
+            </a>
+            <ul>
+                <li>
+                    <a class="menu-item {% if request.path == '/farmacia/requisicoes-materiais-farmacia/' or request.path == '/farmacia/requisicao-material-farmacia/criar/' or request.path|comparar_urls:'/farmacia/requisicao-material-farmacia/atualizar/' %}active{% endif %}" href="{% url 'saude_farmacia:requisicao_material_farmacia_list' %}">
+                        <span class="icon">
+                            <i class="fas fa-plus-square" aria-hidden="true"></i>
+                        </span><span class="content">Consultas</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="menu-item {% if request.path == '/farmacia/requisicoes-materiais-farmacia/' or request.path == '/farmacia/requisicao-material-farmacia/criar/' or request.path|comparar_urls:'/farmacia/requisicao-material-farmacia/atualizar/' %}active{% endif %}" href="{% url 'saude_farmacia:requisicao_material_farmacia_list' %}">
+                        <span class="icon">
+                            <i class="fas fa-plus-square" aria-hidden="true"></i>
+                        </span><span class="content">Operações</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if not user.tipo_usuario == 'painel' %}
+        <div class="menu-folder relatorios">
+            <a class="menu-item" href="javascript: void(0)">
+                <span class="icon">
+                    <i class="menu-icon me-2 fas fa-laptop-file" aria-hidden="true"></i>
+                </span><span class="content">DDS</span>
+            </a>
+            <ul>
+                <li>
+                    <a class="menu-item {% if request.path == '/enfermagem/atendimentos/realizados/listagem/' %}active{% endif %}" href="{% url 'saude_enfermagem:atendimentos_realizados_list' %}">
+                        <span class="icon">
+                            <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                        </span><span class="content">Cadastros</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="menu-item {% if request.path == '/financeiro/relatorio-procedimentos/gerar/' %}active{% endif %}" href="{% url 'saude_financeiro:procedimentos_gerar_view' %}">
+                        <span class="icon">
+                            <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                        </span><span class="content">Consultas</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="menu-item {% if request.path == '/financeiro/relatorio-procedimentos/gerar/' %}active{% endif %}" href="{% url 'saude_financeiro:procedimentos_gerar_view' %}">
+                        <span class="icon">
+                            <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                        </span><span class="content">Documentos</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="menu-item {% if request.path == '/financeiro/relatorio-procedimentos/gerar/' %}active{% endif %}" href="{% url 'saude_financeiro:procedimentos_gerar_view' %}">
+                        <span class="icon">
+                            <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                        </span><span class="content">Operações</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if not user.tipo_usuario == 'painel' %}
+    <div class="menu-folder configuracoes">
+        <a class="menu-item">
+            <span class="icon">
+                <i class="menu-icon me-2 fas fa-building" aria-hidden="true"></i>
+            </span><span class="content">Mobiliário</span>
+        </a>
+        <ul>
+            <a class="menu-item {% if request.path == '/alterar-senha/' %}active{% endif %}" href="{% url 'autenticacao:alterar_senha' %}">
+                <span class="icon">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                </span><span class="content">Consultas</span>
+            </a>
+            {% if user.profissional_set.exists %}
+            <a class="menu-item {% if request.path|comparar_urls:'/painel/perfil/detalhes/' %}active{% endif %}" href="{% url 'dashboard:meu_perfil_atualizar' pk=user.profissional_set.first.id %}">
+                <span class="icon">
+                    <i class="fa-regular fa-address-card" aria-hidden="true"></i>
+                </span><span class="content">Documentos</span>
+            </a>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="menu-folder configuracoes">
+        <a class="menu-item">
+            <span class="icon">
+                <i class="menu-icon me-2 fas fa-file-invoice" aria-hidden="true"></i>
+            </span><span class="content">Nota Avulsa</span>
+        </a>
+        <ul>
+            <a class="menu-item {% if request.path == '/alterar-senha/' %}active{% endif %}" href="{% url 'autenticacao:alterar_senha' %}">
+                <span class="icon">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                </span><span class="content">Item 1</span>
+            </a>
+            <a class="menu-item {% if request.path|comparar_urls:'/painel/perfil/detalhes/' %}active{% endif %}" href="{% url 'dashboard:meu_perfil_atualizar' pk=user.profissional_set.first.id %}">
+                <span class="icon">
+                    <i class="fa-regular fa-address-card" aria-hidden="true"></i>
+                </span><span class="content">Item 2</span>
+            </a>
+        </ul>
+    </div>
+
+    <div class="menu-folder configuracoes">
+        <a class="menu-item">
+            <span class="icon">
+                <i class="menu-icon me-2 fas fa-file-invoice-dollar" aria-hidden="true"></i>
+            </span><span class="content">Nota Natalense</span>
+        </a>
+        <ul>
+            <a class="menu-item {% if request.path == '/alterar-senha/' %}active{% endif %}" href="{% url 'autenticacao:alterar_senha' %}">
+                <span class="icon">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                </span><span class="content">Item 1</span>
+            </a>
+            <a class="menu-item {% if request.path|comparar_urls:'/painel/perfil/detalhes/' %}active{% endif %}" href="{% url 'dashboard:meu_perfil_atualizar' pk=user.profissional_set.first.id %}">
+                <span class="icon">
+                    <i class="fa-regular fa-address-card" aria-hidden="true"></i>
+                </span><span class="content">Item 2</span>
+            </a>
+        </ul>
+    </div>
+
+    <div class="menu-folder configuracoes">
+        <a class="menu-item">
+            <span class="icon">
+                <i class="menu-icon me-2 fas fa-calculator" aria-hidden="true"></i>
+            </span><span class="content">Parcelamento</span>
+        </a>
+        <ul>
+            <a class="menu-item {% if request.path == '/alterar-senha/' %}active{% endif %}" href="{% url 'autenticacao:alterar_senha' %}">
+                <span class="icon">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                </span><span class="content">Item 1</span>
+            </a>
+            <a class="menu-item {% if request.path|comparar_urls:'/painel/perfil/detalhes/' %}active{% endif %}" href="{% url 'dashboard:meu_perfil_atualizar' pk=user.profissional_set.first.id %}">
+                <span class="icon">
+                    <i class="fa-regular fa-address-card" aria-hidden="true"></i>
+                </span><span class="content">Item 2</span>
+            </a>
+        </ul>
+    </div>
+
+    <div class="menu-folder configuracoes">
+        <a class="menu-item">
+            <span class="icon">
+                <i class="menu-icon me-2 fas fa-folder-open" aria-hidden="true"></i>
+            </span><span class="content">Processos</span>
+        </a>
+        <ul>
+            <a class="menu-item {% if request.path == '/alterar-senha/' %}active{% endif %}" href="{% url 'autenticacao:alterar_senha' %}">
+                <span class="icon">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                </span><span class="content">Item 1</span>
+            </a>
+            <a class="menu-item {% if request.path|comparar_urls:'/painel/perfil/detalhes/' %}active{% endif %}" href="{% url 'dashboard:meu_perfil_atualizar' pk=user.profissional_set.first.id %}">
+                <span class="icon">
+                    <i class="fa-regular fa-address-card" aria-hidden="true"></i>
+                </span><span class="content">Item 2</span>
+            </a>
+        </ul>
+    </div>
+
+    <div class="menu-folder configuracoes">
+        <a class="menu-item">
+            <span class="icon">
+                <i class="menu-icon me-2 fas fa-tree-city" aria-hidden="true"></i>
+            </span><span class="content">SEMURB</span>
+        </a>
+        <ul>
+            <a class="menu-item {% if request.path == '/alterar-senha/' %}active{% endif %}" href="{% url 'autenticacao:alterar_senha' %}">
+                <span class="icon">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                </span><span class="content">Item 1</span>
+            </a>
+            <a class="menu-item {% if request.path|comparar_urls:'/painel/perfil/detalhes/' %}active{% endif %}" href="{% url 'dashboard:meu_perfil_atualizar' pk=user.profissional_set.first.id %}">
+                <span class="icon">
+                    <i class="fa-regular fa-address-card" aria-hidden="true"></i>
+                </span><span class="content">Item 2</span>
+            </a>
+        </ul>
+    </div>
+
+    <div class="menu-folder configuracoes">
+        <a class="menu-item">
+            <span class="icon">
+                <i class="menu-icon me-2 fas fa-people-line" aria-hidden="true"></i>
+            </span><span class="content">Serviços Públicos</span>
+        </a>
+        <ul>
+            <a class="menu-item {% if request.path == '/alterar-senha/' %}active{% endif %}" href="{% url 'autenticacao:alterar_senha' %}">
+                <span class="icon">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                </span><span class="content">Item 1</span>
+            </a>
+            <a class="menu-item {% if request.path|comparar_urls:'/painel/perfil/detalhes/' %}active{% endif %}" href="{% url 'dashboard:meu_perfil_atualizar' pk=user.profissional_set.first.id %}">
+                <span class="icon">
+                    <i class="fa-regular fa-address-card" aria-hidden="true"></i>
+                </span><span class="content">Item 2</span>
+            </a>
+        </ul>
+    </div>
+   
+</nav>
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var currentPath = window.location.pathname;
+        var menuFolder = document.querySelector('.urgencia');
+        var menuEnfermagem = document.querySelector('.enfermagem');
+        var menuFarmacia = document.querySelector('.farmacia');
+        var menuCadastro = document.querySelector('.cadastro');
+        var menuConsultorio = document.querySelector('.consultorio');
+        var menuRelatorios = document.querySelector('.relatorios');
+        var configuracoes = document.querySelector('.configuracoes');
+
+        if(
+            urlsSaoIguais('/atendimento/pacientes/admissao/?modulo=urgencia') ||
+            urlsSaoIguais('/atendimento/paciente/admissao/atualizar/?modulo=urgencia') ||
+            urlsSaoIguais('/atendimento/paciente/admissao/criar/?modulo=urgencia') ||
+            urlsSaoIguais('/atendimento/paciente/novoboletim/') ||
+            urlsSaoIguais('/atendimento/anamnese/') ||
+            urlsSaoIguais('/atendimento/pacientes/classificacao-risco/') ||
+            urlsSaoIguais('/atendimento/paciente/classificacao-risco/') ||
+            urlsSaoIguais('/atendimento/paciente/historico-atendimento/?modulo=urgencia') ||
+            urlsSaoIguais('/atendimento/pacientes/aguardando-atendimento/') ||
+            urlsSaoIguais('/atendimento/paciente/atendimento-medico/') ||
+            urlsSaoIguais('/atendimento/pacientes/atendimento/') ||
+            urlsSaoIguais('/atendimento/pacientes/encaminhamento/') ||
+            urlsSaoIguais('/atendimento/pacientes/concessao-de-alta/') ||
+            urlsSaoIguais('/atendimento/atendimentos-abertos/') ||
+            urlsSaoIguais('/atendimento/paciente/rastreamento/') ||
+            urlsSaoIguais('/atendimento/pacientes/atendimentos-finalizados/')
+        ) {
+            menuFolder.classList.add('active');
+        }else if(
+            urlsSaoIguais('/enfermagem/exames-laboratoriais/listagem/') ||
+            urlsSaoIguais('/enfermagem/exames-laboratoriais/') ||
+            urlsSaoIguais('/enfermagem/exames-imagem/listagem/') ||
+            urlsSaoIguais('/enfermagem/exames-imagem/') ||
+            urlsSaoIguais('/enfermagem/medicacoes/listagem/') ||
+            urlsSaoIguais('/enfermagem/medicacao/') ||
+            urlsSaoIguais('/enfermagem/procedimentos/listagem/') ||
+            urlsSaoIguais('/enfermagem/procedimentos/') ||
+            urlsSaoIguais('/enfermagem/medicamento-vacina/espera/listagem/')
+        ){
+            menuEnfermagem.classList.add('active')
+        }else if(
+            urlsSaoIguais('/cadastro/profissional/') ||
+            urlsSaoIguais('/farmacia/principioativo/') ||
+            urlsSaoIguais('/cadastro/cids/') ||
+            urlsSaoIguais('/cadastro/cid/criar/') ||
+            urlsSaoIguais('/cadastro/cid/atualizar/') ||
+            urlsSaoIguais('/cadastro/convenios/') ||
+            urlsSaoIguais('/cadastro/convenio/criar/') ||
+            urlsSaoIguais('/cadastro/convenio/atualizar/') ||
+            urlsSaoIguais('/cadastro/destino-obito/') ||
+            urlsSaoIguais('/cadastro/destino-obito/criar/') ||
+            urlsSaoIguais('/cadastro/destino-obito/atualizar/') ||
+            urlsSaoIguais('/cadastro/exames/') ||
+            urlsSaoIguais('/cadastro/exame/criar/') ||
+            urlsSaoIguais('/cadastro/exame/atualizar/') ||
+            urlsSaoIguais('/cadastro/tipo-exames/') ||
+            urlsSaoIguais('/cadastro/tipo-exame/criar/') ||
+            urlsSaoIguais('/cadastro/tipo-exame/atualizar/') ||
+            urlsSaoIguais('/cadastro/setores/') ||
+            urlsSaoIguais('/cadastro/setor/criar/') ||
+            urlsSaoIguais('/cadastro/setor/atualizar/') ||
+            urlsSaoIguais('/cadastro/salas/') ||
+            urlsSaoIguais('/cadastro/sala/criar/') ||
+            urlsSaoIguais('/cadastro/sala/atualizar/') ||
+            urlsSaoIguais('/atendimento/tipo-alta-hospitalar/') ||
+            urlsSaoIguais('/atendimento/tipo-alta-hospitalar/criar/') ||
+            urlsSaoIguais('/atendimento/tipo-alta-hospitalar/atualizar/') ||
+            urlsSaoIguais('/cadastro/tipo-historia-clinica/') ||
+            urlsSaoIguais('/cadastro/tipo-historia-clinica/criar/') ||
+            urlsSaoIguais('/cadastro/tipo-historia-clinica/atualiar/') ||
+            urlsSaoIguais('/cadastro/tipo-posologia/') ||
+            urlsSaoIguais('/cadastro/tipo-posologia/criar/') ||
+            urlsSaoIguais('/cadastro/tipo-posologia/atualizar/') ||
+            urlsSaoIguais('/cadastro/transportes/') ||
+            urlsSaoIguais('/cadastro/transporte/criar/') ||
+            urlsSaoIguais('/cadastro/transporte/atualizar/') ||
+            urlsSaoIguais('/cadastro/paineis/') ||
+            urlsSaoIguais('/cadastro/painel/criar/') ||
+            urlsSaoIguais('/cadastro/painel/atualizar/') ||
+            urlsSaoIguais('/cadastro/tipo-classificacao-risco/')
+        ){
+            menuCadastro.classList.add('active')
+        }else if(
+            urlsSaoIguais('enfermagem/atendimentos/realizados/listagem/') ||
+            urlsSaoIguais('/financeiro/relatorio-procedimentos/gerar/')
+        ){
+            menuRelatorios.classList.add('active')
+        }else if(
+            urlsSaoIguais('/farmacia/requisicoes-materiais-farmacia/') ||
+            urlsSaoIguais('/farmacia/requisicao-material-farmacia/criar/') ||
+            urlsSaoIguais('/farmacia/requisicao-material-farmacia/atualizar/') ||
+            urlsSaoIguais('/farmacia/entradas-materiais-farmacia/') ||
+            urlsSaoIguais('/farmacia/entrada-material-farmacia/criar/') ||
+            urlsSaoIguais('/farmacia/entrada-material-farmacia/atualizar/') ||
+            urlsSaoIguais('/farmacia/farmacias/') ||
+            urlsSaoIguais('/farmacia/farmacia/criar/') ||
+            urlsSaoIguais('/farmacia/farmacia/atualizar/') ||
+            urlsSaoIguais('/farmacia/produtos/') ||
+            urlsSaoIguais('/farmacia/produto/criar/') ||
+            urlsSaoIguais('/farmacia/produto/atualizar/') ||
+            urlsSaoIguais('/farmacia/insumos/') ||
+            urlsSaoIguais('/farmacia/insumo/criar/') ||
+            urlsSaoIguais('/farmacia/insumo/atualizar/') ||
+            urlsSaoIguais('/farmacia/medicamentos/') ||
+            urlsSaoIguais('/farmacia/medicamento/criar/') ||
+            urlsSaoIguais('/farmacia/medicamento/atualizar/') ||
+            urlsSaoIguais('/farmacia/controle-estoque-medicamentos/')
+
+        ){
+            menuFarmacia.classList.add('active')
+        }else if(
+            urlsSaoIguais('/atendimento/pacientes/admissao/?modulo=consultorio') ||
+            urlsSaoIguais('/atendimento/paciente/admissao/atualizar/?modulo=consultorio') ||
+            urlsSaoIguais('/atendimento/paciente/admissao/criar/?modulo=consultorio') ||
+            urlsSaoIguais('/atendimento/paciente/historico-atendimento/?modulo=consultorio') ||
+            urlsSaoIguais('/atendimento/minhaagendamedica/') ||
+            urlsSaoIguais('/atendimento/agendamedica/') ||
+            urlsSaoIguais('/atendimento/agendamedica/medico/') ||
+            urlsSaoIguais('/atendimento/horariomedico/')
+        ){
+            menuConsultorio.classList.add('active')
+        }else if(urlsSaoIguais('/alterar-senha/') || urlsSaoIguais('/painel/perfil/')){
+            configuracoes.classList.add('active')
+        }
+
+        function urlsSaoIguais(url2) {
+            var currentPath = window.location.pathname
+            var params = window.location.search
+
+            const partesUrl1 = currentPath.split('/').filter(part => {
+                return !part.match(/[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}/i) && part !== '';
+            });
+            partesUrl1.push(params)
+
+            const partesUrl2 = url2.split('/').filter(part => part !== '');
+            
+            const numero = partesUrl2.length
+            const dominio1 = partesUrl1.slice(0, numero);
+            const dominio2 = partesUrl2.slice(0, numero);
+
+            return JSON.stringify(dominio1) === JSON.stringify(dominio2);
+        }
+
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,279 @@
+{% load static %}
+
+<div v-if="atendimentoMedico" class="container container-lg-custom">
+    <div id="focus-container-topo-procedimentos" class="container" style="margin:0 auto;">
+        <div style="color:white;">.</div>
+
+            <div class="container box-card-border">
+
+                <div class="">
+                    <h5 class="color-title ml-2 font-size17"><i class="fas fa-book"></i> SOLICITAÇÃO / AUTORIZAÇÃO DE PROCEDIMENTOS</h5>
+                    <hr>
+                </div>
+
+                <div id="focus-container-procedimento">
+                    <div class="row mt-40">                    
+                        <div class="col-4 col-left">
+                            <span class="col-form-label font-size16 color-title">Data:</label>
+                        </div>
+                        <div class="col-8 br-input input-highlight">
+                            <input class="capslock font-size15" style="height:43px; margin-top: -8px !important;" id="input-highlight-labeless" type="text" :value="atendimentoMedico.data_atual ? atendimentoMedico.data_atual : 'Sem informação'" readonly/>
+                        </div>
+                    </div>
+
+                    <div class="row mt-20">
+                        <div class="col-4 col-left">
+                            <span class="col-form-label font-size16 color-title">Profissional Solicitante:</span>
+                        </div>
+                        <div v-if="atendimentoMedico" class="col-8 br-input input-highlight">
+                            <input class="capslock font-size15" style="height:43px; margin-top: -8px !important;" id="input-highlight-labeless" type="text" :value="atendimentoMedico.profissional ? atendimentoMedico.profissional.nome : 'Sem informação'" readonly/>
+                        </div>
+                    </div>
+
+                    <div class="row mt-20">
+                        <div class="col-4 col-left">
+                            <span class="col-form-label font-size16 color-title">Estabelecimento Solicitante:</span>
+                        </div>
+                        <div class="col-8 br-input input-highlight">
+                            <input class="capslock font-size15" style="height:43px; margin-top: -8px !important;" id="input-highlight-labeless" type="text" :value="atendimentoMedico.undade_nome ? atendimentoMedico.undade_nome : 'Sem informação'" readonly/>
+                        </div>
+                    </div>
+
+                    <div class="row mt-20">
+                        <div class="col-4 col-left">
+                            <span class="col-form-label font-size16 color-title">CNES:</span>
+                        </div>
+                        <div class="col-8 br-input input-highlight">
+                            <input class="capslock font-size15" style="height:43px; margin-top: -8px !important;" id="input-highlight-labeless" type="text" :value="atendimentoMedico.profissional_coren ?atendimentoMedico.profissional_coren : 'Sem informação'" readonly/>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <hr>
+                    </div>
+                </div>
+
+                <h5 class="color-title ml-2 font-size17">SOLICITAÇÃO DE PROCEDIMENTO</h5>
+                <form method="" id="">
+                    <div class="container row mt-4">
+                        <div class="col-12 margin-0" style="font-family: inherit;">
+                            <button type-data="btn-element" :disabled="verificarProcedimentoPrincipal || verificarAtendimentoEncerrado" @click="formularioProcedimento.classificacao = 0" :class="formularioProcedimento.classificacao === 0 ? 'primary': 'secondary'" class="br-button" type="button" style="border-radius: 7px; border-radius: 5px 0px 0px 5px;">
+                                PRINCIPAL
+                            </button>
+                            <button type-data="btn-element" :disabled="verificarAtendimentoEncerrado" @click="formularioProcedimento.classificacao = 1" :class="formularioProcedimento.classificacao === 1 ? 'primary': 'secondary'" class="br-button" type="button" style="border-radius: 7px; margin-left: -5px; border-radius: 0px 5px 5px 0px;">
+                                SECUNDÁRIO
+                            </button>
+                        </div>
+
+                        <div class="col-12 mt-4 margin-0">
+                            <p class="color-title" style="font-size:16px;">Código do Procedimento: <span style="color:red; opacity:1 !important;">(Obrigatório)</p>
+                            <custom-single-select
+                                ref="customProcediemento"
+                                placeholder="Selecione um procedimento"
+                                :load-options="getProcedimentos"
+                                v-model="selectedProcedimentoValue"
+                                class="form-control"
+                                style="width: 100%; height: 40px; background-color:white; border-radius:5px; color:black; margin-top: -7px !important;"
+                                :disabled="verificarAtendimentoEncerrado"
+                            ></custom-single-select>
+                        </div>
+
+                        <div class="col-6 mt-3 margin-0">
+                            <p class="color-title" style="font-size:16px;">Quantidade: <span style="color:red; opacity:1 !important;">(Obrigatório)</p>
+                            <div class="br-input input-inline input-content mt-n12">
+                                <input type="number" v-model="formularioProcedimento.quantidade" :min="1" :disabled="verificarAtendimentoEncerrado"/>
+                            </div>
+                        </div>
+
+                        <div class="col-6 mt-3 margin-0">
+                            <p class="color-title" style="font-size:16px;">Tipo da Solicitação: <span style="color:red; opacity:1 !important;">(Obrigatório)</p>
+                            <div class="br-input input-inline input-content mt-n6">
+                                <select v-model="formularioProcedimento.tipoSolicitacao" style="width: 100%; height: 40px; border-radius:5px; padding-left: 10px;" :disabled="verificarAtendimentoEncerrado">
+                                    <option value="0">Interno</option>
+                                    <option value="1">Externo</option>
+                                </select> 
+                            </div>
+                        </div>
+
+                        <div v-if="formularioProcedimento.tipoSolicitacao === 0 || formularioProcedimento.tipoSolicitacao === '0'" class="col-12 mt-4" style="font-family: inherit;">
+                            <p class="color-title" style="font-size:16px;">Realizado Por:</p>
+                            <button type-data="btn-element" :disabled="verificarAtendimentoEncerrado" @click="formularioProcedimento.realizadoPor = 0" :class="formularioProcedimento.realizadoPor === 0 ? 'primary': 'secondary'" class="br-button" type="button" style="border-radius: 7px; border-radius: 5px 0px 0px 5px;">
+                                ENFERMAGEM
+                            </button>
+                            <button type-data="btn-element" :disabled="verificarAtendimentoEncerrado" @click="formularioProcedimento.realizadoPor = 1" :class="formularioProcedimento.realizadoPor === 1 ? 'primary': 'secondary'" class="br-button" type="button" style="border-radius: 7px; margin-left: -5px; border-radius: 0px 5px 5px 0px;">
+                                MÉDICO
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-4 mr-4 mb-4 margin-0" style="text-align: end !important; padding-right: 60px;">
+                        <span v-if="formularioProcedimento.id">
+                            <button type="button" class="br-button secondary" @click="EditarCancelarProcedimentos('cancelar')">
+                                <span>Cancelar</span>
+                            </button>
+                            
+                            <button :disabled="!formularioProcedimento.procedimentoPk || !formularioProcedimento.quantidade" type="button" class="br-button primary" @click="crudProcedimentoAtendimento('PUT', formularioProcedimento)">
+                                <img class="mr-2" src="{% static 'img/icons/icon_adicionar_branco.svg' %}" alt="Ícone de impressora" title="Adicionar">
+                                <span>Atualizar</span>
+                            </button>
+                        </span>
+
+                        <button v-else class="br-button primary" :disabled="!formularioProcedimento.procedimentoPk || !formularioProcedimento.quantidade" type="button" @click="crudProcedimentoAtendimento('POST')">
+                            <img class="mr-2" src="{% static 'img/icons/icon_adicionar_branco.svg' %}" alt="Ícone de impressora" title="Adicionar">
+                            <span>Adicionar</span>
+                        </button>
+
+                    </div>
+                </form>
+            </div>
+
+            <div class="container box-card-border mt-4">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="color-title ml-2 font-size17"><i class="fas fa-history"></i> LISTA DE SOLICITAÇÕES DE PROCEDIMENTOS</h5>
+                    </div>
+                    <div class="col-6" style="text-align: end !important;">
+                        <a  v-if="!listagemJustificativaProcedimentos && listagemProcedimentos.length > 0" class="br-button secondary ml-5 mt-4" type="button" href="{% url 'saude_atendimento:justificativa_procedimento_atendimento_create' %}?atendimento={{object.lista_chamada_atendimento_medico_set.pk}}">
+                            <img class="mr-2" src="{% static 'img/icons/icon_visto.svg' %}" alt="Ícone de impressora" title="Editar">
+                            <span>Justificar</span>
+                        </a>
+                        <p v-if="!listagemJustificativaProcedimentos && listagemProcedimentos.length > 0" class="text-danger mt-2">
+                            O preenchimento da justificativa é obrigatório. Clique no botão "Justificar".
+                        </p>
+                    </div>
+                </div>
+                <hr>
+                <div class="overflow-auto mt-3" style="overflow-x: auto;">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width:3%;"></th>
+                                <th scope="col" style="width:3%;"></th>
+                                <th scope="col" style="width:3%;"></th>
+                                <th class="color-title" scope="col"><b>Classificação</b></th>
+                                <th class="color-title" scope="col"><b>Código Procedimento</b></th>
+                                <th class="color-title" scope="col"><b>Procedimento</b></th>
+                                <th class="color-title" scope="col"><b>Quantidade</b></th>
+                                <th class="color-title" scope="col"><b>Responsável</b></th>
+                                <th class="color-title" scope="col"><b>Situação</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-if="listagemProcedimentos.length > 0">
+                                <tr v-for="procedimento in listagemProcedimentos" class="capslock">
+                                    <th scope="row">
+                                        <i v-if="procedimento.situacao === 0 && procedimento.realizado_por === 1" class="fa fa-stethoscope" @click="visualizarInformacoes('procedimento', procedimento, 'visualizar')" style="cursor: pointer;"></i>
+                                        <i v-else class="fa fa-eye font-size17" @click="visualizarInformacoes('procedimento', procedimento, 'visualizar')" style="cursor: pointer;"></i>
+                                    </th>
+
+                                    <th scope="row">
+                                        <i v-if="procedimento.realizado_por === 0" :class="procedimento.medico_solicitante.id !== profissionalPk || procedimento.situacao === 1 || procedimento.situacao === 2 || lista_chamada_solicitacao ? 'button-disabled' : ''" class="fa fa-edit font-size16" @click="EditarCancelarProcedimentos('editar', procedimento.id, procedimento.quantidade, procedimento.procedimento, procedimento.classificacao, procedimento.procedimento_selecionado, procedimento.realizado_por, procedimento.tipo_solicitacao)" style="cursor: pointer;"></i>
+                                        <i v-else :class="procedimento.medico_solicitante.id !== profissionalPk || procedimento.situacao === 1 || procedimento.situacao === 2 || lista_chamada_solicitacao ? 'button-disabled' : ''" class="fa fa-edit font-size16" @click="EditarCancelarProcedimentos('editar', procedimento.id, procedimento.quantidade, procedimento.procedimento, procedimento.classificacao, procedimento.procedimento_selecionado, procedimento.realizado_por, procedimento.tipo_solicitacao)" style="cursor: pointer;"></i>
+
+                                    </th>
+
+                                    <th scope="row">
+                                        <i v-if="procedimento.realizado_por === 0" class="far fa-trash-alt" :class="procedimento.medico_solicitante.id !== profissionalPk || procedimento.situacao === 1 || procedimento.situacao === 2 || procedimento.arquivo || lista_chamada_solicitacao ? 'button-disabled' : ''" @click="showModalDelete('procedimento', 'Procedimento', procedimento)" style="cursor: pointer;"></i>
+                                        <i v-else class="far fa-trash-alt" :class="procedimento.medico_solicitante.id !== profissionalPk || procedimento.situacao === 1 || procedimento.situacao === 2 || procedimento.arquivo || lista_chamada_solicitacao ? 'button-disabled' : ''" @click="showModalDelete('procedimento', 'Procedimento', procedimento)" style="cursor: pointer;"></i>
+                                    </th>
+                                    <td>
+                                        <span v-if="procedimento.classificacao === 0">PRINCIPAL</span>
+                                        <span v-else>SECUNDÁRIO</span>
+                                    </td>
+                                    <td>${procedimento.procedimento_codigo}</td>
+                                    <td>${procedimento.procedimento_nome}</td>
+                                    <td>${procedimento.quantidade}</td>
+                                    <td><span>${procedimento.realizado_por_nome}</span></td>
+                                    <td style="text-align: center;">
+                                        <span v-if="procedimento.situacao === 0" class="br-tag" style="font-size: 15px; height: 30px; background-color: #FF9D29 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                            <i class="fa-solid fa-clock-rotate-left mr-2"></i>Solicitado
+                                        </span>
+                                        <span v-if="procedimento.situacao === 1" class="br-tag" style="font-size: 15px; height: 30px; background-color: #e52207 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                            <i v-if="procedimento.situacao === 1" class="fa-solid fa-link-slash mr-2"></i>
+                                            Suspenso
+                                        </span>
+                                        <span v-if="procedimento.situacao === 2" class="br-tag" style="font-size: 15px; height: 30px; background-color: #289e34f7 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                            <i v-if="procedimento.situacao === 2" class="fa-solid fa-paperclip mr-2"></i>
+                                            Concluído
+                                        </span>
+                                        <span v-if="procedimento.situacao === 3" class="br-tag" style="padding: 12px; font-size: 15px; height: 32px; background-color: var(--interactive-light) !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                            <i v-if="procedimento.situacao === 3" class="fa-solid fa-arrow-rotate-right mr-2"></i>
+                                            Reaberto
+                                        </span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <tr v-else>
+                                <td colspan="9" style="text-align: center;">
+                                    <span>Ainda não existe nenhum procedimento vinculado a esse paciente!</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="buttons-procedimentos" class="mt-4" style="color:white;">.</div>
+                </div>
+
+                <template v-if="listagemJustificativaProcedimentos">
+                    <div class="col-12" style="text-align: end !important;">
+                        <a class="br-button secondary ml-3" type="button" :href="replaceUrlId('{% url 'saude_atendimento:justificativa_procedimento_atendimento_update' pk='00000000-0000-0000-0000-000000000000' %}', listagemJustificativaProcedimentos.id)+'?atendimento={{object.lista_chamada_atendimento_medico_set.pk}}'">
+                            <img class="mr-2" src="{% static 'img/icons/icon_editar_branco.svg' %}" alt="Ícone de impressora" title="Editar">
+                            <span>Editar</span>
+                        </a>
+                        <a class="br-button secondary ml-3" type="button" :href="urlProcedimentoSolicitacao.replace('00000000-0000-0000-0000-000000000000', listagemJustificativaProcedimentos.id)" target="_blank">
+                            <img class="mr-2" src="{% static 'img/icons/icone_impressora.svg' %}" alt="Ícone de impressora" title="Imprimir">
+                            <span>Imprimir</span>
+                        </a>
+                    </div>
+
+                    <div class="container divider-text divider-text-justificativa title-hr box-card-border mt-4" style="border: 0.26px solid #d9d9d9; border-radius: 4px;">
+                        <div class="row">                    
+                            <div class="col-4 col-left">
+                                <label class="col-form-label font-size16 color-title">Descrição do Diagnóstico:</label>
+                            </div>
+                            <div class="col-8 br-input input-highlight">
+                                ${listagemJustificativaProcedimentos.diagnostico_nome}
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">                    
+                            <div class="col-4 col-left">
+                                <label class="col-form-label font-size16 color-title">Cid 10 Principal:</label>
+                            </div>
+                            <div class="col-8 br-input input-highlight">
+                                ${listagemJustificativaProcedimentos.cid_principal_codigo}
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">                    
+                            <div class="col-4 col-left">
+                                <label class="col-form-label font-size16 color-title">Cid 10 Secundário:</label>
+                            </div>
+                            <div class="col-8 br-input input-highlight">
+                                ${listagemJustificativaProcedimentos.cid_secundario_codigo}
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">                    
+                            <div class="col-4 col-left">
+                                <label class="col-form-label font-size16 color-title">Cid 10 Causas Associadas:</label>
+                            </div>
+                            <div class="col-8 br-input input-highlight">
+                                ${listagemJustificativaProcedimentos.cid_associada_codigo}
+                            </div>
+                        </div>
+                        <div class="row mb-4 mt-2">                    
+                            <div class="col-4 col-left">
+                                <label class="col-form-label font-size16 color-title">Observações:</label>
+                            </div>
+                            <div class="col-8 br-input input-highlight" style="word-wrap: break-word;">
+                                ${listagemJustificativaProcedimentos.observacao}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4" style="color:white;">.</div>
+                </template>
+            </div>
+        </div>
+        <div style="color:white;">.</div>
+    </div>
+</div>

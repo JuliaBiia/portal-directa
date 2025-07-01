@@ -1,0 +1,486 @@
+{% extends 'dashboard/base/base-pdf.html' %}
+{% load static %}
+{% block title %}Relatórios{% endblock %}
+{% load widget_tweaks %}
+{% load custom_filters %}
+{% block css-extra-pdf %}
+    <style>
+        @media print {
+            .linha-secao{
+                border-color: var(--interactive);
+                border-top-width: 0.9px !important;
+            }   
+        }
+
+        .table-header > div{
+            /* border: 1px solid var(--color-secondary-04); */
+        }
+
+        .card-content, .secoes{
+            /* border-top: 1px solid var(--color-secondary-04); */
+        }
+
+        .titulo-secao{
+            font-size: 19px;
+            color: var(--interactive);
+        }
+        .linha-secao{
+            border-color: var(--interactive);
+            border-top-width: 0.9px;
+        }
+        .identificacao-dado{
+            color: #4F4C4C;
+        }
+    </style>
+{% endblock %}
+{% block contentpdf %}
+
+    <div class="" style=" font-size:18px; width:100%;">
+    
+        <div class="secoes">
+            <div class="mt-3">
+                <p class="d-flex align-items-center mb-1 ml-4 titulo-secao">
+                    <span><b>Documentação</b></span>
+                    <span class="br-divider linha-secao ml-3 col-xl-9 col-lg-9 col-md-8 col-sm-9 col-7"></span>
+                </p>
+            </div>
+            <div class="documentacao d-flex mt-0 col-xl-11 col-lg-11 col-md-11 col-sm-12">
+                <div class="container-campos ml-2 col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8">
+                    <div class="row mt-3 ml-6">
+                        <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                            <span class="identificacao-dado">Cartão SUS:</span>
+                        </div>
+                        <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                            <span><b>{% if paciente.cartao_sus %}{{paciente.cartao_sus}}{% else %}--{% endif %}</b></span>
+                            </div>
+                    </div>
+                    <div class="row mt-3 mt-md-1 ml-6">
+                        <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                            <span class="identificacao-dado">CPF:</span>
+                        </div>
+                        <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                            <span><b>{% if paciente.cpf %}{{paciente.cpf}}{% else %}--{% endif %}</b></span>
+                        </div>
+                    </div>
+                    <div class="row mt-3 mt-md-1 ml-6">
+                        <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                            <span class="identificacao-dado">RG:</span>
+                        </div>
+                        <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                            <span><b>{% if paciente.rg %}{{paciente.rg}}{% else %}--{% endif %}</b></span>
+                        </div>
+                    </div>
+                    <div class="row mt-3 mt-md-1 ml-6">
+                        <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                            <span class="identificacao-dado">Orgão Expedidor:</span>
+                        </div>
+                        <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                            <span><b>{% if paciente.rg_orgao %}{{paciente.rg_orgao}}{% else %}--{% endif %}</b></span>
+                        </div>
+                    </div>
+                    <div class="row mt-3 mt-md-1 ml-6">
+                        <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                            <span class="identificacao-dado">UF:</span>
+                        </div>
+                        <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                            <span><b>{% if paciente.rg_uf %}{{paciente.rg_uf}}{% else %}--{% endif %}</b></span>
+                        </div>
+                    </div>
+                    <div class="row mt-3 mt-md-1 ml-6">
+                        <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                            <span class="identificacao-dado">Data Expedição:</span>
+                        </div>
+                        <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                            <span><b>{% if paciente.rg_data %}{{paciente.rg_data}}{% else %}--{% endif %}</b></span>
+                        </div>
+                    </div>
+                    <div class="row mt-3 mt-md-1 ml-6">
+                        <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                            <span class="identificacao-dado">Situação:</span>
+                        </div>
+                        <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                            <span><b>{% if paciente.get_situacao_display %}{{paciente.get_situacao_display}}{% else %}--{% endif %}</b></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-foto-paciente d-flex justify-content-end align-items-start mr-6 col-xl-4 col-lg-4 col-md-4 col-sm-4 col-4">
+                    <div class="row">
+                        <div class="d-flex justify-content-start col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 pr-6">
+                            {% if paciente.foto_paciente %}
+                                <img class="mt-2 mb-0 foto-paciente" src="{{ paciente.foto_paciente.url }}" alt="Foto paciente" style="max-width: 80%; border: 1px solid gray;max-height: 180px;">
+                            {% else %}
+                                <img class="mt-4 mb-5 sem-foto-paciente" src="{% static 'img/illustre-user.png' %}" alt="Ícone de pessoa" style="max-width: 80%;">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="infos-pessoais mt-4">
+                <p class="d-flex align-items-center mt-2 mb-1 ml-4 titulo-secao">
+                    <span class=""><b>Informações Pessoais</b></span>
+                    <span class="br-divider linha-secao ml-3 col-xl-9 col-lg-8 col-md-7 col-sm-8 col-5"></span>
+                </p>
+            </div>
+            <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 mt-4">
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Nome Completo:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.nome_paciente %}{{paciente.nome_paciente}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Nome da Mãe:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.nome_mae %}{{paciente.nome_mae}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Nome do Pai:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.nome_pai %}{{paciente.nome_pai}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Nome Social:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.nome_social %}{{paciente.nome_social}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Data de Nascimento:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.data_nascimento %}{{paciente.data_nascimento}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Nacionalidade:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.nacionalidade %}{{paciente.nacionalidade}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Naturalidade:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.naturalidade %}{{paciente.naturalidade}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Sexo:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.get_sexo_display %}{{paciente.get_sexo_display}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Raça/Cor:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.get_raca_display %}{{paciente.get_raca_display}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Estado Civil:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.get_estado_civil_display %}{{paciente.get_estado_civil_display}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Grau de Instrução:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.get_grau_de_instrucao_display %}{{paciente.get_grau_de_instrucao_display}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Profissão:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.profissao %}{{paciente.profissao}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Grupo Sanguíneo:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.get_grupo_sanguineo_display %}{{paciente.get_grupo_sanguineo_display}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Fator RH:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.get_fator_rh_display %}{{ paciente.get_fator_rh_display }}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Doador Sanguíneo:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.get_doador_sanguineo_display %}{{ paciente.get_doador_sanguineo_display }}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Doador de Orgãos:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.get_doador_de_orgaos_display %}{{ paciente.get_doador_de_orgaos_display }}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <p class="d-flex align-items-center mt-2 mb-1 ml-4 titulo-secao mt-4">
+                    <span class=""><b>Endereço</b></span>
+                    <span class="br-divider linha-secao ml-3 col-xl-9 col-lg-9 col-md-9 col-sm-10 col-8"></span>
+                </p>
+            </div>
+            <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 mt-4">
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">CEP:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.cep %}{{paciente.cep}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Endereço:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.endereco %}{{paciente.endereco}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Número:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.numero %}{{paciente.numero}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Complemento:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.complemento %}{{paciente.complemento}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Bairro:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.bairro %}{{paciente.bairro}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Cidade/UF:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.municipio %}{{paciente.formatar_nome_municipio}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <p class="d-flex align-items-center mt-2 mb-1 ml-4 titulo-secao mt-4">
+                    <span class=""><b>Contato</b></span>
+                    <span class="br-divider linha-secao ml-3 col-xl-9 col-lg-9 col-md-9 col-sm-10 col-8"></span>
+                </p>
+            </div>
+            <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 mt-4">
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Celular:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.celular %}{{paciente.celular}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Telefone fixo:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.telefone_fixo %}{{paciente.telefone_fixo}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">WhatsApp:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.whatsapp %}{{paciente.whatsapp}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">E-mail:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.email %}{{paciente.email}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <p class="d-flex align-items-center mt-2 mb-1 ml-4 titulo-secao mt-4">
+                    <span class=""><b>Informações dos Responsáveis</b></span>
+                    <span class="br-divider linha-secao ml-3 col-xl-7 col-lg-6 col-md-5 col-sm-7 col-2"></span>
+                </p>
+            </div>
+            <div class="mt-4 ml-5">
+                <span style="color:var(--interactive);"><b>Responsável 1</b></span>
+            </div>
+            <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 mt-4">
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Nome do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.nome_responsavel_1 %}{{paciente.nome_responsavel_1}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Parentesco:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.parentesco_responsavel_1 %}{{paciente.parentesco_responsavel_1}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">CPF do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.cpf_responsavel_1 %}{{paciente.cpf_responsavel_1}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">RG do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.rg_responsavel_1 %}{{paciente.rg_responsavel_1}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Celular do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.celular_responsavel_1 %}{{paciente.celular_responsavel_1}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">WhatsApp do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.whatsapp_responsavel_1 %}{{paciente.whatsapp_responsavel_1}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">E-mail do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.email_responsavel_1 %}{{paciente.email_responsavel_1}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 ml-5">
+                <span style="color:var(--interactive);"><b>Responsável 2</b></span>
+            </div>
+            <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8 mt-4">
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Nome do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.nome_responsavel_2 %}{{paciente.nome_responsavel_2}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Parentesco:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.parentesco_responsavel_2 %}{{paciente.parentesco_responsavel_2}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">CPF do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.cpf_responsavel_2 %}{{paciente.cpf_responsavel_2}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">RG do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.rg_responsavel_2 %}{{paciente.rg_responsavel_2}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">Celular do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.celular_responsavel_2 %}{{paciente.celular_responsavel_2}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">WhatsApp do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.whatsapp_responsavel_2 %}{{paciente.whatsapp_responsavel_2}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+                <div class="row mt-3 mt-md-1 mb-3 ml-6">
+                    <div class="d-flex justify-content-end col-xl-5 col-lg-5 col-md-5 col-sm-5 col-6">
+                        <span class="identificacao-dado">E-mail do Responsável:</span>
+                    </div>
+                    <div class="pl-1 col-xl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                        <span><b>{% if paciente.email_responsavel_2 %}{{paciente.email_responsavel_2}}{% else %}--{% endif %}</b></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        window.print()
+    </script>
+
+{% endblock %}

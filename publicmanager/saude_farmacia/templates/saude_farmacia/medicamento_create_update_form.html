@@ -1,0 +1,136 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}{% if object %}Edição{% else %}Cadastro{% endif %} de Medicamento{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col-md">
+                <div class="br-card">
+                    <div class="card-header pr-0 pl-0">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                                    <img src="{% static 'img/icons/icone-medicamento-grid.svg' %}" alt="Ícone do medicamento" title="Ícone do medicamento" style="display: block;">
+                                    <span class="mt-1 ml-4 text-weight-semi-bold text-up-02" style="display: block;">{% if object %}EDITAR{% else %}ADICIONAR{% endif %} MEDICAMENTO</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                    </div>
+                    <div class="card-content pt-0">
+                        <form class="col-xl-12 col-lg-12 col-md-12 col-sm-12" method="post" id="medicamento_form">{% csrf_token %}
+                            <div class="card-body">
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+                                        <div class="br-input mt-3">
+                                            <label for="id_nome_medicamento" class="text-color-blue-1gov">Nome: <span class="text-danger">*</span></label>
+                                            {% render_field form.nome_medicamento class="input-com-alfanumericas" placeholder="Ex.: Dipirona" type="text" %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+                                        <div class="br-input mt-3">
+                                            <label for="id_codigo_de_barra" class="text-color-blue-1gov">Número do lote: <span class="text-danger">*</span></label>
+                                            {% render_field form.codigo_de_barra class="input-com-alfanumericas" type="text"  %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                        <div class="br-textarea small mt-3">
+                                            <label for="id_descricao_medicamento" class="text-color-blue-1gov">Descrição</label>
+                                            {% render_field form.descricao_medicamento class="input-com-alfanumericas" placeholder="Digite aqui uma descrição sobre o medicamento se for necessário." type="text" %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+                                        <div class="br-input mt-3">
+                                            <label for="id_principio_ativo_medicamento" class="text-color-blue-1gov">Princípio ativo do medicamento: <span class="text-danger">*</span></label>
+                                            {% render_field form.principio_ativo_medicamento type="text" class="campo-select" style="width: 100%" %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+                                        <div class="br-input mt-3">
+                                            <label for="id_tipo_farmacia" class="text-color-blue-1gov">Tipo do medicamento: <span class="text-danger">*</span></label>
+                                            {% render_field form.tipo_medicamento type="text" class="campo-select" style="width: 100%" %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+                                        <div class="br-input mt-3">
+                                            <label for="id_estoque_minimo_geral" class="text-color-blue-1gov">Estoque mínimo geral: <span class="text-danger">*</span></label>
+                                            {% render_field form.estoque_minimo_geral placeholder="Ex.: 20" type="number" min="0" %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+                                        <div class="br-input mt-3">
+                                            <label for="id_quantidade" class="text-color-blue-1gov">Quantidade: <span class="text-danger">*</span></label>
+                                            {% render_field form.quantidade placeholder="Ex.: 20" type="number" min="0" %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row d-flex justify-content-center">
+                                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+                                        <div class="br-input mt-3">
+                                            <label for="id_situacao_medicamento" class="text-color-blue-1gov">Situação: <span class="text-danger">*</span></label>
+                                            {% render_field form.situacao_medicamento type="text" class="campo-select" style="width: 100%" %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% comment %} Explicação da indicação de campos obrigatórios {% endcomment %}
+                                {% include 'dashboard/includes/explicacao-campos-obrigatorios.html' %}
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer ml-6">
+                                {% if form.errors %}
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                            <div class="br-message danger" role="alert">
+                                                <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                                    aria-hidden="true"></i>
+                                                </div>
+                                                <div class="content"><span
+                                                        class="message-title">Erro no campo {{ field.label }}.</span><span
+                                                        class="message-body"> {{ error }}</span>
+                                                </div>
+                                                <div class="close">
+                                                    <button class="br-button circle small" type="button"
+                                                            aria-label="content"><i
+                                                            class="fas fa-times" aria-hidden="true"></i></button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endif %}
+                                <a href="{% url 'saude_farmacia:medicamento_list' %}" class="br-button secondary mt-6 mr-3"> <i class="fas fa-arrow-left"></i> Voltar</a>
+                                <button type="submit" class="br-button primary mt-6">
+                                    <i class="fas fa-save"></i> Salvar
+                                </button>
+                            </div>
+                            <!-- /.card-footer -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

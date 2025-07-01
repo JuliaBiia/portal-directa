@@ -1,0 +1,94 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load static %}
+
+{% load widget_tweaks %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container">
+    
+    <div class="br-card mt-2">
+        <div class="card-header">
+            <div class="d-flex">
+                <div class="ml-3">
+                    <div class="text-weight-semi-bold text-up-02" style="color:#1351b4;"><i class="fas fa-stethoscope"></i> {% if object %}EDITAR{% else %}ADICIONAR{% endif %} CLASSIFICAÇÃO DE RISCO</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-content mt-3">
+            <div class="container">
+                <div class="row no-gutters">
+                    
+                  <div class="col-2">
+                    <div class="br-avatar mr-3" title="{{object_paciente.paciente_nome}}">
+                        <div class="content">
+                            {% if object_paciente.foto_paciente %}
+                                <img src="{{object_paciente.foto_paciente.url}}" width="100%" alt="Avatar"/>
+                            {% else %}
+                                <img src="{% static 'img/illustre-user.png' %}" width="100%" alt="Avatar"/>
+                            {% endif %}
+                            <div id="progress" class="progress-img"></div>
+                        </div>
+                    </div>
+                  </div>
+                    
+                  <div class="col-6 capslock">
+                    <p><b>Paciente:</b> {{object_paciente.nome_paciente}}</p>
+                    <p><b>Arquivo:</b> Adicionar nome do arquivo </p>
+                    <p><b>Idade:</b> {{object_paciente.calcular_idade}}</p>
+                    <p id="bottom-situacao"><b>Situação:</b> {% if not object %}{{boletim.get_situacao_display}}{% else %}{{object.boletim.get_situacao_display}}{% endif %}</p>
+                  </div>
+                    
+                  <div class="col capslock" style="margin-top:-30px;">
+                    <p>Último atendimento:</p>
+                    <div class="br-message warning" style="background-color:#ebebeb; border-radius:10px; margin-top:-10px;">
+                        <div class="content">
+                            <div class="row">
+                                <div class="col-md-auto">
+                                    <span>20/05/2020 </span>
+                                </div>
+                                <div class="col">
+                                    <div class="progress-img-sm"></div>
+                                </div>
+                            </div>
+                            <p>Dores na garganta e ouvido com tosse seca e persistente</p>
+                            <p><b>Médico:</b> Adicionar Médico</p>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="br-card mt-3">
+        <div id="focus-container-topo" class="container" style="margin:0 auto;">
+            <div style="color:white;">.</div>
+            <div class="" style="border: 1px solid #d9d9d9; border-radius:10px;">
+
+                <p>teste</p>
+
+            </div>
+            <div style="color:white;">.</div>
+        </div>
+    </div>
+    
+</div>
+    
+
+{% endblock %}
+    
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+   
+{% endblock %}

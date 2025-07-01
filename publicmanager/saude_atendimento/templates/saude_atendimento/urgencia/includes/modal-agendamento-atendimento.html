@@ -1,0 +1,324 @@
+{% load widget_tweaks %}
+{% load static %}
+<div class="br-scrim-util foco" id="modal-agendamento-atendimento" data-scrim="true">
+    <div class="br-modal">
+        <div class="header">
+            <div class="text-up-02 text-color-blue-1gov titulo-modal-agendamento-atendimento">
+                <img src="{% static 'img/icons/icone-agendamedica.svg' %}" alt="Ícone da farmácia" title="Ícone da farmácia" style="display: block;"> 
+                <span class="ml-3">AGENDAMENTO</span>
+            </div>
+            <a class="fechar-modal" id="fechar-modal-agendamento-atendimento">
+                <span aria-hidden="true">&times;</span>
+                {% comment %} <i class="fas fa-times" aria-hidden="true" hidden></i> {% endcomment %}
+            </a>
+        </div>
+        <form method="post" id="agendamento_form">
+            {% csrf_token %}
+            {{ form.media.js }}
+            <div class="br-modal-body">
+                <div class="form-group row campo-paciente">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                <label for="id_paciente" class="text-color-blue-1gov">Paciente:</label>
+                            </div>
+                            <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                {% render_field form.paciente type="text" class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-1">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                <label for="id_nome_paciente" class="text-color-blue-1gov">
+                                    <span>Nome do paciente:</span>
+                                </label>
+                            </div>
+                            <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                {% render_field form.nome_paciente class="input-com-alfanumericas" type="text" placeholder="Ex.: Paulo Santos da Silva" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-1">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                <label for="id_cpf" class="text-color-blue-1gov">
+                                    CPF:
+                                </label>
+                            </div>
+                            <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                {% render_field form.cpf_paciente class="mask-cpf" type="text" placeholder="Ex.: 458.952.584-41" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-1">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                <label for="id_celular" class="text-color-blue-1gov">Celular:</label>
+                            </div>
+                            <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                {% render_field form.celular_paciente type="text" placeholder="Ex.: (85) 99904-9695" class="mask-telefone" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-1">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                <label for="id_telefone_fixo" class="text-color-blue-1gov">
+                                    Telefone fixo:
+                                </label>
+                            </div>
+                            <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                {% render_field form.telefone_fixo_paciente type="text" placeholder="Ex.: (85) 3656-2104" class="mask-telefoneresidencial" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-1">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                <label for="id_medico" class="text-color-blue-1gov">Médico:</label>
+                            </div>
+                            <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                {% render_field form.medico class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento" disabled="True"%}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-3">
+                    <div class="d-flex col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                            <label class="d-flex justify-content-end text-color-blue-1gov">Neste dia, este médico atende:</label>
+                        </div>
+                        <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            <div id="container-primeiro-atendimento">
+                                <span id="label-primeiro-atendimento" class="text-color-blue-1gov" style="font-weight: 700;">PRIMEIRO ATENDIMENTO: </span>
+                                <span id="valor-primeiro-atendimento"></span>
+                            </div>
+                            <div id="container-retorno">
+                                <span id="label-retorno" class="text-color-blue-1gov" style="font-weight: 700;">RETORNO: </span>
+                                <span id="valor-retorno"></span>
+                            </div>
+                            <div id="container-extra-encaixe">
+                                <span id="label-extra-encaixe" class="text-color-blue-1gov" style="font-weight: 700;">EXTRA ENCAIXE: </span>
+                                <span id="valor-extra-encaixe"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-3">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-input">
+                            <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                <label for="form.agendado_por.id_for_label" class="text-color-blue-1gov">Agendado por:</label>
+                            </div>
+                            <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                {% render_field form.agendado_por class="modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento" disabled="True"%}
+                                {% comment %} <input
+                                    id=""
+                                    type="text" value="{{farmaceutico_solicitante}}" disabled="True"
+                                > {% endcomment %}
+                                {% comment %} {{form.agendado_por.initial.pk}} {% endcomment %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-tipo form-group row mt-3">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                            <label class="d-flex justify-content-end text-color-blue-1gov">Tipo:</label>
+                        </div>
+                        <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                            {% render_field form.tipo_atendimento type="radio" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2 container-data">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-datetimepicker" data-mode="single" data-type="text">
+                            <div class="br-input has-icon">
+                                <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                    <label for="id_data_atendimento" class="text-color-blue-1gov"><span>Data:</span></label>
+                                </div>
+                                <div class="pl-0 pr-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                    {% render_field form.data_atendimento type="text" placeholder="dd/mm/aaaa" data-input="data-input" %}
+                                    <button class="br-button circle small" type="button" aria-label="Abrir Timepicker"
+                                            data-toggle="data-toggle" id="simples-input-btn"><i
+                                            class="fas fa-calendar-alt" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2 container-horario">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2 label">
+                            <label for="" class="d-flex justify-content-end text-color-blue-1gov">Início:</label>
+                        </div>
+                        <div class="container-selects col-xl-8 col-lg-8 col-md-8 col-sm-9 col-9">
+                            <div class="container-hora">
+                                <select id="inicio_hora" name="inicio_hora" class="select-horario modal-campo-select" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento">
+                                    <option value="08">08</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                </select>
+                            </div>
+                            <div class="minuto">
+                                <select id="inicio_minuto" name="inicio_minuto" class="select-horario modal-campo-select" data-tipo-container-form="modal" data-class-modal="modal-agendamento-atendimento">
+                                    <option value="00">00</option>
+                                    <option value="20">20</option>
+                                    <option value="40">40</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2 container-horario">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2 label">
+                            <label for="id_hora_termino_atendimento" class="d-flex justify-content-end text-color-blue-1gov">Término:</label>
+                        </div>
+                        <div class="container-selects col-xl-8 col-lg-8 col-md-8 col-sm-9 col-9">
+                            <div class="container-hora">
+                                <select id="termino_hora" name="termino_hora" class="select-horario modal-campo-select" disabled>
+                                    <option value="08">08</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                </select>
+                            </div>
+                            <div class="minuto">
+                                <select id="termino_minuto" name="termino_minuto" class="select-horario modal-campo-select" disabled>
+                                    <option value="00">00</option>
+                                    <option value="20">20</option>
+                                    <option value="40">40</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <div class="br-textarea small">
+                            <div class="pl-0 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">
+                                <label for="id_observacoes" class="text-color-blue-1gov">Observações:</label>
+                            </div>
+                            <div class="pl-0 pr-0 col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                                {% render_field form.observacoes class="input-com-alfanumericas" type="text" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+                        <div class="br-message warning mt-5">
+                            <div class="icon">
+                                <i class="fas fa-exclamation-triangle fa-lg" aria-hidden="true"></i>
+                            </div>
+                            <div class="content" aria-label="Os campos com * devem obrigatoriamente ser preenchidos." role="alert">
+                                <span class="message-title">Atenção.</span>
+                                <span class="message-body"> Os campos com <span class="text-danger">*</span> devem obrigatoriamente ser preenchidos.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% comment %} <div class="row d-flex justify-content-center">
+                    <div class="d-flex justify-content-end col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                        <span class="text-color-blue-1gov explicacao-indicacao-obrigatoriedade d-flex col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">Campos Obrigatórios</span>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+            <!-- /.card-body -->
+            <div class="br-modal-footer justify-content-center">
+                {% if form.errors %}
+                    {% for field_errors in form.errors.values %}
+                        {% for error in field_errors %}
+                            <div class="br-message danger" role="alert">
+                                <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                     aria-hidden="true"></i>
+                                </div>
+                                <div class="content"><span
+                                        class="message-title">Erro: </span><span
+                                        class="message-body"> {{ error }}</span>
+                                </div>
+                                <div class="close">
+                                    <button class="br-button circle small" type="button"
+                                            aria-label="content"><i
+                                            class="fas fa-times" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <div class="br-message danger" role="alert">
+                                <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                     aria-hidden="true"></i>
+                                </div>
+                                <div class="content"><span
+                                        class="message-title">Erro no campo {{ field.label }}.</span><span
+                                        class="message-body"> {{ error }}</span>
+                                </div>
+                                <div class="close">
+                                    <button class="br-button circle small" type="button"
+                                            aria-label="content"><i
+                                            class="fas fa-times" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
+                <div class="botoes pl-0 pr-0 col-xl-11 col-lg-11 col-md-11 col-sm-11 col-11">
+                    <div class="container-botoes-principais">
+                        <button type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="agendar-atendimento" name="agendar-atendimento">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                        <button type="submit" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="editar-agendamento" name="editar-agendamento">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+
+                        <a class="br-button secondary" id="cancelar-agendamento-atendimento">
+                            Cancelar
+                        </a>
+                        <a class="br-button secondary" id="remover-agendamento">
+                            <i
+                            class="fas fa-trash-alt" aria-hidden="true"></i> Remover
+                        </a>
+                    </div>
+                    <div class="container-botao-pre-atendimento">
+                        <a href="" class="br-button primary mr-3 mt-3 mt-sm-0 ml-sm-3" id="pre-atendimento">
+                            <img src="{% static "img/icons/preatendimento_icone.svg" %}" alt=""> Pré-Atendimento
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-footer -->
+        </form>
+        <input type="hidden" id="id_remocao_agendamento" name="id_remocao_agendamento" value=""/>
+    </div>
+</div>

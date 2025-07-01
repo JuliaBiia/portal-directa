@@ -1,0 +1,131 @@
+input{ border-color: #0459A1 !important; font-size:15px !important; }
+label{ color: #0459A1 !important; }
+legend{ color: #0459A1 !important; }
+.table-title{ color: #1351B4 !important; }
+.th-color{ color: #0459A1 !important; }
+.input-border{ border-color: #0459A1 !important; }
+.testeeeee{ height: 42px !important; }
+textarea{ font-size: 15px !important; color: #333333 !important; border-color: #0459A1 !important; padding-left: 12px; padding-top: 10px !important;}
+.textarea{ font-size: 15px !important; color: #333333 !important;  }
+select{ border-color: #0459A1 !important; background-color: #fff;}
+.select2-container--default .select2-selection--single {border: 1px solid #0459A1 !important; background-color: #fff !important;}
+
+.card-content > form > .card-body,
+.card-content > form > .card-body > .row{
+    display: flex;
+    justify-content: center;
+}
+
+.card-content > form > .card-body{
+    flex-direction: column;
+}
+
+.card-content > form > .card-body > .form-group.row > div{
+    margin-top: 9px !important;
+}
+
+.card-content > form > .card-body > .form-group.row:first-child > div{
+    margin-top: 0px !important;
+}
+
+.card-content > form > .card-body > .form-group.row label{
+    /* color: var(--blue-vivid-60) !important; */
+    color: #1351B4 !important;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+}
+
+/* .card-content > form > .card-body > .form-group.row label::after {
+    content: ':';
+} */
+
+.card-content > form > .card-body > .form-group.row label .text-danger,
+div.br-message.warning > div.content > span.message-body > span.text-danger{
+    font-size: 30px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+
+    height: 14px !important;
+    padding-top: 8px !important;
+}
+
+.card-content > form > .card-body > .form-group.row input{
+    border-color: #1351B4 !important;
+    height: 41px !important;
+    margin-top: 0px !important;
+}
+
+.card-content > form > .card-body > .form-group.row textarea{
+    border-color: #0459A1 !important;
+}
+
+.campo-select {
+    background-color: var(--background-light) !important;
+    border-color: #0459A1 !important;
+    border-radius: var(--surface-rounder-sm) !important;
+    border-style: var(--border-style) !important;
+    border-width: var(--border-width) !important;
+    color: var(--color-light) !important;
+    display: block !important;
+    font-size: 15px !important;
+    font-weight: var(--font-weight-medium) !important;
+    margin-top: var(--spacing-scale-half) !important;
+    padding-bottom: 0 !important;
+    padding-left: var(--spacing-scale-2x) !important;
+    padding-right: var(--spacing-scale-2x) !important;
+    padding-top: 0 !important;
+    width: 100% !important;
+    height: var(--input-size) !important;
+}
+
+.campo-select + .select2-container .select2-selection{
+    border-color: #1351B4 !important;
+    height: 41px !important;
+    margin-top: 0px !important;
+}
+.campo-select + .select2-container .select2-selection > .select2-selection__rendered{
+    color:black !important;
+    
+    font-family: Arial, sans-serif;
+    font-weight: var(--font-weight-medium);
+    font-size: 15px !important;
+
+    padding: 0 16px;
+}
+.campo-select + .select2-container .select2-selection__arrow > [role=presentation]{
+    border-color: #0459A1 transparent transparent transparent !important;
+}
+
+.campo-select + .select2-container .select2-selection--multiple{
+    min-height: var(--input-size) !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b::before{
+    content: "\f107";
+    font-weight: 900;
+    font-family: "Font Awesome 6 Free";
+    font-style: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-rendering: auto;
+    font-size: 16px;
+    text-align: center;
+    color: #1351B4 !important;
+}
+
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b::before{
+    content: "\f106";
+}
+
+
+@media (max-width: 575px) {
+    .card-content > form > .card-body > .form-group.row:first-child > div {
+        margin-top: 9px !important;
+    }
+    .card-content > form > .card-body > .form-group.row:first-child > div:nth-child(1) {
+        margin-top: 0px !important;
+    }
+}

@@ -1,0 +1,608 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Histórico Time Line{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block css %}
+    <style>
+        :root {
+            --white: #ffffff;
+            --black: #000000;
+            --blue:#03447c;
+            --gray:#ebebeb;
+            --box-shadow1:0px 0px 18px 2px rgba(10, 55, 90, 0.15);
+        }
+        :focus{
+            outline: 0px solid transparent !important;
+        }
+        .timeline {
+            padding: 50px 0;
+            position: relative;
+        }
+        .timeline-nodes {
+                padding-bottom: 25px;
+                position: relative;
+            }
+        .timeline-nodes:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        .timeline h3, .timeline p {
+            padding: 5px 15px;
+        } 
+        .timeline h3{
+            font-weight: lighter;
+            background: var(--blue);
+        }
+        .timeline p, .timeline time {
+            color: black;
+        }
+        .timeline::before {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 0;
+            border-left: 2px dashed var(--blue);
+            height: 100%;
+            z-index: 1;
+            transform: translateX(-50%);
+        }
+        .timeline-content {
+            border: 1px solid var(--blue);
+            position: relative;
+            border-radius: 0 0 10px 10px;
+            box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        }
+        .timeline-nodes:nth-child(odd) h3,
+        .timeline-nodes:nth-child(odd) p {
+            text-align: right;
+        }
+        .timeline-nodes:nth-child(odd) .timeline-date {
+            text-align: left;
+        }
+         
+        .timeline-nodes:nth-child(even) .timeline-date {
+            text-align: right;
+        }
+        .timeline-nodes:nth-child(odd) .timeline-content::after {
+            content: "";
+            position: absolute;
+            top: 5%;
+            left: 100%;
+            width: 0;
+            border-left: 10px solid var(--blue);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+        .timeline-nodes:nth-child(even) .timeline-content::after {
+            content: "";
+            position: absolute;
+            top: 5%;
+            right: 100%;
+            width: 0;
+            border-right: 10px solid var(--blue);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+        .timeline-image {
+            position: relative;
+            z-index: 100;
+        }
+        .timeline-image::before {
+            content: "";
+            width: 80px;
+            height: 80px;
+            border: 2px dashed var(--blue);
+            border-radius: 50%;
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            background-color: #fff;
+            z-index: 1;
+            
+        
+        }
+        .timeline-image img {
+            position: relative;
+            z-index: 100;
+        }
+        /*small device style*/
+        
+        @media (max-width: 767px) {
+            .timeline-nodes:nth-child(odd) h3,
+            .timeline-nodes:nth-child(odd) p {
+            text-align: left
+        }
+        .timeline-nodes:nth-child(even) {
+            flex-direction: row;
+        }
+            .timeline::before {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 4%;
+            width: 0;
+            border-left: 2px dashed var(--blue);
+            height: 100%;
+            z-index: 1;
+            transform: translateX(-50%);
+        }
+        .timeline h3 {
+            font-size: 1.7rem;
+        }
+        .timeline p {
+            font-size: 14px;
+        }
+        .timeline-image {
+            position: absolute;
+            left: 0%;
+            top: 60px;
+            /*transform: translateX(-50%;);*/
+        }
+        .timeline-nodes:nth-child(odd) .timeline-content::after {
+            content: "";
+            position: absolute;
+            top: 5%;
+            left: auto;
+            right: 100%;
+            width: 0;
+            border-left: 0;
+            border-right: 10px solid var(--blue);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+        .timeline-nodes:nth-child(even) .timeline-content::after {
+            content: "";
+            position: absolute;
+            top: 5%;
+            right: 100%;
+            width: 0;
+            border-right: 10px solid var(--blue);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+        .timeline-nodes:nth-child(even) .timeline-date {
+            text-align: left;
+        }
+        .timeline-image::before {
+            width: 65px;
+            height: 65px;
+        }
+        }
+        
+        /*extra small device style */
+        @media (max-width: 575px) {
+            .timeline::before {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 3%;
+        }
+        .timeline-image {
+            position: absolute;
+            left: -5%;
+            }
+        .timeline-image::before {
+            width: 60px;
+            height: 60px;
+        }
+        }
+
+        .title-first{ color:#03447c; font-weight:bold; }
+        .title-timeline{ color:#03447c; font-size:18px; }
+        .hr-border{ border: 0.5px solid var(--blue); }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container" style="border:1px solid var(--interactive); border-radius:10px;">
+        <div class="row mt-3">
+            <div class="col-9">
+                <h4 class="title-timeline"><i class="fas fa-history"></i>HISTÓRICO DE ATENDIMENTOS ANTERIORES</h4>
+            </div>
+            <div class="col-3 txt-center">
+                <p class="pdt-5">Nº do Atendimento: <br/><span class="title-first">{{boletim.boletim_classificacao_risco_set.first.formatar_numeros_atendimento}}</p> 
+            </div>
+        </div>
+        <hr style="border:0.5px solid var(--interactive);">
+        <p style="text-align:center; color:var(--interactive); margin-top:20px;">
+            <b>DATA DO ATENDIMENTO</b>
+        </p>
+        <p style="text-align:center; color:var(--interactive); margin-top:-10px;">
+            <b>{{boletim.created_at|date:'d/m/Y'}}</b>
+        </p>
+        <div class="timeline">
+
+            {% comment %} classificacao-risto {% endcomment %}
+            <div class="row no-gutters justify-content-end justify-content-md-around align-items-start  timeline-nodes">
+                <div class="col-10 col-md-5 order-3 order-md-1 timeline-content">
+                    <div class="row">
+                        <div class="col-10">
+                            <h4 class="title-timeline">PRÉ-ATENDIMENTO</h4>
+                        </div>
+                        <div class="col-2">
+                            <h4 class="title-timeline">
+                                {% if boletim.boletim_classificacao_risco_set.exists %}
+                                    {{boletim.boletim_classificacao_risco_set.first.data_hora_avaliacao|time:'H:i'}}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </h4>
+                        </div>
+                    </div>
+                    <hr class="hr-border" style="margin-top:-3px;">
+                    {% if boletim.boletim_classificacao_risco_set.first %}
+                        <div class="row timeline-row-info">
+                            <div class="col-5">
+                                <p>Nome do Paciente:</p>
+                            </div>
+                            <div class="col-7">  
+                                <p>{{boletim.boletim_classificacao_risco_set.first.paciente.nome_paciente}}</p>
+                            </div>
+                            <div class="col-5">
+                                <p>Responsável Atendimento:</p>
+                            </div>
+                            <div class="col-7">  
+                                <p>{{boletim.boletim_classificacao_risco_set.first.profissional.nome_profissional}}</p>
+                            </div>
+                            <div class="col-5">
+                                <p>Queixa Principal:</p>
+                            </div>
+                            <div class="col-7">
+                                <p>
+                                    {% if boletim.boletim_classificacao_risco_set.first.queixa_principal %}
+                                        {{ boletim.boletim_classificacao_risco_set.first.queixa_principal }}
+                                    {% else %}
+                                        NÃO INFORMADO
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-5">
+                                <p>Escala de Dor:</p>
+                            </div>
+                            <div class="col-7"> 
+                                <p>{{boletim.boletim_classificacao_risco_set.first.get_escala_dor_display}}</p>
+                            </div> 
+                            <div class="col-5">
+                                <p>Estado Geral:</p>
+                            </div>
+                            <div class="col-7"> 
+                                <p>{{boletim.boletim_classificacao_risco_set.first.get_estado_geral_display}}</p>
+                            </div>  
+                        </div>
+                        <div class="row">
+                        </div>
+                    {% else %}
+                    <div class="box-no-date">
+                        <p>NÃO EXISTE REGISTRO DE PRÉ-ATENDIMENTO PARA ESSE PACIENTE.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-2 col-sm-1 px-md-3 order-2 text-md-center">
+                    <i class="fas fa-arrow-alt-circle-left" style="font-size:40px; margin-left:-60px; color:#03447c;"></i>
+                </div>
+
+                <div class="col-10 col-md-5 order-1 order-md-3 py-3 timeline-date">
+                </div>
+            </div>
+
+            {% comment %} atendimento medico {% endcomment %}
+            <div class="row no-gutters justify-content-end justify-content-md-around align-items-start  timeline-nodes">
+                <div class="col-10 col-md-5 order-3 order-md-1 timeline-content">
+                    <div class="row">
+                        <div class="col-10">
+                            <h4 class="title-timeline">ATENDIMENTO MÉDICO</h4>
+                        </div>
+                        <div class="col-2">
+                            <h4 class="title-timeline">
+                                {% if boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set %}
+                                    {{boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.created_at|time:'H:i'}}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </h4>
+                        </div>
+                    </div>
+                    <hr class="hr-border" style="margin-top:-3px;">
+                    {% if boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set %}
+                    <div class="row timeline-row-info">
+                        <div class="col-5">
+                            <p>Médico Responsável:</p>
+                        </div>
+                        <div class="col-7">  
+                            {% for profissional in boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.profissionais.all %}
+                                <p>{{profissional.nome_profissional}}</p>
+                            {% endfor %}
+                        </div>
+                        <div class="col-5">
+                            <p>Evolução:</p>
+                        </div>
+                        <div class="col-7">
+                            {% if boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_evolucao_atendimento_set.all %}
+                                {% for evolucao in boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_evolucao_atendimento_set.all %}
+                                    <p>{{evolucao.numero_evolucao}} - {{evolucao.registro_evolucao}}</p>
+                                {% endfor %}
+                            {% else %}
+                                <p style="font-size:15px;">Não existem evoluções registradas para esse paciente nesse atendimento.</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-5">
+                            <p>Diagnóstico:</p>
+                        </div>
+                        <div class="col-7"> 
+                            {% if boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_diagnostico_atendimento_set.all %}
+                                {% for diagnostico in boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_diagnostico_atendimento_set.all %}
+                                    <p>{{diagnostico.cid.nome}} - {{diagnostico.cid.codigo}}</p>
+                                {% endfor %}
+                            {% else %}
+                                <p style="font-size:15px;">Não existem diagnósticos registrados para esse paciente nesse atendimento.</p>
+                            {% endif %}
+                        </div>    
+                    </div>
+                    {% else %}
+                    <div class="box-no-date">
+                        <p>NÃO EXISTE REGISTRO DE ATENDIMENTO MÉDICO PARA ESSE PACIENTE.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-2 col-sm-1 px-md-3 order-2 text-md-center">
+                    <i class="fas fa-arrow-alt-circle-right" style="font-size:40px; margin-left:30px; color:#03447c;"></i>
+                </div>
+
+                <div class="col-10 col-md-5 order-1 order-md-3 py-3 timeline-date">
+                </div>
+            </div>
+
+            {% comment %} medicacoes {% endcomment %}
+            <div class="row no-gutters justify-content-end justify-content-md-around align-items-start timeline-nodes">
+                <div class="col-10 col-md-5 order-3 order-md-1 timeline-content">
+                    <div class="row">
+                        <div class="col-10">
+                            <h4 class="title-timeline">MEDICAÇÕES</h4>
+                        </div>
+                        <div class="col-2">
+                            <h4 class="title-timeline">
+                                {% if boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.medicacaoatendimento_set.exists %}
+                                    {{boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.medicacaoatendimento_set.first.created_at|time:'H:i'}}
+                                {% else %}
+                                    
+                                {% endif %}
+                            </h4>
+                        </div>
+                    </div>
+                    <hr class="hr-border" style="margin-top:-3px;">
+                    {% if boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.medicacaoatendimento_set.exists %}
+                        {% for medicacoes in boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.medicacaoatendimento_set.all %}
+                            <div class="row timeline-row-info">
+                                <div class="col-5">
+                                    <p>Enfermeiro Responsável:</p>
+                                </div>
+                                <div class="col-7">
+                                    <p>{{medicacoes.medico.nome_profissional}}</p>
+                                </div>    
+                                <div class="col-5">
+                                    <p>Medicações:</p>
+                                </div>    
+                                <div class="col-7">
+                                    <p>{{medicacoes.get_aplicacao_display}} - {{medicacoes.medicacao.nome_medicamento}}<br/> 
+                                    {{medicacoes.dosagem}} - 
+                                    {{medicacoes.get_admin_medicamentosa_display}} 
+                                    {% if medicacoes.get_tipo_parenteral_display %}
+                                        - {{medicacoes.get_tipo_parenteral_display}}
+                                    {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="box-no-date">
+                            <p>NÃO EXISTEM MEDICAÇÕES REGISTRADAS PARA ESSE PACIENTE NESSE ATENDIMENTO.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-2 col-sm-1 px-md-3 order-2 text-md-center">
+                    <i class="fas fa-arrow-alt-circle-left" style="font-size:40px; margin-left:-60px; color:#03447c;"></i>
+                </div>
+
+                <div class="col-10 col-md-5 order-1 order-md-3 py-3 timeline-date">
+                </div>
+            </div>
+
+            {% comment %} exames {% endcomment %}
+            <div class="row no-gutters justify-content-end justify-content-md-around align-items-start  timeline-nodes">
+                <div class="col-10 col-md-5 order-3 order-md-1 timeline-content">
+                    <div class="row">
+                        <div class="col-10">
+                            <h4 class="title-timeline">EXAMES</h4>
+                        </div>
+                        <div class="col-2">
+                            <h4 class="title-timeline">
+                                {% if boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_exame_atendimento_set.exists %}
+                                    {{ boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_exame_atendimento_set.first.created_at|time:'H:i' }}
+                                {% else %}
+                                    
+                                {% endif %}
+                            </h4>
+                        </div>
+                    </div>
+                    <hr class="hr-border" style="margin-top:-3px;">
+                    {% if boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_exame_atendimento_set.exists %}
+                        {% for dados in boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_exame_atendimento_set.all %}
+                            <div class="row timeline-row-info">
+                                    <div class="col-5">
+                                        <p>Enfermeiro Responsável:</p>
+                                    </div>
+                                    <div class="col-7">
+                                        <p>{{dados.profissional_responsavel.nome_profissional}}</p>
+                                    </div>    
+                                    <div class="col-5">
+                                        <p>Exames:</p>
+                                    </div>
+                                    <div class="col-7">
+                                        <p>{{dados.exame.tipo_exame.nome}} - {{dados.exame.nome}}</p>
+                                    </div>
+                                    <div class="col-5">
+                                        <p>Justificativa:</p>
+                                    </div>
+                                    <div class="col-7">
+                                        {% if dados.justificativa %}
+                                            <p>{{dados.justificativa}}</p>
+                                        {% else %}
+                                            <p>SEM INFORMAÇÃO</p>
+                                        {% endif %}
+                                    </div>
+                                    {% if dados.arquivo %}
+                                    <div class="col-5">
+                                        <p>Anexo:</p>
+                                    </div>
+                                    <div class="col-7">
+                                        <button type="button" class="br-button" onclick="window.open('{{dados.arquivo.url}}', '_blank')"><i class="fas fa-file-image"></i>Visualizar</button>
+                                    </div>
+                                    {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="box-no-date">
+                            <p>NÃO EXISTEM EXAMES REGISTRADOS PARA ESSE PACIENTE NESSE ATENDIMENTO.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-2 col-sm-1 px-md-3 order-2 text-md-center">
+                    <i class="fas fa-arrow-alt-circle-right" style="font-size:40px; margin-left:30px; color:#03447c;"></i>
+                </div>
+
+                <div class="col-10 col-md-5 order-1 order-md-3 py-3 timeline-date">
+                </div>
+            </div>
+
+            {% comment %} procedimentos {% endcomment %}
+            <div class="row no-gutters justify-content-end justify-content-md-around align-items-start timeline-nodes">
+                <div class="col-10 col-md-5 order-3 order-md-1 timeline-content">
+                    <div class="row">
+                        <div class="col-10">
+                            <h4 class="title-timeline">PROCEDIMENTOS</h4>
+                        </div>
+                        <div class="col-2">
+                            <h4 class="title-timeline">
+                                {% if boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_procedimento_atendimento_set.exists %}
+                                    {{ boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_procedimento_atendimento_set.first.created_at|time:'H:i' }}
+                                {% else %}
+                                    
+                                {% endif %}
+                            </h4>
+                        </div>
+                    </div>
+                    <hr class="hr-border" style="margin-top:-3px;">
+                    {% if boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_procedimento_atendimento_set.exists %}
+                        {% for dados in boletim.boletim_classificacao_risco_set.first.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.atendimento_procedimento_atendimento_set.all %}
+                            <div class="row timeline-row-info">
+                                <div class="col-5">
+                                    <p>Médico Responsável:</p>
+                                </div>
+                                <div class="col-7">
+                                    <p>{{dados.Profissional.nome_profissional}}</p>
+                                </div>
+                                <div class="col-5">
+                                    <p>Procedimento:</p>
+                                </div>
+                                <div class="col-7">
+                                    <p>{{dados.procedimento.nome}}</p>
+                                </div>
+                                <div class="col-5">
+                                    <p>Código:</p>
+                                </div>
+                                <div class="col-7">
+                                    <p>{{dados.procedimento.codigo}}</p>
+                                </div>
+                                {% if dados.procedimento.arquivo %}
+                                <div class="col-5">
+                                    <p>Anexo:</p>
+                                </div>
+                                <div class="col-7">
+                                    <button type="button" class="br-button" onclick="window.open('{{dados.procedimento.arquivo.url}}', '_blank')"><i class="fas fa-file-image"></i>Visualizar</button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="box-no-date">
+                            <p>NÃO EXISTEM PROCEDIMENTOS REGISTRADOS PARA ESSE PACIENTE NESSE ATENDIMENTO.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-2 col-sm-1 px-md-3 order-2 text-md-center">
+                    <i class="fas fa-arrow-alt-circle-left" style="font-size:40px; margin-left:-60px; color:#03447c;"></i>
+                </div>
+
+                <div class="col-10 col-md-5 order-1 order-md-3 py-3 timeline-date">
+                </div>
+            </div>
+
+            {% comment %} end {% endcomment %}
+            <div class="row no-gutters justify-content-end justify-content-md-around align-items-start  timeline-nodes">
+                <div class="col-10 col-md-5 order-3 order-md-1 timeline-content">
+                    <div class="row">
+                        <div class="col-10">
+                            <h4 class="title-timeline">ATENDIMENTO MÉDICO</h4>
+                        </div>
+                        <div class="col-2">
+                            <h4 class="title-timeline">{{boletim.boletim_classificacao_risco_set.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.created_at|time:'H:i'}}</h4>
+                        </div>
+                    </div>
+                    <hr class="hr-border" style="margin-top:-3px;">
+                    {% if boletim %}
+                    <div class="row timeline-row-info">
+                        <div class="col-5">
+                            <p>Médico Responsável:</p>
+                        </div>
+                        <div class="col-7">  
+                            {% for profissional in boletim.boletim_classificacao_risco_set.classificacao_risco_lista_chamada_set.lista_chamada_atendimento_medico_set.profissionais.all %}
+                                <p>{{profissional.nome_profissional}}</p>
+                            {% endfor %}
+                        </div>
+                        <div class="col-5">
+                            <p>Situação:</p>
+                        </div>
+                        <div class="col-7">  
+                            <p>{{boletim.get_situacao_display}}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="box-no-date">
+                        <p>Não existe registro de atendimento para esse paciente.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-2 col-sm-1 px-md-3 order-2 text-md-center">
+                    {% if boletim.get_situacao_display == 'MELHORADO' %}
+                    <i class="fas fa-arrow-alt-circle-right" style="font-size:40px; margin-left:35px; color:#33cc33;"></i>
+                    {% elif boletim.get_situacao_display == 'CURADO' %}
+                    <i class="fas fa-arrow-alt-circle-right" style="font-size:40px; margin-left:35px; color:#33cc33;"></i>
+                    {% else %}
+                    <i class="fas fa-arrow-alt-circle-right" style="font-size:40px; margin-left:35px; color:red;"></i>
+                    {% endif %}
+                </div>
+
+                <div class="col-10 col-md-5 order-1 order-md-3 py-3 timeline-date">
+                </div>
+            </div>
+
+         </div>
+    </div>
+
+{% endblock %}
+{% block script %}
+
+{% endblock %}

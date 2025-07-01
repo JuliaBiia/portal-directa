@@ -1,0 +1,158 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load static %}
+{% block title %}Formulário Ficha Referência{% endblock %}
+{% load widget_tweaks %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="br-card">
+            
+            <div class="card-header">
+                <div class="d-flex">
+                    <div class="ml-3 mt-3">
+                        <div class="text-weight-semi-bold text-up-02 color-title"><i class="fa-solid fa-file-signature" style="font-size:25px;"></i> FICHA REFERÊNCIA</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            
+            <div class="card-content">
+                <form method="post">    
+                {% csrf_token %}
+
+                    <div class="card-body">
+                        <div class="form-group row">
+                            
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 margin-0">
+                                <div class="br-input mt-3">
+                                    <div class="br-input">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                            <label for="id_nome_paciente">Data de Entrada:</label>
+                                        </div>
+                                        <div class="col br-input input-highlight">
+                                            <input id="input-highlight-labeless" value="{{data_atual}}" type="text" readonly/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 margin-0">
+                                <div class="br-input mt-3">
+                                    <div class="br-input">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                            <label for="id_nome_paciente">Resumo clinico:</label>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <textarea class="form-control capslock" name="resumo_clinico" id="id_resumo_clinico" type="text" style="height:180px; width: 100%; border-radius:4px;"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="container mt-5">
+                                <h4 class="color-title" style="font-size:18px; margin-left:25px;">Adicionar Informações do Atendimento</h4>
+                                <hr class="margin-0" style="border:1px solid var(--interactive); width: 97%;">
+
+                                <div class="row" style="margin: 50px auto; width:90%; background-color:;">
+                                    <div class="col-1" style="margin-top:43px;">
+                                        <input class="input-sem-borda capslock" name="exames" id="exames" type="checkbox" style="width: 17px; height: 27px;border: 1px solid gray !important; border-radius: 5px; cursor:pointer;"> 
+                                    </div>
+                                    <div class="col-md-auto" style="margin-top:43px;">
+                                        <p>Resultado de Exames</p> 
+                                    </div>
+                                    {% if atendimento.atendimento_exame_atendimento_set.all %}
+                                        <div class="col" style="margin-left:50px;">
+                                            {% for dados in atendimento.atendimento_exame_atendimento_set.all %}
+                                                <p><b>{{dados.exame.nome}}</b></p>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                            <div class="col" style="height:110px;">
+                                            </div>
+                                    {% endif %}
+                                </div>
+
+                                <hr>
+
+                                <div class="row" style="margin: 40px auto; width:90%;">
+                                    <div class="col-1" style="margin-top:43px;">
+                                         <input class="input-sem-borda capslock" name="tratamentos" id="tratamentos" type="checkbox" style="width: 17px; height: 27px;border: 1px solid gray !important; border-radius: 5px; cursor:pointer;"> 
+                                    </div>
+                                    <div class="col-md-auto" style="margin-top:43px;">
+                                        <p>Tratamento Realizado</p> 
+                                    </div>
+                                    {% if atendimento.medicacaoatendimento_set.all %}
+                                        <div class="col capslock" style="margin-left:50px;">
+                                            {% for dados in atendimento.medicacaoatendimento_set.all %}
+                                                <p><b>{{dados.medicacao.nome_medicamento}}</b><p>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="col" style="height:110px;">
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <hr>
+
+                                <div class="row" style="margin: 40px auto; width:90%; background-color:;">
+                                    <div class="col-1" style="margin-top:43px;">
+                                         <input class="input-sem-borda capslock" name="diagnosticos" id="diagnosticos" type="checkbox" style="width: 17px; height: 27px;border: 1px solid gray !important; border-radius: 5px; cursor:pointer;"> 
+                                    </div>
+                                    <div class="col-md-auto" style="margin-top:43px;">
+                                        <p>Impressão Diagnóstico</p> 
+                                    </div>
+                                    {% if atendimento.atendimento_diagnostico_atendimento_set.all %}
+                                        <div class="col" style="margin-left:50px;">
+                                            {% for dados in atendimento.atendimento_diagnostico_atendimento_set.all %}
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <p>Descrição Diagnóstico:</p>
+                                                    </div>
+                                                    <div class="col-8" style="text-transform: capitalize;">
+                                                        <p><b>{{dados.descricao}}</b></p>
+                                                    </div>
+
+                                                    <div class="col-4 mt-4">
+                                                        <p>CID Principal:</p>
+                                                    </div>
+                                                    <div class="col-8 mt-4">
+                                                        <p><b>{{dados.cid.codigo}} - {{dados.cid.nome}}</b></p>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="col" style="height:110px;">
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                            <input type="hidden" name="atendimento" id="id_atendimento" value="{{atendimento.id}}"/>
+
+                            <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 margin-0" style="text-align:right;">
+                                <div class="mt-5">
+                                    <a href="{% url 'saude_atendimento:atendimento_ficha_list' %}?pk={{paciente.pk}}" class="br-button secondary mr-3"> <i class="fas fa-arrow-left"></i> Voltar </a>
+                                    <button type="submit" class="br-button primary"><i class="fas fa-print"></i> Imprimir</button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,334 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Concessão de Alta{% endblock %}
+{% load static %}
+
+{% load widget_tweaks %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/sweetalert-custom-alta-hospitalar.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatables.min.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<style>
+    .swal2-modal {width: 550px; height: 420px;}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container-lg box-concessao-alta">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row mt-1">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="text-weight-semi-bold text-up-02 color-title font-size24">ALTA HOSPITALAR</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="card-content mt-n10-tb">
+                    <form class="box-wdth-search" id="formSubmit" method="get" onsubmit="setDate()">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-left-search">
+                                    <div class="br-input">
+                                        <label for="id_nome">Dados da Busca</label>
+                                        <input type="text" name="buscar_nome" maxlength="255" class="form-control input-com-alfanumericas mt-2" value="{{buscar_nome}}" style="height:44px !important;">
+                                    </div>
+                                </div>
+                                <div class="col-right-search">
+                                    <div class="br-select mt-10-w mt-10-tb">
+                                        <div class="br-input">
+                                        <label for="select-simple">Opção de Busca</label>
+                                        <input class="mt-2" id="select-simple" type="text" placeholder="Selecione o item"/>
+                                        <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1" data-trigger="data-trigger">
+                                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                        </button>
+                                        </div>
+                                        <div class="br-list" tabindex="0">
+                                        <div class="br-item {% if opcao_filtro == 'paciente' %} selected {% endif %}" tabindex="-1">
+                                            <div class="br-radio">
+                                            <input id="rb0" type="radio" name="opcao_filtro" value="paciente"/>
+                                            <label for="rb0">Paciente</label>
+                                            </div>
+                                        </div>
+                                        <div class="br-item {% if opcao_filtro == 'cpf' %} selected {% endif %}" tabindex="-1">
+                                            <div class="br-radio">
+                                            <input id="rb1" type="radio" name="opcao_filtro" value="cpf"/>
+                                            <label for="rb1">CPF</label>
+                                            </div>
+                                        </div>
+                                        <div class="br-item {% if opcao_filtro == 'rg' %} selected {% endif %}" tabindex="-1">
+                                            <div class="br-radio">
+                                            <input id="rb2" type="radio" name="opcao_filtro" value="rg"/>
+                                            <label for="rb2">RG</label>
+                                            </div>
+                                        </div>
+                                        <div class="br-item {% if opcao_filtro == 'sus' %} selected {% endif %}" tabindex="-1">
+                                            <div class="br-radio">
+                                            <input id="rb3" type="radio" name="opcao_filtro" value="sus"/>
+                                            <label for="rb3">Cartão Sus</label>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-3">
+                            <button class="br-button primary ml-n15" type="submit">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card hover">
+                <div class="card-content">
+                    <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                        data-random="data-random">
+                        
+                        <div class="table-header">
+                            <div class="top-bar">
+                                <div class="table-title"><i class="fa-solid fa-list-ul color-title"></i> LISTA DE PACIENTES EM ATENDIMENTO</div><hr>
+                            </div>
+                        </div>
+                        
+                        <table class="table table-responsive mt-2">
+                            <thead>
+                                <tr>
+                                    <th class="th-color visible-xs" style="width:5%;"></th>
+                                    {% comment %} <th class="th-color hidden-xs" style="width:5%;"></th> {% endcomment %}
+                                    <th class="th-color hidden-xs" style="width:5%;"></th>
+                                    <th class="th-color"><b>Paciente</b></th>
+                                    <th class="th-color hidden-xs"><b>Entrada</b></th>
+                                    <th class="th-color hidden-xs"><b>Queixa Principal</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" style="background-color: #00b0e4; color: #fff;"></td>
+                                </tr>
+                                {% if em_atendimento %}
+                                    {% for dados in em_atendimento %}
+                                        <tr>
+                                            <td class="visible-xs">
+                                                <button class="mostra-columns br-button circle" onclick="modalInfo('{{dados.pk}}', '{{dados.classificacao_risco.boletim.pk}}', '{{dados.paciente.nome_paciente}}', '{{dados.classificacao_risco.boletim.data_entrada}}', '{{dados.classificacao_risco.queixa_principal}}')"><i class="fa-solid fa-circle-plus font-size18"></i></button>
+                                            </td>
+                                            <td class="hidden-xs" style="text-transform:uppercase; width:10%;">
+                                                <a class="br-button primary small" onclick="alertFinalizarBoletim('{{dados.classificacao_risco.boletim.pk}}', '{{dados.pk}}', '{{dados.paciente.nome_paciente}}')" type="button" style="width:140px; font-size:13px;"><i class="fas fa-home mr-1"></i> Conceder Alta</a>
+                                            </td>
+                                            {% comment %} <td class="hidden-xs">
+                                                <a href="#"><i class="far fa-file-pdf" style="font-size:23px; text-transform:uppercase;"></i></a>
+                                            </td> {% endcomment %}
+                                            <td class="capslock">{{dados.paciente.nome_paciente}}</td>
+                                            <td class="hidden-xs hidden-tb capslock">{{dados.classificacao_risco.boletim.data_entrada}}</td>
+                                            <td class="hidden-xs hidden-tb  capslock">{{dados.classificacao_risco.queixa_principal}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="7"><p style="text-align: center" class="my-2">Não existem altas no momento!</p></td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        {% include 'dashboard/includes/paginacao.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/datatables.min.js' %}"></script>
+<script src="{% static 'js/data_table.js' %}"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+<script src="{% static 'js/utils_forms.js' %}"></script>
+<script src="{% static 'js/moment.locale.min.js' %}"></script>
+<script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+
+<script>
+    function finalizarBoletim(boletimPk, listaChamadaPk, situacaoAltaPaciente){
+        let url  = "{% url 'saude_atendimento:api_finalizar_boletim' pk='00000000-0000-0000-0000-000000000000' %}"
+        axios.put(url.replace('00000000-0000-0000-0000-000000000000', boletimPk), {"chamado_id": listaChamadaPk, "situacao": situacaoAltaPaciente, 'situacao_chamado': 6})
+        .then((response)=>{
+            window.location.replace("{% url 'saude_atendimento:concessao_alta_list' %}");
+        });
+    }
+
+    function alertFinalizarBoletim(boletimPk, listaChamadaPk, pacienteNome){
+        self = this;
+        
+        Swal.fire({
+            html: `
+            <div class="swal2-title swal2-title-custom text-left" id="swal2-title">
+                <h2 class="ml-3">
+                    <i class="fas fa-clipboard-list text-color-blue-1gov"></i>
+                    <label class="text-color-blue-1gov">Alta do Paciente</label>
+                    <button type="button" class="close mr-2" aria-label="Close" onclick="Swal.close()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </h2>
+            </div>
+        
+            <div class="container">
+                <div class="row br-input justify-content-center mt-2">
+                    <div class="col-11 br-input">
+                        <label class="text-color-blue-1gov">Paciente:</label>
+                        <input class="input-highlight-labeless input-tab capslock" type="text" value="${pacienteNome}" readonly/>
+                    </div>
+                </div>
+                <div class="row br-input justify-content-center mt-2">
+                    <div class="col-6 br-input">
+                        <label class="text-color-blue-1gov">Data:</label>
+                        <input class="input-highlight-labeless input-tab capslock" type="text" value="${moment().format('DD/MM/YYYY')}" readonly/>
+                    </div>
+                    <div class="col-5 br-input">
+                        <label class="text-color-blue-1gov">Hora:</label>
+                        <input class="input-highlight-labeless input-tab capslock" type="text" value="${moment().format('H:mm')}" readonly/>
+                    </div>
+                </div>
+                <div class="row br-input justify-content-center mt-2">
+                    <div class="col-11">
+                        <label class="text-color-blue-1gov">Tipo:</label>
+                        <div class="br-input mt-1">
+                            <select id="tipoSelect" class="select-custom modal-campo-select" style="width: 100%" data-tipo-container-form="modal" data-class-modal="swal2-container">
+                                <option value="">SELECIONE UMA OPÇÃO</option>
+                                <option value="2">CURADO</option>
+                                <option value="3">ÓBITO</option>
+                                <option value="4">REVELIA</option>
+                                <option value="5">MELHORADO</option>
+                                <option value="6">INALTERADO</option>
+                                <option value="7">TRANSFERÊNCIA</option>
+                                <option value="8">DECISÃO MÉDICA</option>
+                                <option value="9">ENCERRAMENTO ADMINISTRATIVO</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `,
+            confirmButtonColor: "#1250b4",
+            confirmButtonText: '<i class="fa-regular fa-floppy-disk mr-2"></i>Salvar',
+            cancelButtonText: '<i class="fa-solid fa-xmark mr-2"></i> Fechar',
+            showCancelButton: true,
+            showConfirmButton: true,
+            reverseButtons: true,
+            allowOutsideClick: false,
+            preConfirm: () => {
+                const selectElement = document.getElementById('tipoSelect');
+                const selectedValue = selectElement.value;
+
+                if (selectedValue === '') {
+                    Swal.showValidationMessage('Selecione o tipo da alta!');
+                    var modal = document.querySelector(".swal2-modal");
+                    var validate = document.querySelector(".swal2-validation-message");
+
+                    validate.style.setProperty("background-color", "transparent", "important");
+                    validate.style.setProperty("z-index", "1", "important");
+                    validate.style.setProperty("font-size", "20px", "important");
+                    validate.style.setProperty("height", "80px", "important");
+                    validate.style.setProperty("margin-top", "-50px", "important");
+                    validate.style.setProperty("opacity", "1", "important");
+                    validate.style.setProperty("color", "black", "important");
+                    validate.style.setProperty("margin-left", "-18px", "important");
+                    modal.style.setProperty("height", "480px", "important");
+                } else {
+                    self.finalizarBoletim(boletimPk, listaChamadaPk, selectedValue)
+                }
+            },
+        });
+
+        document.querySelector(".swal2-container").setAttribute('id', 'swal2-container');
+        ajustarSelectModal();
+    }
+
+    function modalInfo(id_atendimento, id_boletim, nome, entrada, queixa_principal){
+        Swal.fire({
+            html: `
+            <div class="container" style="width:90%;">
+
+                <div class="swal2-title swal2-title-custom text-left mt-6" id="swal2-title">
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="button" class="close" style="background-color:#0459A1; border:none; color:white; font-size:15px; width:30px; height:30px;" aria-label="Close" onclick="Swal.close()">X</button>
+                            <h2 class="mt-n1"><label class="text-color-blue-1gov custom-text ft-sz14">Detalhes do Paciente</label></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row font-size16 mt-1">
+                    <div class="col-4 color-title">
+                        <span class="">Paciente:</span>
+                    </div>
+                    <div class="col-6">
+                        <span>${nome}<span/>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-4 color-title">
+                        <span>Entrada:</span>
+                    </div>
+                    <div class="col-6">
+                        <span>${entrada}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-4 color-title">
+                        <span>Queixa Principal:</span>
+                    </div>
+                    <div class="col-6">
+                        <span>${queixa_principal}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-10 mb-3">
+                    <div class="col-6 text-center color-title">
+                        <span><a><button class="br-button primary small" onclick="alertFinalizarBoletim('${id_boletim}', '${id_atendimento}', '${nome}')" type="button" style="width:145px; font-size:15px;"><i class="fas fa-home mr-1"></i> Conceder Alta</button></a></span>
+                    </div>
+                    <div class="col-6 text-center color-title">
+                        <span><a href="#"><button class="br-button primary small" type="button" style="width:145px; font-size:15px;">Pdf</button></a></span>
+                    </div>
+                </div><hr style="border:1px solid #a6a6a6;">
+
+            </div>
+            `,
+            confirmButtonColor: "#1250b4",
+            confirmButtonText: '<i class="fa-regular fa-floppy-disk mr-2"></i>Salvar',
+            cancelButtonText: '<i class="fa-solid fa-xmark mr-2"></i> Fechar',
+            showCancelButton: false,
+            showConfirmButton: false,
+            //reverseButtons: true,
+            allowOutsideClick: true,
+        });
+    }
+
+</script>
+
+{% endblock %}

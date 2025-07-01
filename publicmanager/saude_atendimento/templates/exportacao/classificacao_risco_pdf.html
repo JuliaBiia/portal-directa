@@ -1,0 +1,241 @@
+{% extends 'dashboard/base/base-pdf.html' %}
+{% load static %}
+{% block title %}Relatório Classificação de Risco{% endblock %}
+{% load widget_tweaks %}
+{% block css-extra-pdf %}
+<style>
+    .col p{color:black;}
+    .row{ font-size:18px; }
+    .row .col-4 p{ font-size:18px; }
+    .row .col p{ font-size:18px; }
+    .title-span{ text-align:right; }
+    .title-span-clock{ text-align:right; }
+    .title-span span{ font-size:20px; color:var(--interactive); }
+    .title-span-clock span{ color:var(--interactive); }
+    .hr-ficha-title{ border: 1px solid var(--interactive); width:100%; }
+</style>
+{% endblock %}
+{% block contentpdf %}
+
+    <div class="" style="text-align:center; margin-top:50px;">
+        <h5>Número do BAU: <b>{% if classificacao_risco.formatar_numeros_atendimento %}{{classificacao_risco.formatar_numeros_atendimento}}{% else %}--{% endif %}</b></h5>
+    </div>
+
+    <div class="row mt-4" style="width:100%;">
+        <div class="col-4 title-span">
+            <span><b>Informações do Paciente</b></span>
+        </div>
+        <div class="col-7">
+            <hr class="hr-ficha-title">
+        </div>
+    </div>
+
+    <div class="row mt-4" style="width:95%;">
+        <div class="col-4" style="text-align:right;">
+            <p>Paciente:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.nome_paciente %}{{classificacao_risco.paciente.nome_paciente}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-4" style="width:95%;">
+        <div class="col-4" style="text-align:right;">
+            <p>CPF:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.cpf %}{{classificacao_risco.paciente.cpf}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-4" style="width:95%;">
+        <div class="col-4" style="text-align:right;">
+            <p>RG:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.rg %}{{classificacao_risco.paciente.rg}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Data de Nascimento:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.data_nascimento %}{{classificacao_risco.paciente.data_nascimento}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Sexo:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.get_sexo_display %}{{classificacao_risco.paciente.get_sexo_display}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Estado Civil:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.get_estado_civil_display %}{{classificacao_risco.paciente.get_estado_civil_display}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Profissão:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.profissao %}{{classificacao_risco.paciente.profissao}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>CEP:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.cep %}{{classificacao_risco.paciente.cep}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Endereço:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.endereco %}{{classificacao_risco.paciente.endereco}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Número:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.numero %}{{classificacao_risco.paciente.numero}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Complemento:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.complemento %}{{classificacao_risco.paciente.complemento}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Bairro:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.bairro %}{{classificacao_risco.paciente.bairro}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Cidade/UF:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.municipio %}{{classificacao_risco.paciente.formatar_nome_municipio}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Celular:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.paciente.celular %}{{classificacao_risco.paciente.celular}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Nome do Responsável:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.boletim.nome_responsavel %}{{classificacao_risco.boletim.nome_responsavel}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>RG do Responsável:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.boletim.rg_responsavel %}{{classificacao_risco.boletim.rg_responsavel}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+
+    <div class="row mt-4" style="width:100%;">
+        <div class="col-4 title-span">
+            <span><b>Classificação de Risco</b></span>
+        </div>
+        <div class="col-7">
+            <hr class="hr-ficha-title">
+        </div>
+    </div>
+
+    <div class="row mt-4" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Tipo Classificação:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.tipo_classificacao_risco.get_tipo_display %}{{classificacao_risco.tipo_classificacao_risco.get_tipo_display}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Queixa Principal:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.queixa_principal %}{{classificacao_risco.queixa_principal}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+
+    <div class="row mt-2" style="width:95%;">
+        <div class="col-4" style="text-align:right;">
+            <p>Estado Geral:</p>
+        </div>
+        <div class="col">
+            <p><b>{% if classificacao_risco.get_estado_geral_display %}{{classificacao_risco.get_estado_geral_display}}{% else %}--{% endif %}</b></p>
+        </div>
+    </div>
+
+    <div class="row mt-4" style="width:100%;">
+        <div class="col-4 title-span">
+            <span><b>Histórico Patológico</b></span>
+        </div>
+        <div class="col-7">
+            <hr class="hr-ficha-title">
+        </div>
+    </div>
+
+    <div class="row mt-4" style="width:95%;">
+        <div class="col-4" style="text-align:right;">
+            <p>Nome Comorbidades:</p>
+        </div>
+        <div class="col">
+            {% if classificacao_risco.paciente.anamnese_paciente.antecedentes_patologicos_pessoais.all %}
+                {% for comorbidade in classificacao_risco.paciente.anamnese_paciente.antecedentes_patologicos_pessoais.all %}
+                    <p><b>{{comorbidade}}</b></p>
+                {% endfor %}
+            {% else %}
+                <p><b>--</b></p>
+            {% endif %}
+            <p><b></b></p>
+        </div>
+    </div>
+
+    <div class="row mt-2" style="width:95%;  ">
+        <div class="col-4" style="text-align:right;">
+            <p>Alergia Medicamentosa:</p>
+        </div>
+        <div class="col">
+            {% if classificacao_risco.paciente.anamnese_paciente.alergias_medicamentosas.all %}
+                {% for alergia in classificacao_risco.paciente.anamnese_paciente.alergias_medicamentosas.all %}
+                    <p><b>{{alergia}}</b></p>
+                {% endfor %}
+            {% else %}
+                <p><b>--</b></p>
+            {% endif %}
+        </div>
+    </div>
+
+<br/><br/><br/>
+                                
+{% endblock %}

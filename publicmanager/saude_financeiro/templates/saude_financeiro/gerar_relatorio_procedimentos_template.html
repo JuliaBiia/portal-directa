@@ -1,0 +1,225 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Gerar Procedimentos{% endblock %}
+
+{% load enfermagem_filters %}
+{% load static %}
+
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/estilizacao-grid.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade_tb.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade.css' %}"/>
+<style>
+    .select2-selection__arrow b::before{display: none;}
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {color: #333;}
+    .swal2-confirm {background-color: var(--interactive-light) !important;}
+    .select2-selection__rendered {margin-top: 5px !important;}
+
+    .tag-amarelo { background-color: #eae451; }
+    .tag-azul { background-color: #4c9fe4; }
+    .tag-verde { background-color: #3ec86d; }
+    .tag-laranja { background-color: #ff9d29; }
+    .tag-roxo { background-color: #5942D2; }
+    .tag-cinza { background-color: #999; }
+    .tag-vermelho { background-color: #e52207; }
+    .tag-preto { background-color: rgba(0, 0, 0, 0.9); }
+    .disabled-button {pointer-events: none; opacity: 0.5; cursor: not-allowed;}
+</style>
+{% endblock %}
+
+{% block content %}
+<template>
+    <div class="container-lg">
+        {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+        <div class="row mt-1">
+            <div class="col-md">
+                <div class="br-card">
+                    <div class="card-header">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="text-weight-semi-bold text-up-02 color-title font-size24">
+                                    <i class="fa-solid fa-file-pdf font-size25 mr-2"></i> Relatório Geral
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <div class="card-content mt-n10-tb">
+                        <form class="box-wdth-search" id="atendimentos_efetuados_form" method="get">
+                            <div class="card-body">
+                                <div class="form-group row col-xl-12 col-lg-12 col-md-12 col-sm-12" style="justify-content: left;">
+                                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+                                        <div class="br-input">
+                                            <label for="id_data_filtro">Selecione o mês:</label>
+                                            <select class="select-busca-grid campo-select" v-model="selectedMonth">
+                                                <option value="01">Janeiro</option>
+                                                <option value="02">Fevereiro</option>
+                                                <option value="03">Março</option>
+                                                <option value="04">Abril</option>
+                                                <option value="05">Maio</option>
+                                                <option value="06">Junho</option>
+                                                <option value="07">Julho</option>
+                                                <option value="08">Agosto</option>
+                                                <option value="09">Setembro</option>
+                                                <option value="10">Outubro</option>
+                                                <option value="11">Novembro</option>
+                                                <option value="12">Dezembro</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+                                        <div class="br-input">
+                                            <label for="id_data_filtro">Modelo:</label>
+                                            <select class="select-busca-grid campo-select" v-model="selectedType">
+                                                <option value="1">Consolidado Resumido</option>
+                                                <option value="2">Consolidado Detalhado</option>
+                                                <option value="3">Individualizado</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+                                        <label>Selecione o ano:</label>
+                                        {% for year in years %}
+                                            <span class="br-tag m-1" :class="selectedYear === '{{year}}' ? 'br-primary' : 'tag-cinza'"  @click="selectedYear = '{{year}}'" style="cursor: pointer;">{{year}}</span>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div :style="selectedType === '3' ? 'display: block;' : 'display: none;'" class="col-xl-8 col-lg-8 col-md-12 col-sm-12">
+                                        <label class="color-title mt-1">Categoria:</label>
+                                        <select id="tipo-select" name="tipo" class="form-control campo-select">
+                                            <option value="" selected>Todos</option>
+                                            <option value="2">Médico</option>
+                                            <option value="3">Enfermeiro</option>
+                                        </select>
+                                    </div>
+
+                                    <div :style="tipoSelect === '' ? 'display: none;' : ''" class="col-xl-8 col-lg-8 col-md-12 col-sm-12">
+                                        <label class="color-title mt-2">Profissional:</label>
+                                        <select id="profissional-select" name="profissional" class="form-control campo-select">
+                                            <option value="" selected>TODOS</option>
+                                        </select> 
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer mt-3">
+                                <div class="row group-btn-search txt-center-w col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                    <div class="col ml-3 ml-lg-0 ml-sm-0" style="text-align: left;">
+                                        <a class="br-button primary ml-n15" :href="paramFilter" target="_blank"> Gerar Relatório</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script>
+    var app = new Vue({
+        delimiters: ['${', '}'],
+        el: '#base-vue',
+        data: {
+            selectedYear: '{{current_year}}',
+            selectedMonth: '{{current_month}}',
+            selectedType: '1',
+            urlConsolidadoDetalhado: '{% url "saude_financeiro:relatorio_consolidado_detalhado_pdf" %}',
+            urlConsolidadoResumido: '{% url "saude_financeiro:relatorio_consolidado_resumido_pdf" %}',
+            urlIndividualizado: '{% url "saude_financeiro:boletimproducao_dados_individualizados" %}',
+            unidadeSaudeSessionId: '{{unidade_saude.id}}',
+            profissionalSelecionado: '',
+            tipoSelect: '',
+        },
+        watch: {
+            'selectedType': {
+                handler(value) {
+                    if(value === '1' || value === '2'){
+                        this.profissionalSelecionado = ''
+                        this.tipoSelect = ''
+                        $('#tipo-select').val(null).trigger('change');
+                        $('#profissional-select').val(null).trigger('change');
+                    }
+                }
+            }
+        },
+        computed: {
+            paramFilter() {
+                let params = ''
+
+                if(this.selectedType === '1'){
+                    params = `${this.urlConsolidadoResumido}?mes=${this.selectedMonth}&ano=${this.selectedYear}`
+                }else if(this.selectedType === '2'){
+                    params = `${this.urlConsolidadoDetalhado}?mes=${this.selectedMonth}&ano=${this.selectedYear}`
+                }else{
+                    params = `${this.urlIndividualizado}?mes=${this.selectedMonth}&ano=${this.selectedYear}&profissional=${this.profissionalSelecionado}`
+                }
+                return params
+            },
+        },
+        methods: {
+            getProfissionais(tipo){
+                axios.get(`{% url "saude_cadastro:api_profissional_view" %}?tipo=${tipo}&unidade_saude_id=${this.unidadeSaudeSessionId}`)
+                .then((response)=>{  
+                    var $profissionaisSelecionados = $('#profissional-select').empty()
+
+                    var allOption = new Option("Todos", "", false, false);
+                    $profissionaisSelecionados.append(allOption);
+
+                    response.data.forEach(function(pro) {
+                        var newOption = new Option(pro.nome_profissional, pro.id, false, false);
+                        $profissionaisSelecionados.append(newOption);
+                    });
+                    $profissionaisSelecionados.trigger('change');
+
+                });
+            },
+        },
+        mounted(){
+            self = this;
+
+            $('#tipo-select').select2({
+                placeholder: "Selecione uma categoria de profissional",
+                width: '100%',
+                allowClear: true
+            }).on('change', function(e) {
+                const selectedValue = e.target.value;
+
+                if(selectedValue){
+                    self.tipoSelect = selectedValue;
+                    self.getProfissionais(selectedValue)
+                }else{
+                    self.tipoSelect = '';
+                }
+            }).on('select2:unselect', (e) => {
+                self.tipoSelect = '';
+            });
+
+            $('#profissional-select').select2({
+                placeholder: "Selecione um profissional",
+                width: '100%',
+                allowClear: true
+            }).on('change', function(e) {
+                const selectedValue = e.target.value;
+
+                self.profissionalSelecionado = selectedValue
+                
+            }).on('select2:unselect', (e) => {
+                self.profissionalSelecionado = '';
+            });
+        },
+    });
+</script>
+
+{% endblock %}

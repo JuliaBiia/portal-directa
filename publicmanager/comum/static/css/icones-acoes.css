@@ -1,0 +1,28 @@
+a:hover > .fa-edit,
+a:hover > .fa-trash-alt,
+a:hover > .fa-eye,
+i.fa-eye{
+    background: var(--color-rgb);
+    cursor: pointer;
+}
+
+.fa-edit{
+    color: rgba(19, 81, 180, 1);
+}
+
+.fa-trash-alt{
+    /* color: var(--danger) !important; */
+    color: rgba(19, 81, 180, 1);
+}
+
+a:hover > .icone-desativado{
+    cursor: not-allowed;
+}
+
+.fa-edit.icone-desativado{
+    color: rgba(19, 81, 180, 0.5) !important;
+}
+
+.fa-trash-alt.icone-desativado{
+    color: rgba(19, 81, 180, 0.5) !important;
+}

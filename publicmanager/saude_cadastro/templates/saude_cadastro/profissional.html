@@ -1,0 +1,311 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de Profissionais{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/campos-ocultos-profissional.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/estilizacao-grid.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes-mod-cadastro.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade_tb.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<div class="container-lg">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row mt-1">
+        <div class="col-md">
+            <div class="br-card">
+
+                <div class="card-header">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="text-weight-semi-bold text-up-02 color-title font-size24">
+                                {% comment %} <img src="{% static 'img/icons/icone-profissional.svg' %}" alt="Ícone de profissional" title="Ícone de profissional" style="display: block;"> 
+                                <span class="mt-1 ml-4" style="display: block;">PROFISSIONAIS</span> {% endcomment %}
+                                <i class="fa-solid fa-user-tie mr-2"></i> PROFISSIONAIS
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <hr>
+
+                <div class="card-content mt-n10-tb">
+                    <form
+                        class="box-wdth-search"
+                        id="profissional_form_busca"
+                        method="get"
+                        onsubmit="setDate()"
+                    >
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                    <div class="br-input">
+                                        <label for="id_nome_profissional_filtro" class="text-color-blue-1gov">Nome</label>
+                                        <input
+                                            id="id_nome_profissional_filtro"
+                                            class="input-busca-grid form-control input-com-alfanumericas"
+                                            name="nome_profissional_filtro"
+                                            type="text"
+                                            maxlength="100"
+                                            value="{{nome_profissional_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                    <div class="br-input">
+                                        <label for="id_tipo_profissional_filtro" class="text-color-blue-1gov">Tipo de Profissional</label>
+                                        <select
+                                            id="id_tipo_profissional_filtro"
+                                            class="select-busca-grid campo-select"
+                                            name="tipo_profissional_filtro" 
+                                            style="width: 100%"
+                                        >
+                                            <option value="">TODOS</option>
+                                            {% for tipo_profissional in tipos_profissional %}
+                                                {% if tipo_profissional_filtro ==  forloop.counter0%}
+                                                    <option selected value="{{forloop.counter0}}">{{tipo_profissional}}</option>
+                                                {% else %}
+                                                    <option value="{{forloop.counter0}}">{{tipo_profissional}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row campo-oculto-container">
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 mt-3 campo-oculto-coren">
+                                    <div class="br-input">
+                                        <label for="id_coren_filtro" class="text-color-blue-1gov">COREN</label>
+                                        <input
+                                            id="id_coren_filtro"
+                                            class="input-busca-grid form-control"
+                                            name="coren_filtro"
+                                            type="text"
+                                            maxlength="7"
+                                            value="{{coren_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 mt-3 campo-oculto-crm">
+                                    <div class="br-input">
+                                        <div class="br-input">
+                                            <label for="id_crm_filtro" class="text-color-blue-1gov">CRM</label>
+                                            <input
+                                                id="id_crm_filtro"
+                                                class="input-busca-grid form-control"
+                                                name="crm_filtro"
+                                                type="text"
+                                                maxlength="7"
+                                                value="{{crm_filtro}}"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-5 col-lg-5 col-md-5 mt-3 col-sm-5">
+                                    <div class="br-input">
+                                        <label for="id_cns_filtro" class="text-color-blue-1gov">CNS</label>
+                                        <input
+                                            id="id_cns_filtro"
+                                            class="input-busca-grid form-control"
+                                            name="cns_filtro"
+                                            type="text"
+                                            maxlength="7"
+                                            value="{{cns_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 mt-3 col-sm-3">
+                                    <div class="br-input">
+                                        <label for="id_cbo_filtro" class="text-color-blue-1gov">CBO</label>
+                                        <input
+                                            id="id_cbo_filtro"
+                                            class="input-busca-grid form-control"
+                                            name="cbo_filtro"
+                                            type="text"
+                                            maxlength="7"
+                                            value="{{cbo_filtro}}"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-4 ml-6 buttonbusctb2">
+                            <button type="submit" class="br-button primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card hover">
+            <div class="card-content">
+                <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                    data-random="data-random">
+                    <div class="table-header">
+                        <div>
+                            <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                        </div>
+                        <div class="top-bar mt-2">
+                            <div class="table-title">
+                                {% comment %} <img src="{% static 'img/icons/icone-profissional.svg' %}" alt="Ícone profissional" title="Ícone profissional" style="display: block; height: 28px;"> 
+                                <span class="mt-1 ml-4" style="display: block;">Listagem de Profissionais</span> {% endcomment %}
+                                <i class="fa-solid fa-user-tie mr-2" style="font-size: 20.16px;"></i> <span>Listagem de Profissionais</span>
+                            </div>
+                            <div class="search-trigger">
+                                <a href="{% url 'saude_cadastro:profissional_add' %}" class="br-button primary"><i class="fas fa-plus-circle"></i> Adicionar</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="mt-2">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>Nome</th>
+                                <th>CRM</th>
+                                <th>COREN</th>
+                                <th>Tipo de Profissional</th>
+                                <th style="text-align: center;">Situação</th>
+                            </tr>
+                        </thead>
+                        <tbody class="capslock">
+                        {% if object_list %}
+                            {% for profissional in object_list %}
+                                <tr>
+                                    <td data-th="Editar">
+                                        <a href="{% url 'saude_cadastro:profissional_update' pk=profissional.id %}">
+                                            <i class="fas fa-edit" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td data-th="Recep_Noturna">
+                                        {% if profissional.recepcao_noturno %}
+                                            <a href="#" onclick="confirmRecepcaoNoturna('{{ profissional.id }}', '{{ profissional.recepcao_noturno|yesno:"true,false" }}')">
+                                                <i class="fa-solid fa-moon" aria-hidden="true"></i>
+                                            </a>
+                                        {% else %}
+                                            <a href="#" onclick="confirmRecepcaoNoturna('{{ profissional.id }}', '{{ profissional.recepcao_noturno|yesno:"true,false" }}')">
+                                                <i class="fa-regular fa-moon" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                    <td data-th="Excluir">
+                                        <a href="javascript:void(0)" onclick="confirmCancel('{% url 'saude_cadastro:profissional_delete' profissional.id %}', 'profissional')">
+                                            <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td data-th="Nome do Profissional">{{ profissional.nome_profissional }}</td>
+                                    <td data-th="CRM do Profissional">{{ profissional.crm|default:"Não informado" }}</td>
+                                    <td data-th="COREN do Profissional">{{ profissional.coren|default:"Não informado" }}</td>
+                                    <td data-th="Tipo de Profissional">{{ profissional.get_tipo_profissional_display }}</td>
+
+                                    {% if profissional.situacao == 'ATIVO' %}
+                                            <td data-th="Situação"><span class="bg-situacao-ativo situacao-grid">{{profissional.situacao}}</span></td>
+                                    {% elif profissional.situacao == 'INATIVO' %}
+                                        <td data-th="Situação"><span class="bg-situacao-inativo situacao-grid">{{profissional.situacao}}</span></td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                    {% comment %} Paginação {% endcomment %}
+                    {% include 'dashboard/includes/paginacao.html' %}
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+{% endblock %}
+
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/gerenciamento_modal_notificacao_usuarios.js' %}"></script>
+
+<script src="{% static 'js/gerenciamento_select_tipo_de_profissional.js' %}"></script>
+
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+
+<script>
+function confirmRecepcaoNoturna(profissionalId, isRecepcaoNoturna) {
+    let message = '';
+
+    if (isRecepcaoNoturna === 'true' || isRecepcaoNoturna === true) {
+        message = 'O usuário não é mais da recepção noturna?';
+    } else {
+        message = 'O usuário é da recepção noturna?';
+    }
+
+    Swal.fire({
+        title: 'Confirmação',
+        text: message,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim',
+        cancelButtonText: 'Não'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Se o usuário confirmar, faça a requisição para atualizar o status
+            updateRecepcaoNoturna(profissionalId, isRecepcaoNoturna);
+        } 
+    });
+}
+
+function updateRecepcaoNoturna(profissionalId, isRecepcaoNoturna) {
+    url = `{% url 'saude_cadastro:api_profissional_recepcaonoturno_view' pk='00000000-0000-0000-0000-000000000000' %}?confirmacao_recepcao_noturna=${isRecepcaoNoturna}`
+    axios.put(url.replace("00000000-0000-0000-0000-000000000000", profissionalId), 
+    {
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}' // Certifique-se de incluir o token CSRF
+        }
+    })
+    .then(response => {
+        if (response.status === 200) {
+            // Atualize a interface do usuário conforme necessário
+            location.reload(); // Recarrega a página para refletir as mudanças
+        } else {
+            Swal.fire('Erro', 'Erro ao atualizar o status do profissional.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        Swal.fire('Erro', 'Erro ao atualizar o status do profissional.', 'error');
+    });
+}
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,302 @@
+#id_agendamentos_filtro_form > .card-footer{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.select-medico {
+    display: flex;
+    flex-direction: column;
+}
+
+#abrir-modal-inserir-feriado,
+#abrir-modal-inserir-bloqueio-agenda,
+#abrir-modal-relatorio-agendamento{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+
+    box-shadow: var(--card-shadow);
+    border-color: var(--background-light);
+}
+
+#abrir-modal-inserir-bloqueio-agenda{
+    color: rgba(19,81,180,0.5) !important;
+    cursor: not-allowed;
+}
+
+#abrir-modal-inserir-bloqueio-agenda.habilitado{
+    color: rgba(19,81,180) !important;
+    cursor: pointer;
+}
+
+#buscar-agendamentos{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 112px;
+    padding: 0 8px;
+}
+
+#abrir-modal-inserir-feriado > i,
+#abrir-modal-inserir-bloqueio-agenda > i,
+#buscar-agendamentos > i,
+#abrir-modal-relatorio-agendamento > i{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#abrir-modal-inserir-feriado > i,
+#abrir-modal-inserir-bloqueio-agenda > i{
+    margin-right: 8px;
+}
+
+#buscar-agendamentos > i,
+#abrir-modal-relatorio-agendamento > i{
+    margin-right: 5px;
+}
+
+#abrir-modal-inserir-feriado > span,
+#abrir-modal-inserir-bloqueio-agenda > span,
+#buscar-agendamentos > span,
+#abrir-modal-relatorio-agendamento > span{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#modal-feriado > .br-modal,
+#modal-bloqueio-agenda > .br-modal,
+#modal-relatorio-agendamento > .br-modal{
+    max-width: 100% !important;
+    max-height: 100% !important;
+    height: 70%;
+    width: 80%;
+}
+
+#modal-feriado > .br-modal .br-button,
+#modal-bloqueio-agenda > .br-modal .br-button,
+#modal-relatorio-agendamento > .br-modal .br-button,
+#modal-agendamento-atendimento > .br-modal .br-button{
+    height: 43px;
+}
+
+#modal-feriado > .br-modal .br-card,
+#modal-bloqueio-agenda > .br-modal .br-card,
+#modal-relatorio-agendamento > .br-modal .br-card{
+    box-shadow: var(--surface-shadow-sm) !important;
+}
+
+#modal-feriado >  .br-modal > .header,
+#modal-bloqueio-agenda >  .br-modal > .header,
+#modal-relatorio-agendamento >  .br-modal > .header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#modal-feriado >  .br-modal > .header > .container-botao-fechar,
+#modal-bloqueio-agenda >  .br-modal > .header > .container-botao-fechar,
+#modal-relatorio-agendamento >  .br-modal > .header > .container-botao-fechar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+}
+
+#modal-feriado >  .br-modal > .header > .container-botao-fechar > a,
+#modal-bloqueio-agenda >  .br-modal > .header > .container-botao-fechar > a,
+#modal-relatorio-agendamento >  .br-modal > .header > .container-botao-fechar > a{
+    color: gray;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+#modal-relatorio-agendamento > .br-modal > #id_relatorio_agendamento_form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#modal-feriado > .br-modal #id_feriado_form > .br-modal-body,
+#modal-bloqueio-agenda > .br-modal #id_bloqueio_agenda_form > .br-modal-body,
+#modal-relatorio-agendamento > .br-modal > #id_relatorio_agendamento_form > .br-modal-body{
+    overflow: hidden !important;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 18px;
+    margin-bottom: 30px;
+}
+
+#modal-feriado > .br-modal #id_feriado_form > .br-modal-body > .form-group,
+#modal-bloqueio-agenda > .br-modal #id_bloqueio_agenda_form > .br-modal-body > .form-group,
+#modal-relatorio-agendamento > .br-modal > #id_relatorio_agendamento_form > .br-modal-body > .form-group{
+    display: flex;
+    justify-content: center;
+}
+
+#modal-bloqueio-agenda > .br-modal > #id_bloqueio_agenda_form > .br-modal-body .br-textarea > textarea {
+    height: 100px;
+}
+
+#modal-feriado > .br-modal > .row > .col-md > .br-card > .card-content > .br-table > .table-header > .top-bar,
+#modal-bloqueio-agenda > .br-modal > .row > .col-md > .br-card > .card-content > .br-table > .table-header > .top-bar{
+    padding-left: 0;
+}
+
+#modal-feriado > .br-modal > #id-feriado-filtro-form > .card-footer,
+#modal-bloqueio-agenda > .br-modal > #id_bloqueio_agenda_form > .card-footer{
+    padding-left: 0;
+}
+
+#modal-feriado > .br-modal #id_feriado_form > .br-modal-footer,
+#modal-bloqueio-agenda > .br-modal #id_bloqueio_agenda_form > .br-modal-footer{
+    padding-left: 0;
+    margin-left: 10%;
+}
+
+#modal-bloqueio-agenda > .br-modal > .row > .col-md > .br-card > .card-content > .br-table > .table-header > .top-bar > .table-title,
+#modal-feriado > .br-modal > .row > .col-md > .br-card > .card-content > .br-table > .table-header > .top-bar > .table-title{
+    /* padding-left: 20px; */
+    padding-left: 10px;
+}
+
+#modal-feriado > .br-modal > .row > .col-md > .br-card > .card-content > .br-table > .responsive,
+#modal-feriado > .br-modal > .row > .col-md > .br-card > .card-content > .br-table > .table-header,
+#modal-feriado > .br-modal > .row > .col-md > .br-card > .card-content > .br-table .table-footer,
+#modal-bloqueio-agenda > .br-modal > .row > .col-md > .br-card > .card-content > .br-table > .responsive,
+#modal-bloqueio-agenda > .br-modal > .row > .col-md > .br-card > .card-content > .br-table > .table-header,
+#modal-bloqueio-agenda > .br-modal > .row > .col-md > .br-card > .card-content > .br-table .table-footer{
+    padding: 0 50px;
+}
+
+form > .br-modal-body > .form-group.row label{
+    color: #0459A1 !important;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+form > .br-modal-body > .form-group.row input{
+    border-color: var(--blue-vivid-60) !important;
+    height: 51px !important;
+}
+
+
+.modal-campo-select {
+    background-color: var(--background-light);
+    /* border-color: var(--border-color-alternative); */
+    /* border-color: var(--blue-vivid-60) !important; */
+    border-color: #0459A1 !important;
+    border-radius: var(--surface-rounder-sm);
+    border-style: var(--border-style);
+    border-width: var(--border-width);
+    color: var(--color-light);
+    display: block;
+    font-size: var(--font-size-scale-up-01);
+    font-weight: var(--font-weight-medium);
+    /* height: var(--input-size); */
+    height: 51px;
+    margin-top: var(--spacing-scale-half);
+    padding-bottom: 0;
+    padding-left: var(--spacing-scale-2x);
+    padding-right: var(--spacing-scale-2x);
+    padding-top: 0;
+    width: 100%;
+}
+
+.modal-campo-select + .select2-container .select2-selection{
+    /* border-color: var(--blue-vivid-60) !important; */
+    border-color: #0459A1 !important;
+}
+.modal-campo-select + .select2-container .select2-selection > .select2-selection__rendered{
+    /* color: var(--blue-vivid-60) !important; */
+    color: #0459A1 !important;
+}
+.modal-campo-select + .select2-container .select2-selection__arrow > [role=presentation]{
+    /* border-color: var(--blue-vivid-60) transparent transparent transparent !important; */
+    border-color: #0459A1 transparent transparent transparent !important;
+}
+
+#id_medico_bloqueio_agenda + .select2-container--default .select2-selection--single{
+    height: 51px;
+    border: 1px solid #0459A1;
+    display: flex;
+    align-items: center;
+}
+
+#id_medico_bloqueio_agenda + .select2-container--default .select2-selection--single .select2-selection__arrow{
+    top: 12px;
+}
+
+#id_medico_bloqueio_agenda + .select2-container--default .select2-selection--single .select2-selection__arrow b{
+    border: none;
+}
+
+#id_medico_bloqueio_agenda + .select2-container--default .select2-selection--single .select2-selection__arrow{
+    top: 12px;
+    height: 32px;
+    width: 32px;
+    margin-top: -8px;
+    margin-right: 4px;
+}
+
+.modal-campo-select + .select2-container .select2-selection--multiple{
+    min-height: 51px !important;
+}
+
+.container-calendario > .col-md > .br-card > .card-header > div{
+    /* border: 0.2px solid var(--interactive); */
+    box-shadow: inset 0 0 1px 0.2px var(--interactive);
+    border-bottom: none;
+
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.container-calendario > .col-md > .br-card > .card-header > div > .mt-2 > .d-flex{
+    padding: 12px 0;
+}
+
+.container-calendario > .col-md > .br-card > .card-content > #calendar{
+    /* border: 0.2px solid var(--interactive); */
+    box-shadow: inset 0 0 1px 0.2px var(--interactive);
+
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+    padding: 25px;
+
+}
+
+.flatpickr-calendar.open {
+    z-index: var(--z-index-layer-3);
+}
+
+.fc .fc-button-primary,
+.fc .fc-button-primary:disabled{
+    background-color: #fff;
+    border-color: #fff;
+    color: #0459A1 !important;
+
+    box-shadow: var(--surface-shadow-sm);
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active{
+    background-color: #F4F4F6;
+    border-color: #F4F4F6;
+    color: #0459A1 !important;
+}
+
+.fc .fc-toolbar-title,
+.fc .fc-col-header-cell-cushion,
+.fc .fc-timegrid-slot-label-cushion.fc-scrollgrid-shrink-cushion{
+    color: #0459A1 !important;
+}
+
+

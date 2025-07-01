@@ -1,0 +1,48 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="row">
+            <div class="col-lg-12 mb-4 order-0">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0 d-sm-inline-block">Adicionar Situação</h5>
+                    </div>
+                    <form method="post" id="situacao_form">{% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                                    <div class="br-input">
+                                        <label for="descricao">Descrição</label>
+                                        {% render_field form.descricao class="input-com-alfanumericas" type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                    <div class="br-input">
+                                        <label for="codigo">Código</label>
+                                        {% render_field form.codigo type="text" %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            {{ form.errors }}
+                            <input type="submit" class="br-button primary mr-3" value="Cadastrar">
+                            <a href="{% url 'situacao_list' %}" class="br-button">Cancelar</a>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

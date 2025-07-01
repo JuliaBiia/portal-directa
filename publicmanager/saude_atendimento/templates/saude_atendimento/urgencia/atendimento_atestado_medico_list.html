@@ -1,0 +1,143 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load static %}
+{% block title %}Atestado Médico{% endblock %}
+{% load widget_tweaks %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<style>
+    .br-tag {
+        font-size: 15px;
+        width: 46px !important;
+        height: 27px;
+    }
+    .tag-amarelo { color: #fff; background-color: #eae451; }
+    .tag-azul { color: #fff; background-color: #4c9fe4; }
+    .tag-verde { color: #fff; background-color: #3ec86d; }
+    .tag-laranja { color: #fff; background-color: #ff9d29; }
+    .tag-roxo { color: #fff; background-color: #5942D2; }
+    .tag-cinza { color: #fff; background-color: #999; }
+    .tag-vermelho { color: #fff; background-color: #e52207; }
+
+    a[disabled="disabled"] {
+        pointer-events: none;
+        color: #888;
+        text-decoration: none;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md">
+                <div class="br-card">
+                    
+                    <div class="card-header">
+                        <div class="d-flex">
+                            <h4 class="title-list color-title"><i class="fas fa-notes-medical" style="font-size:25px;"></i> ATESTADO MÉDICO</h4>
+                        </div>
+                    </div>
+                    <hr style="margin-top:-1px;">
+                    
+                    <div class="card-content">
+                        <div class="card-body">
+
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 margin-0 br-input input-highlight">
+                                    <div class="br-input">
+                                        <label for="id_nome">Paciente:</label>
+                                        <input id="input-highlight-labeless" value="{{object_paciente.nome_paciente}}" type="text" readonly/>
+                                    </div>
+                                </div>
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11 margin-0">
+                                    <div class="mt-5">
+                                        <a href="{% url 'saude_atendimento:atendimento_medico_detail' pk=lista_chamada.id %}?relatorio=1" class="br-button secondary mr-3"> <i class="fas fa-arrow-left"></i> Voltar </a>
+                                        <a href="{% url 'saude_atendimento:atendimento_atestado_create' %}?pk={{paciente_pk}}&lista={{lista_chamada.id}}"><button type="submit" class="br-button primary"><i class="fas fa-plus-circle"></i> Adicionar</button></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div><br/>
+
+                    <hr class="margin-0" style="border:1px solid var(--interactive); width: 97%;">
+                    
+                    <div class="br-table mt-4" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                            
+                        <div class="table-header">
+                            <div class="top-bar">
+                                <div class="table-title color-title"><i class="fas fa-notes-medical" style="font-size:20px;"></i> ATESTADOS MÉDICOS ANTERIORES</div><hr>
+                            </div>
+                        </div>
+                        
+                        <table class="mt-3">
+                            <thead>
+                                <tr>
+                                    <th style="color:var(--interactive);"><b></b></th>
+                                    <th style="color:var(--interactive);"><b>Data</b></th>
+                                    <th style="color:var(--interactive);"><b>CRM</b></th>
+                                    <th style="color:var(--interactive);"><b>Médico</b></th>
+                                    <th style="color:var(--interactive);"><b>Impressão de Diagnóstico</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" style="background-color: #00b0e4; color: #fff;"></td>
+                                </tr>
+                                {% for dados in atestado %}
+                                    <tr>
+                                        <td class="capslock" style="cursor: pointer;"><i class="fa fa-eye font-size17" style="color:var(--interactive);" data-id-atestado="{{dados.id}}"></i></td>
+                                        <td class="capslock">{{dados.created_at|date:'d/m/Y'}}</td>
+                                        <td class="capslock">{{dados.profissional.crm}}</td>
+                                        <td class="capslock">{{dados.profissional.nome_profissional}}</td>
+                                        <td class="capslock">
+                                                {{ dados.cid.nome }}<br/>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    window.onload = function() {
+        const parametrosURL = new URLSearchParams(window.location.search);
+        const impressao = parametrosURL.get('impressao');
+
+        if (impressao) {
+            let url  = "{% url 'saude_atendimento:atendimento_atestado_pdf' pk='00000000-0000-0000-0000-000000000000' %}";
+            url = url.replace('00000000-0000-0000-0000-000000000000', impressao);
+            window.open(url, '_blank');
+
+            // Limpar o parâmetro 'impressao' da URL atual
+            parametrosURL.delete('impressao');
+            const novaURL = window.location.pathname + '?' + parametrosURL.toString();
+            history.replaceState({}, '', novaURL);
+        }
+        
+        Array.from(document.querySelectorAll("i[data-id-atestado]")).forEach(
+            element => {
+                element.addEventListener('click', function(e) {
+                    let url  = "{% url 'saude_atendimento:atendimento_atestado_pdf' pk='00000000-0000-0000-0000-000000000000' %}";
+                    url = url.replace('00000000-0000-0000-0000-000000000000', e.target.getAttribute("data-id-atestado"));
+                    window.open(url, '_blank');
+                })
+            }
+        )
+    };
+</script>
+{% endblock %}

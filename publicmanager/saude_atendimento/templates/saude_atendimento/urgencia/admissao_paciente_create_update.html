@@ -1,0 +1,527 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Incluir Processo Contribuinte{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% load widget_tweaks %}
+{% load custom_filters %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/responsividade.css' %}">
+<link rel="stylesheet" href="{% static 'css/responsividade_tb.css' %}">
+<link rel="stylesheet" href="{% static 'css/paciente-create-update.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<style>
+    .br-breadcrumb .crumb-list .crumb a {max-width: 220px !important;}
+    .swal2-container{z-index: 109999;}
+    .modal-anamnese-btn-fechar{border: 1px solid rgb(48, 133, 214) !important; color: rgb(48, 133, 214) !important;}
+
+    #video{border: 2px solid #ccc; border-radius: 5px; display: none; width: 100%; margin-top: 10px; margin-bottom: 20%;}
+    .upload-label {cursor: pointer;}
+    .disabled {pointer-events: none; opacity: 0.6; cursor: not-allowed;}
+    
+    @media only screen and (min-width: 900px) and (max-width: 1200px) {
+        .br-item {
+            text-align: center;
+        }
+    }
+    .swal2-confirm {width: 170px;}
+    .swal2-confirm-custom {background-color: #1351b4 !important; border-radius: 25px !important; font-weight: bold !important; width: 263px !important; padding: 8px;}
+    .swal2-cancel-custom {border-radius: 25px !important; font-weight: bold !important; background-color: #fff !important; color: #1351b4 !important; border: 1px solid !important; width: 263px !important; padding: 8px;}
+    .swal2-cancel-custom:hover{background-color: #ecf1f9 !important; width: 263px;}
+
+    .swal2-container {z-index: 99999;}
+    .swal2-confirm {background-color: #1351b4 !important; border-radius: 25px !important; font-weight: bold !important; 165px; padding: 8px;}
+    .swal2-cancel{border-radius: 25px !important; font-weight: bold !important; background-color: #fff !important; color: #1351b4 !important; border: 1px solid !important; width: 130px; padding: 8px;}
+    .swal2-cancel:hover{background-color: #ecf1f9 !important; width: 130px;}
+</style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+
+        <div class="br-card mt-2">
+            <div class="row margin-0" style="width:95%;">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                    <p class="color-title fontsize20-w" style="font-size:22px; margin-left:224px; padding-top:16px; font-weight:bold;"><i class="fas fa-file-invoice"></i> Abrir Processo Eletronico</p>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mt-4 hidden-xs hidden-tb" id="btn-cad-top-paciente">
+                    <!-- <a href="{% url 'saude_atendimento:admissao_paciente_list' %}?modulo={{modulo}}" class="br-button secondary mr-3">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a> -->
+                    {% comment %} {% if object %}
+                        <a href="#" class="br-button success mr-2">
+                            <i class="far fa-plus-square" style="font-size:20px;"></i>
+                        </a>
+                    {% endif %} {% endcomment %}
+                    {% if paciente %}
+                        <a href="{% url 'saude_atendimento:relatorio_paciente_pdf' pk=paciente.pk %}" target="_blank" class="br-button primary dark-mode mr-2" title="Impressão">
+                            <i class="fas fa-print" style="font-size:20px;"></i>
+                        </a>
+                    {% endif %}
+                    {% if object %}
+                        <a href="{% url 'saude_atendimento:paciente_historico_list' pk=paciente.pk %}?modulo={{modulo}}" class="br-button warning mr-2" title="Histórico">
+                            <i class="fas fa-history" style="font-size:20px;"></i>
+                        </a>
+                    {% endif %}
+                    {% comment %} {% if paciente.anamnese_paciente_id %}
+                    <a href="{% url 'saude_atendimento:anamnese_update' pk=paciente.anamnese_paciente_id %}?modulo={{modulo}}" class="br-button success mr-2" title="Anamnese">
+                        <i class="fas fa-heartbeat" style="font-size:20px;"></i>
+                    </a>
+                    {% endif %} {% endcomment %}
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="br-card">
+
+            <div class="row w100 justify-content-center margin-0 mt-4" style="background-color:;">
+                <div class="card">
+                    
+                    <form method="post" class="margin-0" id="create-paciente-form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.media.js }}
+
+                        <fieldset class="mt-3" style="width:900px; background-color:;">
+                            <div class="row">
+                                <div class="col-md-auto">
+                                    <legend class="color-title ">Identificação da Pessoa</legend>
+                                </div>
+                                <div class="col">
+                                    <span class="br-divider mt-4 mt-n5-tb"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 margin-0 flex-column-reverse-md">
+                                <div class="col-12 container-campos">
+                                    <div class="form-group row mt-2 mt-md-3">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                            <div class="br-input">
+                                                <label for="id_cpf">CPF/CNPJ do Interessado
+                                                    <a href="javascript:void(0);" data-tooltip-text="Aceito somente números."><i class="fas fa-exclamation-circle"></i></a>
+                                                </label>
+                                                {% render_field form.cpf class="mask-cpf" type="text" placeholder="" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-3">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                            <div class="br-input">
+                                                <label for="id_nome_paciente">Nome/Razão Social do Interessado</label>
+                                                {% render_field form.nome_paciente class="input-com-alfanumericas" type="text" placeholder=""  d=" d" %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-3">
+                                        <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                            <div class="br-input">
+                                                <label for="id_cep">Processo para outra pessoa?</label>
+                                                {% render_field form.cep class="" type="text" placeholder="" %}
+                                                {% comment %} <p style="margin-bottom: 0;">* Se o CEP digitado for válido, os campos abaixo são preenchidos automaticamente a partir dele. Para o preenchimento automático acontecer, é necessário clicar fora deste campo.</p> {% endcomment %}
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2 mt-2" style="display: flex; align-items: flex-end;margin-bottom: 4px;">
+                                            <button class="br-button primary" onclick="pesquisacep(event)">
+                                                &nbsp; Consultar
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-3">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                            <div class="br-input">
+                                                <label for="id_nome_paciente">Nome/Razão Social do Requerente</label>
+                                                {% render_field form.nome_paciente class="input-com-alfanumericas" type="text" placeholder=""  %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="" style="width:900px; background-color:;">
+                            <div class="row">
+                                <div class="col-md-auto">
+                                    <legend class="color-title ">MEUS CONTATOS</legend>
+                                </div>
+                                <div class="col">
+                                    <span class="br-divider mt-4 mt-n5-tb"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row mt-3">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                    <div class="br-input mt-3">
+                                        <label for="idade">Numero:</label>
+                                        <input type="text" id="idade" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row mt-3">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                    <div class="br-input">
+                                        <label for="id_nome_social">
+                                            Nome: <a href="javascript:void(0);" data-tooltip-text="Só preencha este campo caso a pessoa prefira ser chamada por um nome diferente daquele de registro.">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                            </a>
+                                        </label>
+                                        {% render_field form.nome_social class="input-com-alfanumericas" type="text" placeholder="" %}
+                                    </div>
+                                </div>
+                            </div>
+                            </fieldset>
+                        </fieldset><br/>
+
+                        <div class="col-12 card-footer mt-4 mt-n30" style="text-align:right !important;">
+                            <a onclick="abrirAlert()" type="" class="br-button primary">
+                                Avançar
+                            </a>
+                        </div>
+
+                    </form>
+
+                    <hr>
+
+                    <div class="alert alert-primary" style="color:red;">
+                        *Para alterar ou excluir, clique em uma linha da grade para selecionar o registro.
+                    </div>
+                    <table class="table table-responsive mt-2">
+                        <thead>
+                            <tr>
+                                <th class="th-color" style="background-color:#00b0e4 !important; color:white !important;"><b>Contato</b></th>
+                                <th class="th-color hidden-xs" style="background-color:#00b0e4 !important; color:white !important;"><b>Tipo</b></th>
+                                <th class="th-color hidden-xs" style="background-color:#00b0e4 !important; color:white !important;"><b>Principal</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="">(84)98108-7996</td>
+                                <td class="">Celular</td>
+                                <td class="">Sim</td>
+                            </tr>
+                            <tr>
+                                <td class="">jimydickson@email.com</td>
+                                <td class="">email</td>
+                                <td class="">Sim</td>
+                            </tr>
+                            <tr>
+                                <td class="">3223-2432</td>
+                                <td class="">Telefone</td>
+                                <td class="">Sim</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="text-align:right !important;">
+                    <button type="submit" class="br-button small primary mt-4" onclick="abrirModal()">
+                        Novo Contato
+                    </button>
+                    </div><br/>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {% comment %} {% if view == "paciente_update_view" %}
+        {% for message in messages %}
+            {% if message.extra_tags == "paciente_cadastrado_com_sucesso" %}
+                <div class="br-scrim-util foco modal-admissao-anamnese" id="modal-redirecionamento-anamnese" data-scrim="true">
+                    <div class="br-modal">
+                    <div class="br-modal-header"></div>
+                    <div class="br-modal-body">
+                        <div class="container-icone-atencao">
+                            <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                            <p>Atenção!</p>
+                        </div>
+                        <p>A Anamnese Respostas Humanas dos Procedimentos Vitais do Paciente não foi preenchida. Deseja preencher agora?</p>
+                        <div class="justify-content-center">
+                            <a class="br-button secondary" id="fechar-modal" type="button" data-dismiss="scrimexample">
+                                <i class="fas fa-times"></i> Fechar
+                            </a>
+                            <a href="{% url 'saude_atendimento:anamnese_update' pk=id_anamnese_paciente %}" class="br-button primary mt-3 mt-sm-0 ml-sm-3">
+                                <img src="{% static 'img/icons/icone-modal-envio-para-anamnese.svg' %}" alt="Ícone de acesso à anamnese do paciente a partir do modal" title="Acesse à anamnese do paciente - Modal"> Anamnese
+                            </a>
+                        </div>
+                    </div>
+                    <div class="br-modal-footer justify-content-center">
+                    </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %} {% endcomment %}
+
+<!-- Modal -->
+<div id="novoContatoModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5>Novo Contato</h5>
+            <span class="close" id="closeModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="novoContatoForm">
+                <div class="form-group row mt-3">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                        <div class="br-input mt-3">
+                            <label for="idade">Contato:</label>
+                            <input type="text" id="idade" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row mt-3">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                        <div class="br-input mt-3">
+                            <label for="idade">Tipo:</label>
+                            <input type="text" id="idade" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="principalContato">É principal?</label>
+                    <select id="principalContato"  d>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="br-button primary small">
+                Fechar
+            </button>
+            <button type="submit" class="br-button primary small ml-2">
+                Salvar
+            </button>
+        </div><br/>
+    </div>
+</div>
+
+{% endblock %}
+{% block script %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_campos_tela_cadastro_paciente.js' %}"></script>
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script src="{% static 'js/mask.js' %}"></script>
+
+<script>
+    {% include 'comum/includes/sweetalert-mixin-notificacao-usuario.js' %}
+</script>
+
+<script src="/static/smart-selects/admin/js/chainedfk.js"></script>
+<script src="/static/smart-selects/admin/js/bindfields.js"></script>
+<script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+<script>
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.extra_tags == "paciente_atualizado_com_sucesso" or message.extra_tags == "paciente_criado_com_sucesso" %}
+                Swal.fire({
+                    title: '{{message}}',
+                    text: "Deseja retornar à lista de pacientes ou registrar um novo boletim?",
+                    icon: "success",
+                    showCancelButton: true,
+                    confirmButtonColor: "#1250b4",
+                    confirmButtonText: '<i class="fa-regular fa-paste"></i> Novo Botetim',
+                    cancelButtonText: '<i class="fas fa-times"></i> Voltar',
+                    reverseButtons: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const novo_boletim = `{% url 'saude_atendimento:paciente_boletim_listagem' pk=paciente.id %}?modulo={{modulo}}`;
+                        window.location.href = novo_boletim;
+                    }else if (result.dismiss === Swal.DismissReason.cancel) {
+                        const lista_pacientes = `{% url 'saude_atendimento:admissao_paciente_list' %}?modulo=urgencia`;
+                        window.location.href = lista_pacientes;
+                    }
+                });
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if view == "paciente_update_view" %}
+        {% comment %} document.getElementById("modal-redirecionamento-anamnese").style.display = "block";
+
+        document.getElementById("fechar-modal").addEventListener("click", () => {
+            document.getElementById("modal-redirecionamento-anamnese").style.display = "none";
+        }) {% endcomment %}
+        $(document).ready(function() {
+            document.getElementById("id_data_nascimento").removeAttribute("readonly")
+        })
+        $(document).ready(function() {
+            document.getElementById("id_rg_data").removeAttribute("readonly")
+        })
+    {% else %}
+        $(document).ready(function() {
+            document.getElementById("id_data_nascimento").removeAttribute("readonly")
+        })
+        $(document).ready(function() {
+            document.getElementById("id_rg_data").removeAttribute("readonly")
+        })
+    {% endif %}
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('camera-btn').addEventListener('click', function(event) {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const captureBtn = document.getElementById('capture-btn');
+            let photoInput = document.getElementById('id_foto_paciente');
+            let accountUserImage = document.getElementById('accountUploadedAvatar');
+            let fileInput = document.querySelector('.account-image-reset');
+            let btnCamera = document.getElementById('camera-btn');
+            let uploadButton = document.querySelector('.upload-button');
+
+            const constraints = { video: true };
+            let stream;
+
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then((mediaStream) => {
+                    stream = mediaStream;
+                    accountUserImage.style.setProperty('display', 'none', 'important');
+                    fileInput.style.display = 'none';
+                    btnCamera.style.display = 'none';
+                    uploadButton.classList.add('disabled');
+
+                    video.style.display = 'inline';
+                    captureBtn.style.removeProperty('display');
+                    video.srcObject = mediaStream;
+                    video.play();
+                })
+                .catch((err) => {
+                    console.error('Erro ao acessar a webcam: ', err);
+                });
+
+            captureBtn.addEventListener('click', function capturePhoto() {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                canvas.toBlob(function(blob) {
+                    const file = new File([blob], "photo.png", { type: 'image/png' });
+
+                    const fileURL = URL.createObjectURL(file);
+                    fileInput.style.removeProperty('display');
+                    btnCamera.style.removeProperty('display');
+                    accountUserImage.style.display = 'inline';
+                    uploadButton.classList.remove('disabled');
+
+                    if (accountUserImage) {
+                        const resetImage = accountUserImage.src;
+                        accountUserImage.src = fileURL;
+                    }
+
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    photoInput.files = dataTransfer.files;
+
+                });
+
+                stream.getTracks().forEach(track => track.stop());
+                video.style.display = 'none';
+                captureBtn.style.display = 'none';
+            });
+
+        });
+
+        let accountUserImage = document.getElementById('accountUploadedAvatar');
+        const fileInput = document.querySelector('.account-file-input');
+        let resetFileInput = document.querySelector('.account-image-reset');
+
+        resetFileInput.addEventListener('click', function() {
+            resetFileInput.style.display = 'none'
+        });
+
+
+        if (accountUserImage) {
+            const resetImage = accountUserImage.src;
+            fileInput.onchange = () => {
+                if (fileInput.files[0]) {
+                    resetFileInput.style.removeProperty('display');
+                    accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
+                }
+            };
+            resetFileInput.onclick = () => {
+                fileInput.value = '';
+                accountUserImage.src = resetImage;
+            };
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const dataNascimentoInput = document.querySelector('[name="data_nascimento"]');
+        const idadeInput = document.getElementById('idade');
+    
+        function calcularIdade() {
+            if (dataNascimentoInput.value) {
+                const dataNascimento = new Date(dataNascimentoInput.value.split('/').reverse().join('-'));
+                const hoje = new Date();
+                let idadeAnos = hoje.getFullYear() - dataNascimento.getFullYear();
+                let idadeMeses = hoje.getMonth() - dataNascimento.getMonth();
+    
+                if (idadeMeses < 0 || (idadeMeses === 0 && hoje.getDate() < dataNascimento.getDate())) {
+                    idadeAnos--;
+                    idadeMeses += 12;
+                }
+    
+                if (hoje.getDate() < dataNascimento.getDate()) {
+                    idadeMeses--;
+                }
+    
+                if (idadeAnos > 0) {
+                    idadeInput.value = idadeAnos + ' ANOS ';
+                } else {
+                    idadeInput.value = idadeMeses + ' MESES';
+                }
+            }
+        }
+    
+        dataNascimentoInput.addEventListener('change', calcularIdade);
+
+        calcularIdade();
+    });
+</script>
+
+<script>
+    function abrirAlert() {
+        Swal.fire({
+            title: 'Sucesso!',
+            text: "Solicitação criada com sucesso!",
+            icon: 'success',
+            allowOutsideClick: false,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('create-paciente-form').submit();
+            }
+        });
+    }
+    // Função para abrir o modal
+    function abrirModal() {
+        const modal = document.getElementById('novoContatoModal');
+        modal.style.display = 'flex'; // Exibe o modal
+    }
+
+    function fecharModal() {
+        const modal = document.getElementById('novoContatoModal');
+        modal.style.display = 'none'; // Oculta o modal
+    }
+
+    // Fechar o modal ao clicar no botão de fechar
+    document.getElementById('closeModal').addEventListener('click', function () {
+        const modal = document.getElementById('novoContatoModal');
+        modal.style.display = 'none'; // Oculta o modal
+    });
+
+    // Fechar o modal ao clicar fora dele
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('novoContatoModal');
+        if (event.target === modal) {
+            modal.style.display = 'none'; // Oculta o modal
+        }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de Produtos{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header pr-0 pl-0 pt-2">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                                <img src="{% static 'img/icons/icone-produto-grid.svg' %}" alt="Ícone do produto" title="Ícone do produto" style="display: block;"> 
+                                <span class="mt-1 ml-4" style="display: block;">PRODUTOS MÉDICOS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="br-divider mt-1 divider-grid mb-3 col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                </div>
+
+                <div class="card-content">
+                    <form id="formSubmit" method="get" onsubmit="setDate()">
+                        <div class="card-body d-flex justify-content-center">
+                            <div class="form-group row d-flex justify-content-center col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8">
+                                    <div class="br-input">
+                                        <label for="id_nome" class="text-color-blue-1gov">Dados da Busca</label>
+                                        <input type="text" name="buscar_nome" maxlength="255" class="input-busca-grid form-control input-com-alfanumericas" value="{{buscar_nome}}">
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                    <div class="br-select">
+                                        <div class="br-input">
+                                        <label for="select-simple" class="text-color-blue-1gov">Opção de Busca</label>
+                                        <input class="input-busca-grid" id="select-simple" type="text" placeholder="Selecione o item"/>
+                                        <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1" data-trigger="data-trigger">
+                                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                        </button>
+                                        </div>
+                                        <div class="br-list" tabindex="0">
+                                            <div class="br-item {% if opcao_filtro == 'produto' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb0" type="radio" name="opcao_filtro" value="produto"/>
+                                                <label for="rb0">Nome</label>
+                                                </div>
+                                            </div>
+                                            <div class="br-item {% if opcao_filtro == 'codigo_de_barra' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb1" type="radio" name="opcao_filtro" value="codigo_de_barra"/>
+                                                <label for="rb1">Número do lote</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-6 ml-6">
+                            <button type="submit" class="br-button primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+                
+                <div class="card-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row">
+        <div class="col-md">
+            <div class="d-flex justify-content-center br-card hover">
+                <div class="card-content d-flex justify-content-center col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                    <div class="br-table d-flex flex-column justify-content-center col-xl-12 col-lg-12 col-md-12 col-sm-12" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                        <div class="table-header">
+                            <div>
+                                <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                            </div>
+                            <div class="top-bar mt-2">
+                                <div class="d-flex table-title">
+                                    <img src="{% static 'img/icons/icone-produto-grid.svg' %}" alt="Ícone do produto" title="Ícone do produto" style="display: block; height: 38px;"> 
+                                    <span class="mt-1 ml-4" style="display: block;">Lista de Produtos Médicos</span>
+                                </div>
+                                <div class="search-trigger">
+                                    <a href="{% url 'saude_farmacia:produto_add' %}" class="br-button primary"><i class="fas fa-plus-circle"></i> Adicionar</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="mt-2">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th><b class="text-color-blue-1gov">Nome do Produto</b></th>
+                                    <th><b class="text-color-blue-1gov">Tipo</b></th>
+                                    <th><b class="text-color-blue-1gov">Estoque Mínimo</b></th>
+                                    <th><b class="text-color-blue-1gov">Quantidade em Estoque</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% if produtos %}
+                                {% for produto in produtos %}
+                                    <tr>
+                                        <td>
+                                            <a data-th="Editar" href="{% url 'saude_farmacia:produto_update' pk=produto.id %}" class="br-button circle "><i class="fas fa-edit" aria-hidden="true"></i></a>
+                                        </td>
+                                        <td data-th="Excluir">
+                                            <a href="javascript:void(0)" class="br-button circle" onclick="confirmCancel('{% url 'saude_farmacia:produto_delete' produto.id %}', 'produto')">
+                                                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                        <td data-th="Nome do Produto" style="text-transform:uppercase;">{{ produto.nome_produto }}</td>
+                                        <td data-th="Tipo do Produto">{{ produto.tipo_produto|return_tipo_produto_choice_option_text }}</td>
+                                        <td data-th="Estoque Mínimo Geral do Produto">{{ produto.estoque_minimo_geral }}</td>
+                                        <td data-th="Quantidade do Produto em Estoque">{{ produto.quantidade }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                        {% comment %} Paginação {% endcomment %}
+                        {% include 'dashboard/includes/paginacao.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

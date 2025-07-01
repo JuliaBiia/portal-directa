@@ -1,0 +1,25 @@
+.col-collapse-atendimento-info, .col-collapse-atendimento-atendimento{ width:22%; }
+
+.row-atendimento-info{ width:90%; margin:0 auto; }
+.col-atendimento-info-left{ width:20%; }
+.col-atendimento-info-right{ width:80%; }
+
+/* collapse-informações */
+
+.col-info-left-atendimentomedico{ width:20%; }
+.col-info-right-atendimentomedico{ width:30%; }
+
+
+@media only screen and (min-width: 350px) and (max-width: 991px) {
+    .col-collapse-atendimento-info,
+    .col-collapse-atendimento-atendimento{
+        width: 50%;
+    }
+}
+
+@media only screen and (max-width: 349px) {
+    .col-collapse-atendimento-info,
+    .col-collapse-atendimento-atendimento{
+        width: 100%;
+    }
+}

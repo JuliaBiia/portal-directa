@@ -1,0 +1,69 @@
+{% extends 'dashboard/base//base-pdf.html' %}
+{% load static %}
+{% block title %}Relatório Atendimento {% endblock %}
+{% load widget_tweaks %}
+{% block css-extra-pdf %}
+<style>
+    .col p{color:black;}
+    .row{ font-size:20px; }
+    .row .col-4 p{ font-size:20px;}
+    .row .col p{ font-size:20px;}
+    .title-span{ text-align:right; }
+    .title-span-clock{ text-align:right; }
+    .title-span span{ font-size:22px; color:var(--interactive); }
+    .title-span-clock span{ color:var(--interactive); }
+    .hr-ficha-title{ border: 1px solid var(--interactive); width:100%; }
+</style>
+{% endblock %}
+{% block contentpdf %}
+
+    <div class="row" style="width:100%; margin-top:50px;">
+        <div class="col-4 title-span">
+            <span><b>Informações do Paciente</b></span>
+        </div>
+        <div class="col-7">
+            <hr class="hr-ficha-title">
+        </div>
+    </div>
+
+    <div class="row mt-4" style="width:95%;">
+        <div class="col-4" style="text-align:right;">
+            <p>Nome:</p>
+        </div>
+        <div class="col">
+            <p><b>{{atendimento_medico.paciente.nome_paciente}}</b></p>
+        </div>
+    </div>
+
+    <div class="row mt-3" style="width:95%;">
+        <div class="col-4" style="text-align:right;">
+            <p>Bau:</p>
+        </div>
+        <div class="col">
+            <p><b>{{ atendimento_medico.classificacao_risco.formatar_numeros_atendimento }}</b></p>
+        </div>
+    </div>
+
+    <div class="row mt-3" style="width:95%;">
+        <div class="col-4" style="text-align:right;">
+            <p>Médico:</p>
+        </div>
+        <div class="col">
+            <p><b>
+                {% for profissional in atendimento_medico.profissionais.all %}
+                    {{profissional.nome_profissional}}
+                {% endfor %}
+            </b></p>
+        </div>
+    </div>
+
+    <div class="row mt-3" style="width:95%;">
+        <div class="col-4" style="text-align:right;">
+            <p>Data do Atendimento:</p>
+        </div>
+        <div class="col">
+            <p><b>{{atendimento_medico.created_at|date:'d/m/Y'}} ÁS {{atendimento_medico.created_at|date:'H:i'}}</b></p>
+        </div>
+    </div>
+   
+{% endblock %}

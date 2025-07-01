@@ -1,0 +1,137 @@
+.swal2-confirm {
+    background-color: var(--interactive) !important;
+    border-radius: 25px !important;
+    font-weight: bold !important;
+    width: 130px !important;
+}
+.swal2-cancel{
+    border-radius: 25px !important;
+    font-weight: bold !important;
+    background-color: #fff !important;
+    color: var(--interactive) !important;
+    border: 1px solid !important;
+    width: 130px !important;
+}
+.swal2-cancel:hover{
+    background-color: #ecf1f9 !important;
+    width: 130px !important;
+}
+
+.swal2-title-custom {
+    display: block;
+    height: 48px;
+    margin-top: -32px;
+    border-top-left-radius: 12%;
+    border-top-right-radius: 12%;
+
+    background-color: var(--lt-color-gray-100) !important;
+    color: var(--interactive);
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--lt-color-gray-300);
+}
+.swal2-title-custom > h2 > i{
+    font-size: 25px; margin-right: 5px;
+}
+.swal2-title-custom > h2 > label{
+    font-size: var(--font-size-scale-up-02) !important;
+    font-weight: 700 !important;
+}
+.swal2-title-custom > h2 > button{
+    border: 0px;
+    color: var(--blue-vivid-60);
+    background-color: var(--lt-color-gray-100) !important;
+}
+
+.swal2-html-container > .container{
+    padding: 25px;
+}
+.swal2-html-container > .container > .row > div{
+    text-align: left;
+}
+.swal2-html-container > .container > .row > div > label{
+    font-size: 16px !important;
+    font-weight: 600;
+}
+.swal2-html-container > .container > .row > div > input{
+    opacity: 1;
+    background-color: var(--gray-2);
+    height: 51px;
+    border-color: var(--blue-vivid-60) !important;
+}
+.swal2-html-container > .container > .row > div > textarea{
+    opacity: 1; background-color: var(--gray-2);
+    border-color: var(--blue-vivid-60) !important;
+    border-radius: var(--surface-rounder-sm);
+    padding: var(--spacing-scale-base);
+}
+
+.swal2-actions{
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    height: 60px;
+}
+
+div:where(.swal2-container) .swal2-input {
+    padding: 1px 1.3em !important;
+}
+div:where(.swal2-container) .swal2-html-container {
+    margin: 0px !important;
+}
+div:where(.swal2-container) h2:where(.swal2-title) {
+    padding: 0.5em 1em 0 !important;
+}
+.br-header[data-sticky] {
+    z-index: 4 !important;
+}
+.select-custom {
+    height: 51px;
+    border-color: var(--blue-vivid-60) !important;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 4px;
+    width: 100%;
+    color: #444;
+    padding-left: 8px;
+    font-size: 90%;
+    font-weight: var(--font-weight-medium);
+}
+
+.select-custom + .select2-container .select2-selection{
+    border-color: #1351B4 !important;
+    min-height: 51px !important;
+    margin-top: 0px !important;
+}
+.select-custom + .select2-container .select2-selection > .select2-selection__rendered {
+    color: black !important;
+    font-family: Arial, sans-serif;
+    font-weight: var(--font-weight-medium);
+    font-size: 15px !important;
+    padding: 0 16px;
+}
+.select-custom + .select2-container .select2-selection__arrow{
+    top: 18px !important;
+}
+.select-custom + .select2-container .select2-selection__arrow > [role=presentation]{
+    border-color: #1351B4 transparent transparent transparent !important;
+    top: 43% !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b::before{
+    content: "\f107";
+    font-weight: 900;
+    font-family: "Font Awesome 6 Free";
+    font-style: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-rendering: auto;
+    font-size: 16px;
+    text-align: center;
+    color: #1351B4 !important;
+}
+
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b::before{
+    content: "\f106";
+}
+
+

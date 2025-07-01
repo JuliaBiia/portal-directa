@@ -1,0 +1,6 @@
+td[data-th="Editar"]{
+    width: 20px;
+}
+td[data-th="Excluir"]{
+    width: 15px;
+}

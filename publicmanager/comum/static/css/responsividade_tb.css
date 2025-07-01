@@ -1,0 +1,297 @@
+    /* ################## */
+    /* ##### TABLET ##### */
+    /* ################## */
+
+    @media only screen and (min-width: 600px) and (max-width: 900px) {
+
+        /* CSS admissao paciente */
+        .container-foto-paciente {
+          order: -1;
+        }
+
+        .foto-paciente {
+          width: 100% !important;
+          margin-top: 10px;
+        }
+
+        .txt-center-tb{ text-align:center !important; }
+        .width100-tb{ width: 100% !important; }
+        .width95-tb{ width:95% !important; }
+        
+        /* CSS Atendimento medico */
+
+        .col-left-ordenacao {
+          width: 100% !important;
+          margin-top: 10px !important;
+        }
+        .col-right-ordenacao {
+          width: 100% !important;
+          margin-top: 10px !important;
+          margin-left: 30px !important;
+        }
+
+        .widthp80-tb{ width:80% !important; }
+        .widthp80-tb{ width:80% !important; }
+                .widthp80-tb{ width:80% !important; }
+
+        .mt-10-tb{ margin-top:10px !important; }
+        .mt-15-tb{ margin-top:15px !important; }
+        .mt-20-tb{ margin-top:20px !important; }
+        .mt-25-tb{ margin-top:25px !important; }
+        .mt-30-tb{ margin-top:30px !important; }
+        .mt-40-tb{ margin-top:40px !important; }
+        .mt-45-tb{ margin-top:45px !important; }
+        .mt-50-tb{ margin-top:50px !important; }
+
+        .mt-n3-tb{ margin-top:-3px !important; }
+        .mt-n5-tb{ margin-top:-5px !important; }
+        .mt-n6-tb{ margin-top:-6px !important; }
+        .mt-n7-tb{ margin-top:-7px !important; }
+        .mt-n8-tb{ margin-top:-8px !important; }
+        .mt-n10-tb{ margin-top:-10px !important; }
+        .mt-n12-tb{ margin-top:-12px !important; }
+        .mt-n15-tb{ margin-top:-15px !important; }
+        .mt-n30-tb{ margin-top:-30px !important; }
+
+        .ml-5-tb{ margin-left:5px !important; }
+        .ml-8-tb{ margin-left:8px !important; }
+        .ml-10-tb{ margin-left:10px !important; }
+        .mt-15-tb{ margin-left:15px !important; }
+        .ml-20-tb{ margin-left:20px !important; }
+        .ml-50-tb{ margin-left:50px !important; }
+
+        .ml-n5-tb{ margin-left:-5px !important; }
+        .ml-n8-tb{ margin-left:-8px !important; }
+        .ml-n10-tb{ margin-left:-10px !important; }
+        .mt-n15-tb{ margin-left:-15px !important; }
+        .mt-n16-tb{ margin-left:-16px !important; }
+        .ml-n18-tb{ margin-left:-18px !important; }
+        .ml-n20-tb{ margin-left:-20px !important; }
+        .ml-n50-tb{ margin-left:-50px !important; }
+
+        .container{ width: 1500px !important;}
+
+        .col-left-search{ width: 100% !important; }
+        .col-right-search{ width: 100% !important; }
+
+        .box-paciente-01{ width:45% !important; }
+        .box-paciente-02{ width:55% !important; text-align:center !important; }
+
+        /* paciente-historico-list  */
+
+        .img-paciente-historico{ width: 80% !important; }
+
+        /* admissao-paciente-create */
+
+        .left-box-doc{ width:100% !important; }
+        .right-box-doc{ width:100% !important; }
+
+        /* classificacao-de-risco-create */
+
+      }
+    
+    @media only screen and (min-width: 900px) and (max-width: 1200px) {
+        
+      /* CSS cadastros */
+        .buttonbusctb2 {
+          margin-left: 25px !important;
+        }
+
+        .buttonreturnmobile {
+          margin-left: -15px !important;
+        }
+
+        .buttonvoltartb2 {
+          margin-left: -15px !important;
+        }
+
+        .buttonbusc2tb2 {
+          margin-left: 20px !important;
+        }
+
+        .buttonbusc3tb2 {
+          margin-left: 17px !important;
+        } 
+
+        .buttonbusc4tb2 {
+          margin-left: -15px !important;
+        }
+        
+      /* CSS collapse solicitações */
+          .col-btn-waiting {
+            margin-top: -30px !important;
+            margin-left: 190px !important;
+          }
+          .col-text-medic {
+            margin-top: -24px !important;
+          }
+          .col-text-medic2 {
+            margin-left: 35px;
+          }
+          .col-text-medic3 {
+            margin-left: 5px !important;
+          }
+          .col-text-medic4 {
+            margin-left: -180px !important;
+          }
+          .col-text-medic5 {
+            margin-left: 20px !important;
+          }
+          .col-text-medic-6 {
+            margin-left: 10px !important;
+          }
+
+        /* CSS relatórios de atendimento */
+        .col-rel-patient{ width: 50%; }
+        .col-rel-patient-text{ 
+          margin-left: 70px;  
+          font-size:20px;
+        }
+        .relatorio-col-header-left{ width: 100% !important; }
+
+        .relatorio-col-header-right{ width: 100% !important; margin-top: 25px !important; text-align: center !important;}
+        .relatorio-col-header-btn{ width: 100% !important; margin-top: 15px !important; text-align: center !important; }
+      
+
+        /* CSS Classificação de risco */
+        .patient_margintb {
+          text-align: left;
+          /* margin-right: 20px; */
+          background-color: red;
+        }
+
+        /* paciente_hist_list & classificacao de risco */
+        .col-title-paciente-left{ width: 25%; }
+        .col-title-paciente-right{ width: 75%; }
+
+        /* CSS Collapse Medicacoes */
+        .font-table-collapse-med {
+          font-size: 12px;
+        }
+
+        /* CSS admissao paciente */
+        .container-foto-paciente {
+          order: -1;
+        }
+
+        .foto-paciente {
+          width: 30% !important;
+          margin-top: 10px;
+        }
+
+        .patient-center-tb{
+          text-align: center;
+        }
+
+        /* CSS Atendimento medico */
+        .col-left-ordenacao {
+          width: 100% !important;
+          margin-top: 10px !important;
+        }
+        .col-right-ordenacao {
+          width: 100% !important;
+          margin-top: 10px !important;
+          margin-left: 30px !important;
+        }
+        .col-collapse-print1 {
+          margin-left: -10px !important;
+          padding: 5px 10px !important;
+        }
+
+        .col-collapse-print2 {
+          margin-left: 10px !important;
+          padding: 5px 10px !important;
+        }
+
+        .col-title-paciente-atend-left{ width: 27%; font-size: 18px; }
+        .col-title-paciente-atend-right{ width: 73%; font-size: 18px; }
+
+        /* CSS Perfil Paciente */
+        .info-paciente .col-4 {
+            padding-right: 25px; 
+        }
+        .info-paciente .col-8 {
+            padding-left: 25px; 
+        }
+        .ultimo-atendimento {
+            font-size: 17px;
+            margin-left: 20px;
+        }
+        .atendimento-info {
+            width: 90%;
+            margin-left: 20px;
+        }
+        
+        .txt-center-tb{ text-align:center !important; }
+        .width100-tb{ width: 100% !important; }
+        .width90-tb{ width:90% !important; }
+
+        .widthp70-tb{ width:70% !important; }
+        .widthp75-tb{ width:75% !important; }
+        .widthp80-tb{ width:80% !important; }
+        .widthp85-tb{ width:85% !important; }
+        .widthp90-tb{ width:90% !important; }
+        .widthp95-tb{ width:95% !important; }
+
+        .mt-10-tb{ margin-top: 10px !important; }
+        .mt-15-tb{ margin-top:15px !important; }
+        .mt-20-tb{ margin-top:20px !important; }
+        .mt-25-tb{ margin-top:25px !important; }
+        .mt-30-tb{ margin-top:30px !important; }
+        .mt-40-tb{ margin-top:40px !important; }
+        .mt-45-tb{ margin-top:45px !important; }
+        .mt-50-tb{ margin-top:50px !important; }
+        .mt-125-tb{ margin-top:125px !important; }
+
+        .mt-n3-tb{ margin-top:-3px !important; }
+        .mt-n5-tb{ margin-top:-5px !important; }
+        .mt-n6-tb{ margin-top:-6px !important; }
+        .mt-n7-tb{ margin-top:-7px !important; }
+        .mt-n8-tb{ margin-top:-8px !important; }
+        .mt-n10-tb{ margin-top:-10px !important; }
+        .mt-n12-tb{ margin-top:-12px !important; }
+        .mt-n15-tb{ margin-top:-15px !important; }
+        .mt-n30-tb{ margin-top:-30px !important; }
+
+        .ml-5-tb{ margin-left:5px !important; }
+        .ml-8-tb{ margin-left:8px !important; }
+        .ml-10-tb{ margin-left:10px !important; }
+        .mt-15-tb{ margin-left:15px !important; }
+        .ml-20-tb{ margin-left:20px !important; }
+        .ml-50-tb{ margin-left:50px !important; }
+
+        .ml-n5-tb{ margin-left:-5px !important; }
+        .ml-n8-tb{ margin-left:-8px !important; }
+        .ml-n10-tb{ margin-left:-10px !important; }
+        .mt-n15-tb{ margin-left:-15px !important; }
+        .mt-n16-tb{ margin-left:-16px !important; }
+        .ml-n18-tb{ margin-left:-18px !important; }
+        .ml-n20-tb{ margin-left:-20px !important; }
+        .ml-n50-tb{ margin-left:-50px !important; }
+
+        .col-left-search{ width: 100% !important; }
+        .col-right-search{ width: 100% !important; }
+
+        .box-paciente-01{ width:30% !important; }
+        .box-paciente-02{ width:40% !important; text-align:center !important; }
+        .box-paciente-03{ width:30% !important; text-align:center !important; }
+
+        /* paciente-historico-list  */
+
+        .img-paciente-historico{ width: 80% !important; }
+
+        /* admissao-paciente-create */
+
+        .left-box-doc{ width:100% !important; }
+        .right-box-doc{ width:100% !important; }
+
+        /* classificacao-de-risco-create */
+        .avatar-tb{margin-right: 20% !important;}
+
+         /* atendimento médico relatório */
+        .col-rel-patient{ width: 50% }
+        .btn-relatorio-tb{margin-top: 20px !important;}
+        .box-paciente-02{text-align: left !important;}
+
+        /* #video{width: 40% !important; margin-bottom: 5% !important;} */
+     }

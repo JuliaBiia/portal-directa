@@ -1,0 +1,248 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+{% load custom_filters %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<style>
+   @media (max-width: 708px), (max-height: 408px) {
+        #profile-info {display: block !important;}
+    }
+    .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px 16px 16px; 
+        }
+
+        .card-footer a,
+        .card-footer button {
+            margin: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .card-footer {
+                justify-content: space-around;
+                padding: 0 0 16px 0; 
+            }
+
+            .card-footer a,
+            .card-footer button {
+                flex: 1;
+                max-width: calc(50% - 10px); 
+            }
+        }
+
+        @media (min-width: 769px) {
+            .card-footer {
+                justify-content: space-between;
+                padding: 0; 
+            }
+            .card-footer a,
+            .card-footer button {
+                max-width: 200px; 
+            }
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% include 'dashboard/includes/mensagens.html' %}
+    
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+    <div class="row mt-3">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header pr-0 pl-0 pt-2">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="d-flex text-weight-semi-bold text-up-02 text-color-blue-1gov">
+                                <i class="fa-regular fa-address-card" style="font-size: 30px;"></i>
+                                <span class="mt-1 ml-4 text-weight-semi-bold text-up-02" style="display: block;">MEU PERFIL</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12"></span>
+                </div>
+                <div class="card-content pt-0">
+                    <form class="col-xl-12 col-lg-12 col-md-12 col-sm-12" method="post">
+                        {% csrf_token %}
+                        
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_nome_profissional">Nome <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                        {% render_field form.nome_profissional class="input-com-alfanumericas" type="text" placeholder="Ex.: Paulo da Silva Santos" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_cpf">CPF <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                        {% render_field form.cpf class="mask-cpf" type="text" placeholder="Ex.: 247.374.630-35" %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if object.tipo_profissional == 2 or object.tipo_profissional == 3 %}
+                                <div class="form-group row campo-oculto-container">
+                                {% if object.tipo_profissional == 3 %}
+                                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 campo-oculto-coren">
+                                        <div class="br-input mt-3">
+                                            <label for="id_coren">COREN <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                            {% render_field form.coren type="text" required="required" %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if object.tipo_profissional == 2 %}
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 campo-oculto-crm">
+                                    <div class="br-input mt-3">
+                                        <label for="id_crm">CRM <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                        {% render_field form.crm type="text" required="required" %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                    <div class="br-input mt-3">
+                                        <label for="id_cns">CNS <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                        {% render_field form.cns type="text" required="required" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                    <div class="br-input mt-3">
+                                        <label for="id_cbo">CBO <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                        {% render_field form.cbo type="text" required="required" %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_cep">CEP</label>
+                                        {% render_field form.cep class="mask-cep" onblur="pesquisacep()" type="text" placeholder="Ex.: 01153-000" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_endereco">Endereço <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                        {% render_field form.endereco placeholder="Ex.: Rua Vitorino Carmilo" type="text" class="input-com-alfanumericas" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_numero">N°</label>
+                                        {% render_field form.numero type="number" placeholder="Ex: 200" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_complemento">Complemento</label>
+                                        {% render_field form.complemento type="text" class="input-com-alfanumericas" placeholder="Ex.: Apt. 42" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_bairro">Bairro <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                        {% render_field form.bairro class="input-com-alfanumericas" type="text" placeholder="Ex.: Centro" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_estado">UF <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                        {% render_field form.estado type="text" class="select-busca-grid campo-select" style="width: 100%" required=required %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_municipio">Município <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                        {% render_field form.municipio type="text" class="select-busca-grid campo-select" style="width: 100%" required=required %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_telefone_1">Telefone 1 <span class="text-danger" style="font-size: 14px !important; margin-bottom: 6px !important; margin-left: 2px !important;">(Obrigatório)</span></label>
+                                        {% render_field form.telefone_1 class="mask-telefone" type="text" placeholder="(84) 99999-9999" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_telefone_2">Telefone 2</label>
+                                        {% render_field form.telefone_2  class="mask-telefone" type="text" placeholder="(84) 99999-9999" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-3">
+                                        <label for="id_email">E-mail</label>
+                                        {% render_field form.email type="email" required=required placeholder="Ex.: paula-silva-santos@gmail.com" %}
+                                    </div>
+                                </div>
+                               <!-- /.card-body -->
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        {% if form.errors %}
+                                            {% for error in  form|join_to_error_messages%}
+                                                <div class="br-message danger" role="alert">
+                                                    <div class="icon"><i class="fas fa-times-circle fa-lg" aria-hidden="true"></i></div>
+                                                    <div class="content">
+                                                        {% if error|get_element_dict:"field_label" %}
+                                                            <span class="message-title">Erro no campo {{ error|get_element_dict:"field_label" }}: </span><span class="message-body"> {{ error|get_element_dict:"error"  }}</span>
+                                                        {% else %}
+                                                            <span class="message-title">Erro: </span><span class="message-body"> {{ error|get_element_dict:"error"  }}</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="close">
+                                                        <button class="br-button circle small" type="button" aria-label="content"><i class="fas fa-times" aria-hidden="true"></i></button>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        <a href="{% url 'dashboard:index' %}" class="br-button secondary" style="margin: 5px; max-width: 200px;">
+                                            <i class="fas fa-arrow-left"></i> Voltar
+                                        </a>
+                                        <button type="submit" class="br-button primary" style="margin: 5px; max-width: 200px;">
+                                            <i class="fas fa-save"></i> Salvar
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- /.card-footer -->
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--End::row-1 -->
+{% endblock %}
+
+{% block script %}
+
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script src="{% static 'js/mask.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,40 @@
+<!-- Modal -->
+{% load static %}
+
+<div class="br-scrim-util foco modal-notificao-usuario" id="modal-confirmacao-remocao" data-scrim="true">
+    <div class="br-modal">
+        <div class="br-modal-header"></div>
+            <div class="br-modal-body">
+                <div class="container-icone-atencao">
+                    <img src="{% static 'img/icons/icone_atencao.svg' %}" alt="Ícone de atenção" title="Ícone de atenção">
+                    <p>Atenção!</p>
+                </div>
+                <p id="mensagem-confirmacao"></p>
+                <div class="justify-content-center">
+                    <form id="confirm_cancel_form" action="" method="POST">
+                        {% csrf_token %}
+                        <button class="br-button secondary mt-3 mt-sm-0 ml-sm-3" onclick="cancelarModal()" id="negacao-remocao" type="button">Não</button> 
+                        <button class="br-button primary" id="confirmacao-remocao" type="submit" data-dismiss="scrimexample">Sim</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block script %}
+<script>
+    function confirmCancel(url, titulo) {
+
+        document.getElementById('confirm_cancel_form').action = url
+        document.getElementById('modal-confirmacao-remocao').style.display = "block";
+
+        let mensagemConfirmacao =  document.getElementById('mensagem-confirmacao')
+        mensagemConfirmacao.innerHTML = `Deseja realmente remover este(a) ${titulo}?`;
+    }
+
+    function cancelarModal() {
+        document.getElementById('modal-confirmacao-remocao').style.display = "none";
+    }
+</script>
+{% endblock %}

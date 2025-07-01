@@ -1,0 +1,148 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}{% if object %}Edição{% else %}Cadastro{% endif %} de Setor{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+{% endblock %}
+{% block content %}
+<div class="container-lg">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row mt-1">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="text-weight-semi-bold text-up-02 color-title font-size24">
+                                {% comment %} <img src="{% static 'img/icons/icone-setor-grid.svg' %}" alt="Ícone do setor" title="Ícone do setor" style="display: block;">
+                                <span class="mt-1 ml-4 text-weight-semi-bold text-up-02" style="display: block;">{% if object %}EDITAR{% else %}ADICIONAR{% endif %} SETOR</span> {% endcomment %}
+
+                                <i class="fa-solid fa-people-group mr-2"></i>{% if object %}EDITAR INFORMAÇÕES DO{% else %}CADASTRAR{% endif %} SETOR
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="card-content pt-0">
+                    <form
+                        id="farmacia_form"
+                        class="col-xl-12 col-lg-12 col-md-12 col-sm-12"
+                        method="post"
+                    >
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group row d-flex justify-content-center">
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                    <div class="br-input mt-2">
+                                        <label for="id_codigo" class="text-color-blue-1gov">Código <span class="text-danger">*</span></label>
+                                        {% render_field form.codigo class="input-com-alfanumericas" type="text" placeholder="Ex.: 4637" %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-5 col-lg-5 col-md-5 col-sm-5">
+                                    <div class="br-input mt-2">
+                                        <label for="id_sigla" class="text-color-blue-1gov">Sigla <span class="text-danger">*</span></label>
+                                        {% render_field form.sigla class="input-com-alfanumericas" type="text" placeholder="Ex.: URG" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-2">
+                                        <label for="id_nome" class="text-color-blue-1gov">Nome <span class="text-danger">*</span></label>
+                                        {% render_field form.nome class="input-com-alfanumericas" type="text" placeholder="Ex.: Urgência" %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% comment %} <div class="form-group row d-flex justify-content-center">
+                                <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+                                    <div class="br-input mt-3">
+                                        <label for="id_unidade_saude" class="text-color-blue-1gov">Unidade de saúde<span class="text-danger">*</span></label>
+                                        {% render_field form.unidade_saude type="text" class="campo-select" style="width: 100%" %}
+                                    </div>
+                                </div>
+                            </div> {% endcomment %}
+                            <div class="form-group row d-flex justify-content-center">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-2">
+                                        <label for="id_tipo" class="text-color-blue-1gov">Tipo de setor<span class="text-danger">*</span></label>
+                                        {% render_field form.tipo type="text" class="campo-select" style="width: 100%" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-2">
+                                        <label for="id_superior" class="text-color-blue-1gov">Setor Superior</label>
+                                        {% render_field form.superior type="text" class="campo-select" style="width: 100%" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-input mt-2">
+                                        <label for="id_situacao" class="text-color-blue-1gov">Situação<span class="text-danger">*</span></label>
+                                        {% render_field form.situacao type="text" class="campo-select" style="width: 100%" %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row d-flex justify-content-center">
+                                <div class="col-xl-11 col-lg-11 col-md-11 col-sm-11">
+                                    <div class="br-checkbox mt-3">
+                                        {% render_field form.recebe_paciente type="checkbox" %}
+                                        <label for="id_recebe_paciente">Recebe paciente</label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% comment %} Explicação da indicação de campos obrigatórios {% endcomment %}
+                            {% include 'dashboard/includes/explicacao-campos-obrigatorios.html' %}
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer ml-6">
+                            {% if form.errors %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <div class="br-message danger" role="alert">
+                                            <div class="icon"><i class="fas fa-times-circle fa-lg"
+                                                                aria-hidden="true"></i>
+                                            </div>
+                                            <div class="content"><span
+                                                    class="message-title">Erro no campo {{ field.label }}.</span><span
+                                                    class="message-body"> {{ error }}</span>
+                                            </div>
+                                            <div class="close">
+                                                <button class="br-button circle small" type="button"
+                                                        aria-label="content"><i
+                                                        class="fas fa-times" aria-hidden="true"></i></button>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                            <div class="button-container">
+                                <a href="{% url 'saude_cadastro:setor_list' %}" class="br-button secondary mt-3 mr-3 buttonvoltartb2 buttonreturnmobile"> <i class="fas fa-arrow-left"></i> Voltar</a>
+                                <button type="submit" class="br-button primary mt-3 buttonsavemobile">
+                                    <i class="fas fa-save"></i> Salvar
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+<script src="{% static 'js/gerenciamento_select2.js' %}"></script>
+
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

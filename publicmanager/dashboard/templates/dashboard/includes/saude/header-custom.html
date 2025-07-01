@@ -1,0 +1,60 @@
+{% load static %}
+
+{% comment %} nav-bar {% endcomment %}
+<header class="br-header mb-0 pb-0" id="header" data-sticky="data-sticky">
+    <div class="container mb-3">
+        
+        <div class="header-top">
+            
+            {% comment %} .left {% endcomment %}
+            <div class="header-logo">
+                <a href="{% url 'dashboard:saude_redirect_dashboard' %}"><img src="{% static 'img/logo-1gov.png' %}" alt="logo" /></a>
+                <span class="br-divider vertical mr-2"></span>
+                {% if DEBUG %}
+                <div class="p-3 bg-gray-40 ambiente text-uppercase">
+                    {% if user and user.tipo_usuario %}
+                        <div><i class="fas fa-user-md"></i> <b>{{user.profissional_set.first.nome_profissional}}</b></div>
+                        <span class="br-divider dashed dark-mode my-2"></span>
+                    {% endif %}
+                    {% if user.profissional_set.first.unidadelogin %}
+                        <div>
+                            <i class="fas fa-building" style="font-size: 15px;" aria-hidden="true"></i> 
+                            <b>{{user.profissional_set.first.unidadelogin.unidade.nome}}</b>
+                        </div>
+                        
+                        {% if user.profissional_set.first.unidadelogin.sala %}
+                            <div style="cursor: pointer;">
+                                <i class="fa-solid fa-house-medical-circle-check ml-1 mt-2" style="font-size: 15px;" aria-hidden="true"></i> 
+                                <b class="ml-1">
+                                    <a href="{% url 'saude:selecao_salas_list' %}">
+                                        {{user.profissional_set.first.unidadelogin.sala.unidade_setor.get_tipo_display|default:""}} | {{user.profissional_set.first.unidadelogin.sala|default:""}}
+                                    </a>
+                                </b>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                  </div>
+                    
+                {% endif %}
+            </div>
+            
+            {% comment %} .right {% endcomment %}
+            <div class="header-actions">
+
+                {% comment %} icon-nav-mobile {% endcomment %}
+                <span class="br-divider vertical mx-half mx-sm-1"></span>
+               
+                <div class="header-login">
+                    <div class="header-sign-in">
+                        {% if request.user.is_authenticated %}
+                            <a href="{% url 'autenticacao:sair' %}" class="br-sign-in small" type="button" data-trigger="logout"><i class="fas fa-sign-out-alt"></i><span class="d-sm-inline">Sair</span> </a>
+                        {% else %}
+                            <a href="{% url 'autenticacao:entrar' %}" class="br-sign-in small" type="button" data-trigger="login"><i class="fas fa-user" aria-hidden="true"></i><span class="d-sm-inline">Entrar</span> </a>
+                        {% endif %}
+                    </div>
+                    <div class="header-avatar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,23 @@
+#calendar > .fc-header-toolbar > .fc-toolbar-chunk > .fc-toolbar-title { /* Título do calendário. */
+    font-weight: bold;
+}
+
+#calendar > .fc-header-toolbar > .fc-toolbar-chunk > .fc-toolbar-title::first-letter { /* Título do calendário. */
+    text-transform: uppercase;
+}
+
+#calendar a {
+    text-decoration: none !important;
+    color: black;
+}
+
+#calendar [role=columnheader] > div > a { /* Nome do dia da semana. */
+    display: flex !important;
+    justify-content: center;
+    text-transform: capitalize;
+    font-weight: bold;
+}
+
+#calendar .flatpickr-calendar {
+    z-index: var(--z-index-layer-4) !important; /* has to be larger than 1050 */
+}

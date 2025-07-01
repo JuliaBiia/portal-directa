@@ -1,0 +1,181 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Atendimentos em Aberto{% endblock %}
+
+{% load static %}
+{% load widget_tweaks %}
+{% load custom_filters %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/datatables.min.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<style>
+    .br-tag {font-size: 15px; width: 46px !important; height: 27px;}
+    .tag-amarelo { background-color: #eae451; }
+    .tag-azul { background-color: #4c9fe4; }
+    .tag-verde { background-color: #3ec86d; }
+    .tag-laranja { background-color: #ff9d29; }
+    .tag-roxo { background-color: #5942D2; }
+    .tag-cinza { background-color: #999; }
+    .tag-vermelho { background-color: #e52207; }
+    .tag-preto { background-color: rgba(0, 0, 0, 0.9); }
+    table.dataTable thead>tr>th.dt-orderable-asc, table.dataTable thead>tr>th.dt-orderable-desc{ background-color:#00b0e4 !important; color:white; font-weight: normal; font-size:15px; }
+    .hidden-columns {display: none;}
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-lg">
+        <div class="row mt-1">
+            <div class="col-md">
+                <div class="br-card">
+                    
+                    <div class="card-header">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="text-weight-semi-bold text-up-02 color-title font-size24"><i class="fa-solid fa-hospital-user font-size25 mr-2"></i> ATENDIMENTO EM ABERTO</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    
+                    <div class="card-content mt-10-nmb">
+                        <form class="box-wdth-search" id="formSubmit" method="get" onsubmit="setDate()">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9">
+                                        <div class="br-input">
+                                            <label for="id_nome">Dados da Busca</label>
+                                            <input type="text" name="buscar_nome" maxlength="255" class="form-control capslock" value="{{buscar_nome}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 mt-10-w">
+                                        <div class="br-select">
+                                            <div class="br-input">
+                                            <label for="select-simple">Opção de Busca</label>
+                                            <input id="select-simple" type="text" placeholder="Selecione o item"/>
+                                            <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1" data-trigger="data-trigger">
+                                                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                            </button>
+                                            </div>
+                                            <div class="br-list" tabindex="0">
+                                            <div class="br-item capslock {% if opcao_filtro == 'paciente' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb0" type="radio" name="opcao_filtro" value="paciente"/>
+                                                <label for="rb0">Paciente</label>
+                                                </div>
+                                            </div>
+                                            <div class="br-item capslock {% if opcao_filtro == 'cpf' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb1" type="radio" name="opcao_filtro" value="cpf"/>
+                                                <label for="rb1">CPF</label>
+                                                </div>
+                                            </div>
+                                            <div class="br-item capslock {% if opcao_filtro == 'rg' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb2" type="radio" name="opcao_filtro" value="rg"/>
+                                                <label for="rb2">RG</label>
+                                                </div>
+                                            </div>
+                                            <div class="br-item capslock {% if opcao_filtro == 'sus' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb3" type="radio" name="opcao_filtro" value="sus"/>
+                                                <label for="rb3">Cartão Sus</label>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer mt-4">
+                                <button class="br-button primary ml-n15" type="submit">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                  
+                </div>
+            </div>
+        </div>
+        {% comment %} Mensagens de Alerta {% endcomment %}
+        {% include 'dashboard/includes/mensagens.html' %}
+        <div class="row">
+            <div class="col-md">
+                <div class="br-card hover">
+                    <div class="card-content">
+                        <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                            
+                            <div class="table-header mt-n10 white"><h4 class="ml-2 color-title" style="font-size:16px;"><i class="fa-solid fa-list-ul"></i> LISTAGEM DE ATENDIMENTOS EM ABERTO</h4></div>
+
+                            <table class="mt-3 myTable">
+                                <thead class="hgt-55">
+                                    <tr>
+                                        <th style="width:5%;"></th>
+                                        <th style="width:5%;"></th>
+                                        <th><b>Nome do Paciente</b></th>
+                                        <th><b>Idade</b></th>
+                                        <th><b>Chegada</b></th>
+                                        <th><b>Último Chamado</b></th>
+                                        <th><b>Situação</b></th>
+                                        <th><b>Queixa Principal</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if object_list %}
+                                        {% for aberto in object_list %}
+                                            <tr>
+                                                <td class="hgt-75">
+                                                    <a id="linkRecarregar" href="{% url 'saude_atendimento:atendimento_medico_detail' pk=aberto.lista_chamada.id %}" class="br-button primary small" type="button" style="width:115px; font-size:15px; margin-top:2px;">
+                                                        <i class="fas fa-user-md"></i> &nbsp;ATENDER
+                                                    </a>
+                                                </td>
+                                                <td style="padding: 10px;">
+                                                    {% if aberto.classificacao_risco.first %}
+                                                    <span class="br-tag small
+                                                        {% if aberto.lista_chamada.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'AZUL' %}tag-azul {% endif %}
+                                                        {% if aberto.lista_chamada.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'VERDE' %}tag-verde {% endif %}
+                                                        {% if aberto.lista_chamada.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'AMARELO' %}tag-amarelo {% endif %}
+                                                        {% if aberto.lista_chamada.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'LARANJA' %}tag-laranja{% endif %}
+                                                        {% if aberto.lista_chamada.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'VERMELHO' %}tag-vermelho {% endif %}
+                                                        {% if aberto.lista_chamada.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'PRETO' %}tag-preto {% endif %}
+                                                        {% if aberto.lista_chamada.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'ROXO' %}tag-roxo {% endif %}
+                                                        {% if aberto.lista_chamada.classificacao_risco.tipo_classificacao_risco.get_cor_display == 'CINZA' %}tag-cinza {% endif %}
+                                                    "></span>
+                                                    {% else %}
+                                                        ------
+                                                    {% endif %}
+                                                </td>
+                                                <td class="capslock" style="padding: 5px;">{{aberto.paciente.nome_paciente}}</td>
+                                                <td class="capslock">{{aberto.paciente.calcular_idade}}</td>
+                                                <td>{{aberto.created_at|date:'H:i'}} <br/> {{aberto.created_at|date:'d/m/Y'}}</td>
+                                                <td>{{aberto.updated_at|date:'H:i'}} <br/> {{aberto.updated_at|date:'d/m/Y'}}</td>
+                                                <td>{{aberto.lista_chamada.get_situacao_display}}</td>
+                                                <td>{{aberto.lista_chamada.classificacao_risco.queixa_principal|default:'----------'}}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+    
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/datatables.min.js' %}"></script>
+<script src="{% static 'js/data_table.js' %}"></script>
+{% endblock %}

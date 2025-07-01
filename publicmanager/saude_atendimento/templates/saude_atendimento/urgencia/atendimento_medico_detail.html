@@ -1,0 +1,957 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Atendimento Médico{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/responsividade_tb.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsividade.css' %}">
+    <link rel="stylesheet" href="{% static 'css/saude/urgencia.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/saude/atendimento-medico.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/vue-select.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/skeleton-custom.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/alert-animate.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'libs/select2/css/select2.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <style>
+        .select2-selection__arrow b::before{display: none;}
+        @media (max-width: 1599px) {
+            .btn-posterior{margin-left: -124px !important;}
+            .btn-imediata{margin-left: -65px !important;}
+        }
+        .disabled {pointer-events: none;opacity: 0.5;}
+        .readonly-div {
+            margin-top: 5px;
+            width: 100%;
+            height: 100px;
+            padding: 10px; 
+            border: 1px solid #1351B4 !important;
+            border-radius: 4px;
+            padding-left: var(--spacing-scale-2x);
+            color: #333;
+            font-weight: 500 !important;
+            font-size: 15px;
+            white-space: pre-wrap; /* Mantém as quebras de linha e espaços em branco */
+            overflow-y: auto; /* Adiciona rolagem vertical se o conteúdo for maior que a altura */
+        }
+        .readonly-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #1351B4 !important;
+            border-radius: 4px;
+            color: #333;
+            padding-left: var(--spacing-scale-2x);
+            font-weight: 500 !important;
+            font-size: 15px;
+        }
+  
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid var(--interactive);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+            }
+
+        @keyframes rotation {
+            0% {transform: rotate(0deg);}
+            100% {transform: rotate(360deg);}
+        }
+        .divider-text {position: relative; padding-top: 20px;}
+        .divider-text::before {content: ""; top: 0; left: 35px; right: 0; height: 2px; background: var(--divider-color, #1351B4);}
+        .divider-text::after {position: absolute; top: 0; left: 35px; background: white; padding: 0 20px; margin-top: -10px; color: var(--divider-color, #1351B4);}
+        .divider-text-justificativa::after {content: "Justificativa";}
+
+        .col-left-ordenacao {width: 50%;}
+        .col-right-ordenacao {width: 50%;}
+
+        @media (min-width: 905px) {
+            .container, .container-sm {
+                --grid-maxwidth: 119%;
+            }
+        }
+        .tooltip {position: relative; display: inline-block; cursor: pointer;}
+        .tooltip:hover .tooltiptext {visibility: visible; opacity: 1;}
+        .btn-relatorio-tb{margin-top: 30px !important}
+    </style>
+{% endblock %}
+
+{% block content %}
+    <template v-if="!verificarAtendimentoEncerrado">
+        {% include 'dashboard/includes/saude/breadcrumb.html' %}
+    </template>
+    
+    <template>
+        <div class="container-lg br-card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-9 mt-2">
+                        <div class="text-weight-semi-bold text-up-02 color-title font-size18"><i class="fas fa-stethoscope"></i> ATENDIMENTO MÉDICO</div>
+                    </div>
+                    <div class="col-3">
+                        <a v-if="verificarAtendimentoEncerrado" href="{% url 'saude_atendimento:atendimentos_finalizados_list' %}" class="br-button block">&nbsp; <i class="fas fa-arrow-left"></i> Voltar </a>
+                        <button v-else type="button" class="br-button block" @click="verificarSairAtendimento()">&nbsp; <i class="fas fa-arrow-left"></i> Voltar </button>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="card-content mt-1">
+                <div class="row no-gutters">
+                    <div class="box-paciente-01">
+                        <div class="content" style="text-align: center;">
+                            <template v-if="atendimentoMedico && !isLoadingPage">
+                                <img v-if="paciente.foto" :src="paciente.foto" class="img-title" alt="Avatar"/>
+                                <span v-else class="br-avatar large" style="margin-top: 5px;"><span class="content"><i class="fas fa-user" aria-hidden="true"></i></span></span>
+                                <div v-if="atendimentoMedico.classificacao" id="progress" 
+                                    :class="atendimentoMedico.classificacao.tipo_classificacao_risco.cor === 'AZUL' ? 'btn-azul' : 
+                                        atendimentoMedico.classificacao.tipo_classificacao_risco.cor === 'VERDE' ? 'btn-verde' :  
+                                        atendimentoMedico.classificacao.tipo_classificacao_risco.cor === 'AMARELO' ? 'btn-amarelo' : 
+                                        atendimentoMedico.classificacao.tipo_classificacao_risco.cor === 'LARANJA' ? 'btn-laranja' : 
+                                        atendimentoMedico.classificacao.tipo_classificacao_risco.cor === 'VERMELHO' ? 'btn-vermelho' : 
+                                        atendimentoMedico.classificacao.tipo_classificacao_risco.cor === 'PRETO' ? 'btn-preto' : 
+                                        atendimentoMedico.classificacao.tipo_classificacao_risco.cor === 'ROXO' ? 'btn-roxo' : 
+                                        atendimentoMedico.classificacao.tipo_classificacao_risco.cor === 'CINZA' ? 'btn-cinza' : ''"
+                                    class="progress-img "
+                                ></div>
+                            </template>
+                            <template v-else>
+                                <div v-if="isLoadingPage" class="skeleton-image" style="margin-top: 16px;">
+                                    <i class="loading-icon fas fa-spinner"></i>
+                                </div>
+                                <div id="progress" class="skeleton-line pulse" style="width: 100% !important;"></div>
+                            </template>
+                        </div>
+                    </div>
+                    
+                    <div class="box-paciente-02">
+                        <hr class="visible-xs">
+                        <div class="ml-4 ft-sz-atendimento">
+                            <div v-if="!isLoadingPage && paciente" class="row">
+                                <div class="col-title-paciente-atend-left color-title">
+                                    <span>Paciente:</span>
+                                </div>
+                                <div class="col-title-paciente-atend-right capslock">
+                                    <span>${paciente.nome}</span>
+                                </div>
+                            </div>
+                            <div v-else class="row">
+                                <div class="col-2">
+                                    <p><div class="skeleton-line pulse" style="width: 100%;"></div></p>
+                                </div>
+                                <div class="col-10">
+                                    <p><div class="skeleton-line pulse" style="width: 50%;"></div></p>
+                                </div>
+                            </div>
+                            
+                            <div v-if="!isLoadingPage && paciente" class="row" style="padding-top:10px;">
+                                <div class="col-title-paciente-atend-left color-title">
+                                    <span>Idade:</span>
+                                </div>
+                                <div class="col-title-paciente-atend-right capslock">
+                                    <span>${paciente.idade} </span>
+                                </div>
+                            </div>
+                            <div v-else class="row">
+                                <div class="col-2">
+                                    <p><div class="skeleton-line pulse" style="width: 100%;"></div></p>
+                                </div>
+                                <div class="col-10">
+                                    <p><div class="skeleton-line pulse" style="width: 50%;"></div></p>
+                                </div>
+                            </div>
+
+                            <div v-if="!isLoadingPage && paciente" class="row" style="padding-top:10px;">
+                                <div class="col-title-paciente-atend-left color-title">
+                                    <span>CNS:</span>
+                                </div>
+                                <div class="col-title-paciente-atend-right capslock">
+                                    <span v-if="paciente.cartao_sus&& paciente.cartao_sus.toUpperCase() !== 'NONE'">${paciente.cartao_sus}</span>
+                                    <span v-else>-----</span>
+                                </div>
+                            </div>
+                            <div v-else class="row">
+                                <div class="col-2">
+                                    <p><div class="skeleton-line pulse" style="width: 100%;"></div></p>
+                                </div>
+                                <div class="col-10">
+                                    <p><div class="skeleton-line pulse" style="width: 50%;"></div></p>
+                                </div>
+                            </div>
+
+                            <div v-if="!isLoadingPage && paciente" class="row" style="padding-top:10px;">
+                                <div class="col-title-paciente-atend-left color-title">
+                                    <span>CPF:</span>
+                                </div>
+                                <div class="col-title-paciente-atend-right capslock">
+                                    <span v-if="paciente.cpf && paciente.cpf.toUpperCase() !== 'NONE'">${paciente.cpf}</span>
+                                    <span v-else>-----</span>
+                                </div>
+                            </div>
+                            <div v-else class="row">
+                                <div class="col-2">
+                                    <p><div class="skeleton-line pulse" style="width: 100%;"></div></p>
+                                </div>
+                                <div class="col-10">
+                                    <p><div class="skeleton-line pulse" style="width: 50%;"></div></p>
+                                </div>
+                            </div>
+                        
+                            <div v-if="!isLoadingPage && paciente" class="row" style="padding-top:10px;">
+                                <div class="col-title-paciente-atend-left color-title">
+                                    <span>Sexo:</span>
+                                </div>
+                                <div class="col-title-paciente-atend-right capslock">
+                                    <span>${paciente.sexo} </span>
+                                </div>
+                            </div>
+                            <div v-else class="row">
+                                <div class="col-2">
+                                    <p><div class="skeleton-line pulse" style="width: 100%;"></div></p>
+                                </div>
+                                <div class="col-10">
+                                    <p><div class="skeleton-line pulse" style="width: 50%;"></div></p>
+                                </div>
+                            </div>
+
+                            <div v-if="!isLoadingPage && paciente" class="row" style="padding-top:30px;">
+                                <div class="col-title-paciente-atend-left color-title">
+                                    <span>Situação:</span>
+                                </div>
+                                <div class="col-title-paciente-atend-right capslock">
+                                    <span class="bold">${paciente.situacao} </span>
+                                </div>
+                            </div>
+                            <div v-else class="row" style="padding-top:15px;">
+                                <div class="col-2">
+                                    <p><div class="skeleton-line pulse" style="width: 100%;"></div></p>
+                                </div>
+                                <div class="col-10">
+                                    <p><div class="skeleton-line pulse" style="width: 50%;"></div></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="!isLoadingPage && ultimoAtendimento" class="col box-paciente-03 hidden-xs">
+                        <p class="ft-sz-atendimento bold color-title">Último Atendimento:</p>
+
+                        <div class="br-message warning" style="margin:0 auto; background-color:#f2f2f2; border-radius:5px; margin-top:-10px; box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px; width:100%;">
+                            <div v-if="ultimoAtendimento.boletimSituacao && ultimoAtendimento.classificacaoTipo" class="container mt-4 mb-4">
+                                <div v-if="ultimoAtendimento.classificacaoTipo" class="row">
+                                    <div class="col-md-auto">
+                                        <p style="text-transform: uppercase;"><b>${ultimoAtendimento.data}</b></p>
+                                    </div>
+                                    <div class="col">
+                                        <div :class="ultimoAtendimento.classificacaoTipo === 'AZUL' ? 'btn-azul' : 
+                                                ultimoAtendimento.classificacaoTipo === 'VERDE' ? 'btn-verde' :  
+                                                ultimoAtendimento.classificacaoTipo === 'AMARELO' ? 'btn-amarelo' : 
+                                                ultimoAtendimento.classificacaoTipo === 'LARANJA' ? 'btn-laranja' : 
+                                                ultimoAtendimento.classificacaoTipo === 'VERMELHO' ? 'btn-vermelho' :
+                                                ultimoAtendimento.classificacaoTipo === 'PRETO' ? 'btn-preto' :
+                                                ultimoAtendimento.classificacaoTipo === 'ROXO' ? 'btn-roxo' : 
+                                                ultimoAtendimento.classificacaoTipo === 'CINZA' ? 'btn-cinza' : ''"
+                                            class="progress-img-sm"
+                                        ></div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <p class="capslock">${ultimoAtendimento.queixa}</p>
+                                    <p v-if="ultimoAtendimento.classificacaoTipo && ultimoAtendimento.profissionais.length > 0"><b>Médico:</b>
+                                        <span class="capslock" v-for="profissional in ultimoAtendimento.profissionais"> ${profissional.nome}</span><br/>
+                                    </p>
+                                    <p v-if="ultimoAtendimento.classificacaoTipo && ultimoAtendimento.profissionais.length === 0"><b>Médico:</b>
+                                        NÃO HOUVE ATENDIMENTO <span style="color:var(--interactive);">${ultimoAtendimento.boletimSituacao}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div v-else-if="ultimoAtendimento.data && ultimoAtendimento.profissionais.length === 0 && !ultimoAtendimento.classificacaoTipo" class="container mt-4 mb-4">
+                                <div class="col">
+                                    <span>Data entrada: ${ultimoAtendimento.data} </span>
+                                </div>
+                                <div class="text-center mt-4">
+                                    <p class="capslock"><b>Não classificado.</b></p>
+                                    Situação: ${ultimoAtendimento.boletimSituacao}
+                                </div>
+                            </div>
+                            <div v-else class="container mt-4 mb-4">
+                                <div class="text-center">
+                                    <p class="">Não existem atendimentos.</p>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <div v-if="verificarAtendimentoEncerrado" class="row mt-3 margin-0" style="justify-content: center;">
+                            <div class="tooltip ml-1 col-right-ordenacao">
+                                <button class="br-button primary btn-atendimento-alta" type="button" @click="confirmarReaberturaAtendimento(paciente.atendimentoPK)" style="width:210px; font-size:15px !important;"><i class="fas fa-unlock-alt"></i> &nbsp; Reabrir Atendimento</button>
+                            </div>
+                        </div>
+                        <div v-else class="row mt-3 margin-0" :style="!listagemMedicacoesAtendimentosStatus && !listagemExamesLaboratoriaisStatus && !listagemExamesImagemStatus && !listagemProcedimentosStatus ? 'justify-content: center;' : ''">
+                            <div class="col-left-ordenacao tooltip ml-n2" v-if="listagemMedicacoesAtendimentosStatus || listagemExamesLaboratoriaisStatus || listagemExamesImagemStatus || listagemProcedimentosStatus">
+                                <button :disabled="!listagemHistoricoEvolucaoStatus || atendimentoMedico.existe_solicitacoes_abertas" class="br-button primary ml-n13" type="button" @click="abrirModal('modalDrag', 'abrir')" style="width:130px; font-size:15px !important;"><i class="fa-solid fa-timeline"></i> &nbsp; ORDENAR</button>
+                                <span v-if="!listagemHistoricoEvolucaoStatus" class="tooltiptext"><b>Não Existe Prontuário Médico</b></span>
+                            </div>
+
+                            <div class="tooltip ml-1" :class="!listagemMedicacoesAtendimentosStatus && !listagemExamesLaboratoriaisStatus && !listagemExamesImagemStatus && !listagemProcedimentosStatus ? 'col8' : 'col-right-ordenacao'">
+                                <button :disabled="!listagemHistoricoEvolucaoStatus || !verificarSeTemOrdenacao" class="br-button primary btn-atendimento-alta" type="button" @click="verificarConcederAlta()" style="width:170px; font-size:15px !important;"><i class="fa-solid fa-heart"></i> &nbsp; CONCEDER ALTA</button>
+                                <span v-if="!listagemHistoricoEvolucaoStatus" class="tooltiptext"><b>Não Existe Prontuário Médico</b></span>
+                            </div>
+                            
+                            <div class="col-12" v-if="listagemMedicacoesAtendimentosStatus || listagemExamesLaboratoriaisStatus || listagemExamesImagemStatus || listagemProcedimentosStatus">
+                                <div class="mt-3 w-100 text-center" role="alert" style="background-color:#cfe2ff; border-radius:7px; margin-top:-10px; box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px; width:100%;">
+                                    <p class="mb-0" style="font-size:15px; padding-top:10px; padding-bottom:10px; font-weight:bold;">
+                                        <i class="fas fa-arrow-alt-circle-up"></i> <span>ORDENE PARA ENVIAR AS SOLICITAÇÕES!</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div v-else class="col box-paciente-03 hidden-xs">
+                        {% comment %} <p style="color:var(--interactive); font-size:17px; margin-left:20px;"><b><div class="skeleton-line pulse" style="width: 50%;"></div></b></p> {% endcomment %}
+
+                        <div class="skeleton-panel">
+                            <div class="container mt-4 mb-4">
+                                <div class="skeleton-line pulse"></div>
+                                <div class="skeleton-line pulse"></div>
+                                <div class="skeleton-line pulse" style="width: 90%;"></div>
+                                <div class="skeleton-line pulse" style="width: 80%;"></div>
+                            </div>
+                        </div>
+                        <div class="col" style="text-align: -webkit-center;">
+                            <div class="skeleton-line pulse" style="height: 40px; border-radius: 21px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-lg br-card" style="border-radius:10px;">
+
+            <div v-if="!isLoadingPage" class="row pdt-15 hidden-xs">
+                <div class="col tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'informacoesPaciente' }" @click="activeTabLine1 = 'informacoesPaciente'" data-target="informacoesPaciente">Informações Paciente</button>
+                </div>
+                <div class="col tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'classificacaoRisco' }" @click="activeTabLine1 = 'classificacaoRisco'" data-target="classificacaoRisco">Classificação de Risco</button>
+                </div>
+                <div class="col tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'atendimento' }" @click="activeTabLine1 = 'atendimento'" data-target="atendimento">Atendimento</button>
+                </div>
+                <div class="col tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'exames' }" @click="activeTabLine1 = 'exames'" data-target="exames">Exames</button>
+                </div>
+                <div class="col tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'procedimentos' }" @click="activeTabLine1 = 'procedimentos'" data-target="procedimentos">Procedimentos</button>
+                </div>
+                <div class="col tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'medicacoes' }" @click="activeTabLine1 = 'medicacoes'" data-target="medicacoes">Medicações</button>
+                </div>
+                <div class="col tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'relatorios' }" @click="activeTabLine1 = 'relatorios'" data-target="relatorios">Relatórios</button>
+                </div>
+                <div class="col-12">
+                    <hr id="hr-tab-antendimento">
+                </div>
+            </div>
+
+            <div v-if="!isLoadingPage" class="row pdt-15 visible-xs">
+                <div class="col-12 tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'informacoesPaciente' }" @click="activeTabLine1 = 'informacoesPaciente'" data-target="informacoesPaciente">Informações Paciente</button>
+                </div>
+                <div class="col-12 tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'classificacaoRisco' }" @click="activeTabLine1 = 'classificacaoRisco'" data-target="classificacaoRisco">Classificação de Risco</button>
+                </div>
+                <div class="col-12 tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'atendimento' }" @click="activeTabLine1 = 'atendimento'" data-target="atendimento">Atendimento</button>
+                </div>
+                <div class="col-12 tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'exames' }" @click="activeTabLine1 = 'exames'" data-target="exames">Exames</button>
+                </div>
+                <div class="col-12 tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'procedimentos' }" @click="activeTabLine1 = 'procedimentos'" data-target="procedimentos">Procedimentos</button>
+                </div>
+                <div class="col-12 tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'medicacoes' }" @click="activeTabLine1 = 'medicacoes'" data-target="medicacoes">Medicações</button>
+                </div>
+                <div class="col-12 tab-item-design">
+                    <button class="btn-tab-dsn-atendimento color-title bold-normal" :class="{ 'active-tab': activeTabLine1 === 'relatorios' }" @click="activeTabLine1 = 'relatorios'" data-target="relatorios">Relatórios</button>
+                </div>
+                <div class="col-12">
+                    <hr id="hr-tab-antendimento">
+                </div>
+            </div>
+
+            <div v-else class="row" style="padding-top:15px;">
+                <div class="col tab-item-design">
+                    <div class="skeleton-line pulse" style="height: 75px;"></div>
+                </div>
+                <div class="col tab-item-design">
+                    <div class="skeleton-line pulse" style="height: 75px;"></div>
+                </div>
+                <div class="col tab-item-design">
+                    <div class="skeleton-line pulse" style="height: 75px;"></div>
+                </div>
+                <div class="col tab-item-design">
+                    <div class="skeleton-line pulse" style="height: 75px;"></div>
+                </div>
+                <div class="col tab-item-design">
+                    <div class="skeleton-line pulse" style="height: 75px;"></div>
+                </div>
+                <div class="col tab-item-design">
+                    <div class="skeleton-line pulse" style="height: 75px;"></div>
+                </div>
+                <div class="col tab-item-design">
+                    <div class="skeleton-line pulse" style="height: 75px;"></div>
+                </div>
+                <div class="col-12">
+                    <hr id="hr-tab-antendimento">
+                </div>
+            </div>
+
+            <div class="mt-1">
+                <div class="collapse-content" v-show="activeTabLine1 === 'informacoesPaciente'">
+                    {% include 'saude_atendimento/urgencia/atendimento/collapse_informacoes_paciente.html' %}<br/>
+                </div>
+
+                <div class="collapse-content" v-show="activeTabLine1 === 'classificacaoRisco'">
+                    {% include 'saude_atendimento/urgencia/atendimento/collapse_classificacao_risco.html' %}
+                </div>
+
+                <div class="collapse-content" v-show="activeTabLine1 === 'atendimento'">
+                    {% include 'saude_atendimento/urgencia/atendimento/collapse_atendimento_medico.html' %}
+                </div>
+
+                <div class="collapse-content" v-show="activeTabLine1 === 'exames'">
+                    {% include 'saude_atendimento/urgencia/atendimento/collapse_exames.html' %}
+                </div>
+
+                <div class="collapse-content" v-show="activeTabLine1 === 'procedimentos'">
+                    {% include 'saude_atendimento/urgencia/atendimento/collapse_procedimentos.html' %}
+                </div>
+                <div class="collapse-content" v-show="activeTabLine1 === 'medicacoes'">
+                    {% include 'saude_atendimento/urgencia/atendimento/collapse_medicacoes.html' %}
+                </div>
+                <div class="collapse-content" v-show="activeTabLine1 === 'relatorios'">
+                    {% include 'saude_atendimento/urgencia/atendimento/collapse_relatorios.html' %}
+                </div>
+            </div>
+            
+            <div class="mt-4" style="color:white;">.</div>
+        </div>
+
+    </template>
+{% endblock %}
+
+{% block components-modal %}
+    {% comment %} Modal Drag {% endcomment %}
+    <div class="br-scrim-util foco" id="modalDrag" data-scrim="true">
+        <div class="br-modal" aria-labelledby="titulomodalexemplo" style="padding: 0px; width: 700px; border-radius: 10px;">
+            <div class="br-modal-header" style="border-bottom: 1px double #ccc; height: 48px; background-color: #f8f9fc !important;">
+                <div class="modal-title" id="modalalerttitle" style="font-size: 20px !important; font-weight: var(--font-weight-semi-bold); color: var(--interactive); padding-top: 8px;">
+                    <i class="fa-solid fa-timeline ml-2" style="font-size:22px; padding-top:1px;"></i> <span class="ml-2">ORDENAR</span>
+                </div>
+                <button class="br-button close circle" @click="abrirModal('modalDrag', 'fechar')" type="button" data-dismiss="br-modal" aria-label="Fechar" style="color: var(--interactive-light); margin-top: 8px;"><i class="fas fa-times" aria-hidden="true"></i></button>
+                <div role="alert" class="mt-3 w-100 text-center mb-4" style="background-color: rgb(207, 226, 255); border-radius: 7px; margin-top: -10px; box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px; width: 100%;">
+                    <p class="mb-0" style="font-size: 15px; padding-top: 10px; padding-bottom: 10px; font-weight: bold;">
+                        <i class="fas fa-arrow-alt-circle-down"></i> <span>ORDENE AS SOLICITAÇÕES CONFORME A PRIORIDADE DESEJADA</span>
+                    </p>
+                </div>
+            </div>
+            <div class="br-modal-body">
+                <section class="showcase showcase-2">
+                    <div class="container justify-content-start mt-4">
+                        <div class="col-12" style="margin-top: 40px; margin-top: 90px;">
+                            <div v-if="listItems.length > 1" class="vertical-line" :style="listItems.length === 4 ? 'height: 250px;' : listItems.length === 3 ? 'height: 170px;' : listItems.length === 2 ? 'height: 100px;' : listItems.length === 1 ? 'height: 100px;' : ''" style="margin-left: 170px;"></div>
+                            <ul class="drag-list" @drop="drop($event)" :style="listItems.length === 4 ? 'margin-top: -295px;' : listItems.length === 3 ? 'margin-top: -210px;' : listItems.length === 2 ? 'margin-top: -140px;' : ''" @dragover.prevent>
+                                <li v-for="(item, index) in listItems" :key="item.number" :draggable="true" @dragstart="dragStart(index, $event)" :data-index="index">
+                                    <div class="drag-area">${ item.number }</div>
+                                    <div class="title">${ item.title }</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="br-modal-footer justify-content-center" style="margin-bottom: 20px; padding-top: 30px;">
+                <button class="br-button secondary" @click="abrirModal('modalDrag', 'fechar')" type="button" data-dismiss="true"><i class="fa-solid fa-xmark mr-2 mt-1"></i>Cancelar
+                </button>
+                <button class="br-button primary mt-3 mt-sm-0 ml-sm-3" @click="criarSolicitacoes()" type="button"><i class="fa-solid fa-check mr-2 mt-1"></i>Solicitar</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/moment.locale.min.js' %}"></script>
+    <script src="{% static 'libs/select2/js/select2.min.js' %}"></script>
+    <script src="{% static 'libs/select2/js/select2-pt-BR.js' %}"></script>
+
+    <script>
+        moment.locale('pt-br');
+
+        var app = new Vue({
+            delimiters: ['${', '}'],
+            el: '#base-vue',
+            components: {
+                {% include 'dashboard/includes/components/vue-custom-select-multiple.html' %},
+                {% include 'dashboard/includes/components/vue-custom-single-select.html' %},
+            },
+            data: {
+                {% include 'saude_atendimento/urgencia/includes/vue-atendimento-medico-data.js' %},
+                isLoadingPage: true,
+                listItems: [],
+            },
+            watch: {
+                selectedProcedimentoValue: function(object) {
+                    this.formularioProcedimento.procedimentoPk = object ? object.value : '';
+                },
+                selectedMedicacoesValues: function(object) {
+                    this.formularioMedicacao.medicacaoPk = object ? object.value : '';
+                    this.formularioMedicacao.quantidade = object ? object.quantidade : 0;
+                },
+                'formularioProcedimento.quantidade': {
+                    handler(novoValor) {
+                        if (this.formularioProcedimento.quantidade === null || this.formularioProcedimento.quantidade === '' || this.formularioProcedimento.quantidade === 0) {
+                            this.formularioProcedimento.quantidade = 1;
+                        }else{
+                            const valorString = this.formularioProcedimento.quantidade.toString();
+                            const doisDigitos = valorString.slice(0, 2);
+
+                            if(doisDigitos > 20) {
+                                this.formularioProcedimento.quantidade = 20;
+                            }else {
+                                this.formularioProcedimento.quantidade = parseFloat(doisDigitos);
+                            }
+                        }
+                    }
+                },
+                'formularioMedicacao.via': {
+                    handler(valor) {
+                        if (valor === '1' && !this.formularioMedicacao.id) {
+                            this.formularioMedicacao.parental = '';
+                        }else if(!this.formularioMedicacao.id){
+                            this.formularioMedicacao.parental = ''
+                        }
+                    }
+                },
+                'formularioMedicacao.doseUnica': {
+                    handler(valor) {
+                        if(!valor && !this.formularioMedicacao.id){
+                            this.formularioMedicacao.posologia = 1
+                        }else if(!this.formularioMedicacao.id){
+                            this.formularioMedicacao.posologia = ''
+                        } 
+                    }
+                },
+                'formularioMedicacao.medicamentoControlado': {
+                    handler(valor) {
+                        if(!valor && !this.formularioMedicacao.id){
+                            this.formularioMedicacao.medicamento_controlado = 1
+                        }else if(!this.formularioMedicacao.id){
+                            this.formularioMedicacao.medicamento_controlado = 0
+                        } 
+                    }
+                },
+                'formularioMedicacao.aplicacao': {
+                    handler(valor) {
+                        if(valor === '1'){
+                            this.formularioMedicacao.duracaoTratamento = 1
+                        }
+                    }
+                },
+                'formularioReclassificacao.presaoArterial': {
+                    handler(valor) {
+                        if (valor) {
+                            let v = valor.replace(/\D/g, '');
+                            if (v.length > 6) {
+                                v = v.substring(0, 6);
+                            }
+
+                            if (v.length === 4) {
+                                v = v.substring(0, 2) + '/' + v.substring(2);
+                            } else if (v.length === 5) {
+                                const first3 = parseInt(v.substring(0, 3), 10);
+                                if (first3 >= 100) {
+                                    v = v.substring(0, 3) + '/' + v.substring(3);
+                                } else {
+                                    v = v.substring(0, 2) + '/' + v.substring(2);
+                                }
+                            } else if (v.length === 6) {
+                                v = v.substring(0, 3) + '/' + v.substring(3);
+                            }
+
+                            this.formularioReclassificacao.presaoArterial = v;
+                            
+                        }
+                    }
+                },
+                'atendimentoMedico.classificacao.peso': {
+                    handler(value) {
+                        if (value) {
+                            let v = value.toString();
+
+                            // Remove todos os caracteres, exceto dígitos e ponto decimal
+                            v = v.replace(/[^\d.]/g, '');
+
+                            // Remove zeros à esquerda
+                            v = v.replace(/^0+/, '');
+
+                            if (v === '') {
+                                v = '0';
+                            }
+
+                            // Converte para número flutuante e formata com duas casas decimais
+                            const num = parseFloat(v);
+                            const formatted = num.toFixed(3);
+
+                            this.atendimentoMedico.classificacao.peso = formatted;
+                        }
+                    }
+                },
+                'atendimentoMedico.classificacao.altura': {
+                    handler(value) {
+                        if (this.atendimentoMedico && this.atendimentoMedico.classificacao && value) {
+                            var v = value.replace(/\D/g, "");
+
+                            if (v.length > 2) {
+                                v = v.slice(0, v.length - 2) + '.' + v.slice(v.length - 2);
+                            } else if (v.length === 2) {
+                                v = '0.' + v;
+                            } else if (v.length === 1) {
+                                v = '0.0' + v;
+                            } else {
+                                v = '0.00';
+                            }
+
+                            this.atendimentoMedico.classificacao.altura = v;
+                        }
+                    }
+                },
+                'formularioReclassificacao.temperatura': {
+                    handler(value) {
+                        if (value !== null && typeof value === 'string') {
+                            var v = value,
+
+                            v = v.replace(/\D/, "");
+                            v = v.replace(/^[0]+/, "");
+
+                            if (v.length > 3) {
+                                v = v[0] + v[1] + '.' + v[2]
+                            } else {
+
+                                if(v.length === 1){
+                                    v = v[0]
+                                }else if(v.length === 2){
+                                    v = v[0] + v[1]
+                                }else if(v.length === 3){
+                                    v = v[0] + v[1] + '.' + v[2]
+                                }
+                            }
+                            this.formularioReclassificacao.temperatura = v;
+                        }
+                    },
+                    deep: true
+                },
+                'formularioReclassificacao.frequenciaCardiaca': {
+                    handler(value) {
+                        if (value !== null && typeof value === 'string') {
+                            var v = value,
+
+                            v = v.replace(/\D/, "");
+                            v = v.replace(/^[0]+/, "");
+
+                            if (v.length > 2) {
+                                v = v[0] + v[1]
+                            } else {
+                                if(v.length === 1){
+                                    v = v[0]
+                                }else if(v.length === 2){
+                                    v = v[0] + v[1]
+                                }
+                            }
+                            this.formularioReclassificacao.frequenciaCardiaca = v;
+                        }
+                    },
+                    deep: true
+                },
+                'formularioReclassificacao.frequenciaRespiratoria': {
+                    handler(value) {
+                        if (value !== null && typeof value === 'string') {
+                            var v = value,
+
+                            v = v.replace(/\D/, "");
+                            v = v.replace(/^[0]+/, "");
+
+                            if (v.length > 2) {
+                                v = v[0] + v[1]
+                            } else {
+                                if(v.length === 1){
+                                    v = v[0]
+                                }else if(v.length === 2){
+                                    v = v[0] + v[1]
+                                }
+                            }
+                            this.formularioReclassificacao.frequenciaRespiratoria = v;
+                        }
+                    },
+                    deep: true
+                },
+                'formularioReclassificacao.spo2': {
+                    handler(value) {
+                        if (this.atendimentoMedico && this.atendimentoMedico.sinais_vitais && value) {
+                            var v = value,
+
+                            v = v.replace(/\D/, "");
+                            v = v.replace(/^[0]+/, "");
+
+                            if (v.length > 2) {
+                                v = v[0] + v[1]
+                            } else {
+                                if(v.length === 1){
+                                    v = v[0]
+                                }else if(v.length === 2){
+                                    v = v[0] + v[1]
+                                }
+                            }
+                            this.formularioReclassificacao.spo2 = v;
+                        }
+                    } 
+                },
+                'formularioReclassificacao.hgt': {
+                    handler(value) {
+                        if (this.atendimentoMedico && this.atendimentoMedico.sinais_vitais && value) {
+                            var v = value,
+
+                            v = v.replace(/\D/, "");
+                            v = v.replace(/^[0]+/, "");
+
+                            if (v.length > 2) {
+                                v = v[0] + v[1]
+                            } else {
+                                if(v.length === 1){
+                                    v = v[0]
+                                }else if(v.length === 2){
+                                    v = v[0] + v[1]
+                                }
+                            }
+                            this.formularioReclassificacao.hgt = v;
+                        }
+                    } 
+                },
+                listagemProcedimentos: 'updateListItems',
+                listagemMedicacoesAtendimentos: 'updateListItems',
+                listagemExames: 'updateListItems',
+            },
+            computed: {
+                visiblePages() {
+                    let pageRange = Math.floor(this.maxVisiblePages / 2);
+                    let startPage = Math.max(this.currentPage - pageRange, 1);
+                    let endPage = Math.min(startPage + this.maxVisiblePages - 1, this.totalPages);
+        
+                    if (endPage - startPage < this.maxVisiblePages - 1) {
+                        startPage = Math.max(endPage - this.maxVisiblePages + 1, 1);
+                    }
+        
+                    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+                },
+                prevDisabled() {
+                    return this.currentPage === 1;
+                },
+                nextDisabled() {
+                    return this.currentPage === this.totalPages;
+                },
+                verificationVia() {
+                    let via = false;
+
+                    if (this.formularioMedicacao.via === '1' || this.formularioMedicacao.via === 1) {
+                        if (this.formularioMedicacao.parental !== '') {
+                            via = true;
+                        }
+                    } else if (this.formularioMedicacao.via !== '' && this.formularioMedicacao.parental === '') {
+                        via = true;
+                    }
+
+                    return via;
+                },
+                listagemProcedimentosStatus() {
+                    return this.listagemProcedimentos.some((item) => item.situacao === 0 && item.tipo_solicitacao === 0 && item.realizado_por === 0);
+                },
+                listagemMedicacoesAtendimentosStatus() {
+                    return this.listagemMedicacoesAtendimentos.some((item) => item.situacao === 0 && item.aplicacao === 0)
+                },
+                listagemExamesLaboratoriaisStatus() {
+                    return this.listagemExames.some((item) => item.situacao === 0 && item.tipo === 0);
+                },
+                listagemExamesImagemStatus() {
+                    return this.listagemExames.some((item) => item.situacao === 0 && item.tipo === 1);
+                },
+                listagemHistoricoEvolucaoStatus() {
+                    const evolucao = this.atendimentoMedico.evolucao
+                    return evolucao.length > 0;
+                },
+                verificarListaPosterior() {
+                    const posterior = this.listagemMedicacoesAtendimentos.some((item) => item.aplicacao === 1 && !item.medicamento_controlado);
+                    return posterior;
+                },
+                verificarListaControlada() {
+                    const controlada = this.listagemMedicacoesAtendimentos.some((item) => item.medicamento_controlado === true);
+                    return controlada;
+                },
+                verificarListaImediata() {
+                    const imediata = this.listagemMedicacoesAtendimentos.some((item) => item.aplicacao === 0)
+                    return imediata
+                },
+                verificarProcedimentoPrincipal(){
+                    const procedimento = this.listagemProcedimentos.some((item) => item.classificacao === 0)
+
+                    if(procedimento){
+                        this.formularioProcedimento.classificacao = 1
+                    }
+                    return procedimento
+                },
+                verificarAtendimentoEncerrado(){
+                    const situacoesEncerrado = ['5', '6', '7', '8'];
+                    return situacoesEncerrado.includes(this.paciente.situacao_numero);
+                },
+                verificarSeTemOrdenacao() {
+                    const temSolicitacoesPendentes = this.listagemProcedimentosStatus || this.listagemMedicacoesAtendimentosStatus || this.listagemExamesLaboratoriaisStatus || this.listagemExamesImagemStatus;
+                    const situacaoPaciente = this.paciente.situacao_numero === '2' || this.paciente.situacao_numero === 2;
+
+                    if(temSolicitacoesPendentes && situacaoPaciente){
+                        return true
+                    }else if(!temSolicitacoesPendentes && !situacaoPaciente){
+                        return true
+                    }else if(situacaoPaciente){
+                        return true
+                    }else{
+                        return false
+                    }
+                },
+                verificarSeTemProcedimentoMedico() {
+                    return this.listagemProcedimentos.some((item) => item.situacao === 0 && item.tipo_solicitacao === 0 && item.realizado_por === 1);
+                },
+            },
+            methods: {
+                {% include 'saude_atendimento/urgencia/includes/vue-atendimento-medico-requests.js' %},
+                {% include 'saude_atendimento/urgencia/includes/vue-atendimento-medico-functions.js' %},
+                abrirModal(modal, tipo) {
+                    if(tipo === 'abrir'){
+                        $('#'+modal).show()
+                    }else if (tipo === 'fechar'){
+                        $('#'+modal).hide()
+                    }
+                },
+                dragStart(index, event) {
+                    event.dataTransfer.setData('text/plain', index);
+                },
+                drop(event) {
+                    event.preventDefault();
+                    const index = event.dataTransfer.getData('text/plain');
+                    const draggedItem = this.listItems[index];
+                    const targetIndex = parseInt(event.target.closest('li').getAttribute('data-index'));
+                    if (targetIndex !== index) {
+                        const tempTitle = this.listItems[targetIndex].title;
+                        const tempTipo = this.listItems[targetIndex].tipo;
+
+                        this.listItems[targetIndex].title = draggedItem.title;
+                        this.listItems[targetIndex].tipo = draggedItem.tipo;
+                        draggedItem.title = tempTitle;
+                        draggedItem.tipo = tempTipo;
+                    }
+                },
+                updateListItems() {
+                    this.listItems = [];
+            
+                    if (this.listagemExamesLaboratoriaisStatus) {
+                    this.listItems.push({ number: String(this.listItems.length + 1), title: 'Exames Laboratoriais', tipo: '0' });
+                    }
+
+                    if (this.listagemExamesImagemStatus) {
+                    this.listItems.push({ number: String(this.listItems.length + 1), title: 'Exames de Imagem', tipo: '1' });
+                    }
+
+                    if (this.listagemProcedimentosStatus) {
+                    this.listItems.push({ number: String(this.listItems.length + 1), title: 'Procedimentos', tipo: '2' });
+                    }
+                    
+                    if (this.listagemMedicacoesAtendimentosStatus) {
+                    this.listItems.push({ number: String(this.listItems.length + 1), title: 'Medicações', tipo: '3' });
+                    }
+                },
+            },
+            mounted(){
+                self = this
+
+                this.crudExame('GET')
+                this.crudProcedimentoAtendimento('GET')
+                this.crudMedicacaoAtendimento('GET')
+                this.getAtendimentoMedico()
+                this.getHistoricoAnteriores()
+                setTimeout(function() {self.getPutHistoricoPatologico('GET')}, 2000);
+
+                var toggleCollapse = localStorage.getItem('toggleCollapse');
+                var buttonType = localStorage.getItem('buttonType');
+                
+                if(toggleCollapse){
+                    self.activeTabLine1 = `${toggleCollapse}`
+                    localStorage.removeItem('toggleCollapse');
+
+                    if(buttonType === 'save'){
+                        this.SweetAlert("JUSTIFICATIVA DO PROCEDIMENTO SALVO COM SUCESSO!", "success")
+                    }
+
+                    setTimeout(function() {
+                        var elementOffsetTop = $('#buttons-procedimentos').offset().top;
+                        $('html, body').scrollTop(elementOffsetTop);
+                    }, 1000);
+
+                    localStorage.removeItem('buttonType');
+                }else{
+                    self.activeTabLine1 = 'classificacaoRisco'
+                }
+
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                const relatorio = urlParams.get('relatorio');
+
+                if(relatorio === '1'){
+                    this.activeTabLine1 = 'relatorios'
+                    urlParams.delete('relatorio');
+                    const newUrl = window.location.pathname + '?' + urlParams.toString();
+                    window.history.replaceState({}, '', newUrl);
+                }
+
+                $(document).ready(function () {
+                    $(".via-admin").select2({
+                        language: "pt-BR",
+                        placeholder: "SELECIONE UMA OPÇÃO",
+                         minimumResultsForSearch: Infinity
+                    }).on('select2:select', function(e) {
+                        self.formularioMedicacao.via = e.params.data.id
+                        if(e.params.data.id !== '1'){
+                            $(".parental").val('').trigger('change');
+                            self.formularioMedicacao.parental = ''
+                        }
+                    });
+
+                    $(".parental").select2({
+                        language: "pt-BR",
+                        placeholder: "SELECIONE UMA OPÇÃO",
+                        minimumResultsForSearch: Infinity
+                    }).on('select2:select', function(e) {
+                        self.formularioMedicacao.parental = e.params.data.id
+                    });
+                });
+            }
+        });
+    </script>
+   
+{% endblock %}

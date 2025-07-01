@@ -1,0 +1,130 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <link rel="icon" href="{% static 'img/fav-logo2.png' %}" type="image/x-icon" />
+    
+    <title>1GOV - RELATÓRIO DE PROCEDIMENTOS</title>
+    
+    <link rel="stylesheet" href="{% static '@govbr-ds/core/dist/core.css' %}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <style>
+        .logo{ padding-top:15px; width:60%; }
+        title, head {display: none;}
+        .header {text-align: center; font-size: 12px; margin-bottom: 20px;}
+        .header h1, .header h2 {margin: 0;}
+        body {margin: 0; padding: 0; font-family: Arial, sans-serif;}
+        .footer {position: fixed; bottom: 0; width: 100%; background-color: white;}
+        .footer-content {text-align: center; padding: 10px; border-top: 1px solid #333;}
+
+        table {width: 100%; border-collapse: collapse; margin-top: 20px;}
+        table {margin: 20px 0;}
+        th, td {border: 1px solid black !important; text-align: center !important; border-block: initial; font-size: 12px !important;}
+        th {background-color: var(--interactive-light) !important; color: #fff !important;}
+        #tabela-dias td {text-align: left !important; padding: 8px; font-size: 12px !important;}
+        #tabela-procedimentos {width: 50px;}
+        #tabela-codigo {width: 200px;}
+        #tabela-quantidade {padding: 10px; padding-left: 23px;}
+
+        @page {@bottom-center {content: element(footer);}}
+        @page {size: 297mm 210mm; margin: 10mm;}
+        .page-break {page-break-before: always;}
+        @page {
+            @bottom-right {
+                content: "< 1GOV > Impresso em {{ data_impressao }}";
+                font-size: 12px;
+                color: gray;
+            }
+            @bottom-left {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 12px;
+                color: gray;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="row no-gutters" style="border: 1px solid; padding: 5px;">
+            <div class="col-3 mt-3">
+                <img class="logo" src="{% static 'img/logo-1gov.png' %}" alt="Logo"/>
+            </div>
+            <div class="col-6 text-center">
+                <h6 class="mt-3"><b>PREFEITURA MUNICIPAL DE {{unidade_saude.municipio.nome}} <br/> RELATÓRIO DE PROCEDIMENTOS <br/><br/> {{mes_atual_nome}} DE {{ano_selecionado}}</b></h6>
+            </div>
+            <div class="col-3 d-flex justify-content-center mt-3">
+                {% if unidade_saude.logo %}
+                    <img src="{{unidade_saude.logo.url}}" style="width: 100px; margin-left: -10px;"/>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th id="tabela-procedimentos"><b>PROCEDIMENTO</b></th>
+                <th id="tabela-codigo"><b>CÓDIGO</b></th>
+                <th colspan="30" style="text-transform: uppercase;"><b>QUANTIDADE</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if lista_completa %}
+                {% for lista in lista_completa %}
+                <tr>
+                    <td id="tabela-procedimentos">{{lista.codigo}}</td>
+                    <td id="tabela-codigo">{{lista.nome}}</td>
+                    <td id="tabela-quantidade">
+                        <div class="row row-cols-16 justify-content-start">
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.0.1 %}color: #000{% else %}color: #706f6f{% endif %}">1 <br/><b>{{ lista.dias.0.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.1.1 %}color: #000{% else %}color: #706f6f{% endif %}">2 <br/><b>{{ lista.dias.1.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.2.1 %}color: #000{% else %}color: #706f6f{% endif %}">3 <br/><b>{{ lista.dias.2.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.3.1 %}color: #000{% else %}color: #706f6f{% endif %}">4 <br/><b>{{ lista.dias.3.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.4.1 %}color: #000{% else %}color: #706f6f{% endif %}">5 <br/><b>{{ lista.dias.4.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.5.1 %}color: #000{% else %}color: #706f6f{% endif %}">6 <br/><b>{{ lista.dias.5.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.6.1 %}color: #000{% else %}color: #706f6f{% endif %}">7 <br/><b>{{ lista.dias.6.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.7.1 %}color: #000{% else %}color: #706f6f{% endif %}">8 <br/><b>{{ lista.dias.7.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.8.1 %}color: #000{% else %}color: #706f6f{% endif %}">9 <br/><b>{{ lista.dias.8.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.9.1 %}color: #000{% else %}color: #706f6f{% endif %}">10 <br/><b>{{ lista.dias.9.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.10.1 %}color: #000{% else %}color: #706f6f{% endif %}">11 <br/><b>{{ lista.dias.10.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.11.1 %}color: #000{% else %}color: #706f6f{% endif %}">12 <br/><b>{{ lista.dias.11.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.12.1 %}color: #000{% else %}color: #706f6f{% endif %}">13 <br/><b>{{ lista.dias.12.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.13.1 %}color: #000{% else %}color: #706f6f{% endif %}">14 <br/><b>{{ lista.dias.13.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.14.1 %}color: #000{% else %}color: #706f6f{% endif %}">15 <br/><b>{{ lista.dias.14.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.15.1 %}color: #000{% else %}color: #706f6f{% endif %}">16 <br/><b>{{ lista.dias.15.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.16.1 %}color: #000{% else %}color: #706f6f{% endif %}">17 <br/><b>{{ lista.dias.16.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.17.1 %}color: #000{% else %}color: #706f6f{% endif %}">18 <br/><b>{{ lista.dias.17.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.18.1 %}color: #000{% else %}color: #706f6f{% endif %}">19 <br/><b>{{ lista.dias.18.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.19.1 %}color: #000{% else %}color: #706f6f{% endif %}">20 <br/><b>{{ lista.dias.19.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.20.1 %}color: #000{% else %}color: #706f6f{% endif %}">21 <br/><b>{{ lista.dias.20.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.21.1 %}color: #000{% else %}color: #706f6f{% endif %}">22 <br/><b>{{ lista.dias.21.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.22.1 %}color: #000{% else %}color: #706f6f{% endif %}">23 <br/><b>{{ lista.dias.22.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.23.1 %}color: #000{% else %}color: #706f6f{% endif %}">24 <br/><b>{{ lista.dias.23.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.24.1 %}color: #000{% else %}color: #706f6f{% endif %}">25 <br/><b>{{ lista.dias.24.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.25.1 %}color: #000{% else %}color: #706f6f{% endif %}">26 <br/><b>{{ lista.dias.25.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.26.1 %}color: #000{% else %}color: #706f6f{% endif %}">27 <br/><b>{{ lista.dias.26.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.27.1 %}color: #000{% else %}color: #706f6f{% endif %}">28 <br/><b>{{ lista.dias.27.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.28.1 %}color: #000{% else %}color: #706f6f{% endif %}">29 <br/><b>{{ lista.dias.28.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.29.1 %}color: #000{% else %}color: #706f6f{% endif %}">30 <br/><b>{{ lista.dias.29.1|default:'---' }}</b></div>
+                            <div style="border: 1px solid; width: 5.8%; {% if lista.dias.30.1 %}color: #000{% else %}color: #706f6f{% endif %}">31 <br/><b>{{ lista.dias.30.1|default:'---' }}</b></div>
+                            <div style="text-align: center; width: 5.8%;">Total <br/><b>{{lista.total|default:'0'}}</b></div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="33">Nenhuma informação encontrada nesta pesquisa.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+</body>
+</html>

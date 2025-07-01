@@ -1,0 +1,703 @@
+/* ############################################ */
+/* ############# MOBILE & WEB ################# */
+/* ############################################ */
+
+/* Aparecer no MOBILE */
+.visible-xs,
+.visible-sm,
+.visible-md,
+.visible-lg {
+  display: none !important;
+}
+.visible-xs-block,
+.visible-xs-inline,
+.visible-xs-inline-block,
+.visible-sm-block,
+.visible-sm-inline,
+.visible-sm-inline-block,
+.visible-md-block,
+.visible-md-inline,
+.visible-md-inline-block,
+.visible-lg-block,
+.visible-lg-inline,
+.visible-lg-inline-block {
+  display: none !important;
+}
+
+
+@media (max-width: 767px) {
+  .visible-xs {
+    display: block !important;
+  }
+  table.visible-xs {
+    display: table;
+  }
+  tr.visible-xs {
+    display: table-row !important;
+  }
+  th.visible-xs,
+  td.visible-xs {
+    display: table-cell !important;
+  }
+}
+@media (max-width: 767px) {
+  .visible-xs-block {
+    display: block !important;
+  }
+}
+@media (max-width: 767px) {
+  .visible-xs-inline {
+    display: inline !important;
+  }
+}
+@media (max-width: 767px) {
+  .visible-xs-inline-block {
+    display: inline-block !important;
+  }
+}
+
+/* Aparecer na WEB */
+
+@media (max-width: 767px) {
+  .hidden-xs {
+    display: none !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .hidden-tb {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .hidden-tb2 {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1600px) {
+  .hidden-tb3 {
+    display: none !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .visible-tb {
+    display: block !important;
+  }
+}
+
+@media (max-width: 1300px) {
+  .visible-tb2 {
+    display: block !important;
+  }
+}
+
+@media (max-width: 1601px) {
+  .visible-tb3 {
+    display: block !important;
+  }
+}
+
+/* ############################################ */
+/* ################ CLASSES ################### */
+/* ############################################ */
+
+    /*zoom: 110/120%*/
+    @media only screen and (max-width: 1800px) {
+
+        .login-left{ width:59% !important; }
+        .login-right{ width:40% !important; margin-left:2px !important; }
+        .box-btn-class-risco{ width:100% !important; }
+        .timeline-left-text{ margin-left:-385px !important; }
+        .ft-sz-atendimento{ font-size: 15px !important; }
+        .btn-classificacao-atendimento{ height: 74px !important; width:140px !important; text-transform: uppercase !important; border-radius:4px !important; font-size: 15px !important; }
+        .col-title-classificacao-left{ width: 73% !important; }
+        .col-title-classificacao-right{ width: 27% !important; }
+    }
+
+    /*zoom: 120%*/
+    @media only screen and (max-width: 1700px) { 
+
+        .login-left{ width:59% !important; }
+        .login-right{ width:40% !important; margin-left:2px !important; }
+        .box-btn-class-risco{ width:100% !important; }
+        .box-paciente-01{ width:15% !important; }
+        .box-paciente-02{ width:55% !important; }
+        .box-paciente-03{ width:30% !important; }
+        .ft-sz-atendimento{ font-size: 15px !important;}
+        .btn-classificacao-atendimento{ height: 74px !important; width:140px !important; text-transform: uppercase !important; border-radius:4px !important; font-size: 15px !important; }
+        .col-title-classificacao-left{ width: 73% !important; }
+        .col-title-classificacao-right{ width: 27% !important; }
+    }
+
+    /*zoom: 130%*/
+    @media only screen and (max-width: 1600px) { 
+
+        .login-left{ width:59% !important; }
+        .login-right{ width:40% !important; margin-left:2px !important; }
+        .box-btn-class-risco{ margin-left: -1px !important; width:100% !important; }
+        .timeline-left-text{ margin-left:-230px !important; margin-top:-50px; }
+        .timeline-left-circle{ margin-left: -215px !important; }
+        .timeline-left-div-txt{ text-align:right !important; }
+        .box-paciente-01{ width:15% !important; }
+        .box-paciente-02{ width:55% !important; }
+        .box-paciente-03{ width:30% !important; }
+        .ft-sz-atendimento{ font-size: 15px !important; }
+        .btn-classificacao-atendimento{ height: 74px !important; width:140px !important; text-transform: uppercase !important; border-radius:4px !important; font-size: 15px !important; }
+        .col-title-classificacao-left{ width: 73% !important; }
+        .col-title-classificacao-right{ width: 27% !important; }
+    }
+
+    /*zoom: 140%*/
+    @media only screen and (max-width: 1500px) { 
+
+        .login-left{ width:59% !important; }
+        .login-right{ width:40% !important; margin-left:2px !important; }
+        .box-btn-class-risco{ width:100% !important; }
+        .box-paciente-01{ width:15% !important; }
+        .box-paciente-02{ width:55% !important; }
+        .box-paciente-03{ width:30% !important; }
+        .btn-classificacao-atendimento{ height: 74px !important; width:140px !important; text-transform: uppercase !important; border-radius:4px !important; font-size: 15px !important; }
+        .col-title-classificacao-left{ width: 73% !important; }
+        .col-title-classificacao-right{ width: 27% !important; }
+        .col-btn-justificativa-left {width: 15% !important;}
+        .col-btn-justificativa-ringth {width: 15% !important;}
+    }
+
+    /*zoom: 150%*/
+    @media only screen and (max-width: 1400px) { 
+
+        .login-left{ width:59% !important; }
+        .login-right{ width:40% !important; margin-left:2px !important; }
+        .box-btn-class-risco{ margin-left:-1px !important; width:100% !important; }
+        .box-paciente-01{ width:15% !important; }
+        .box-paciente-02{ width:55% !important; }
+        .box-paciente-03{ width:30% !important; }
+        .btn-classificacao-atendimento{ height: 74px !important; width:140px !important; text-transform: uppercase !important; border-radius:4px !important; font-size: 15px !important; }
+        .col-title-classificacao-left{ width: 73% !important; }
+        .col-title-classificacao-right{ width: 27% !important; }
+    }
+
+    @media only screen and (max-width: 1279px) { 
+      .br-header .header-actions .header-functions > .br-list {
+          margin-right: 0;
+
+          box-shadow: none;
+          display: flex !important;
+          position: static;
+
+          background: var(--header-background);
+      }
+
+      .br-header .header-actions .header-functions > .br-list > .br-item:not(:last-child) {
+        border-bottom: 0;
+
+        /* --focus-offset: var(--spacing-scale-half);
+        --interactive-rgb: var(--interactive-light-rgb); */
+        color: var(--interactive-light);
+        padding: 0;
+
+        white-space: nowrap;
+
+        text-align: left;
+        width: 100%;
+      }
+
+      .br-header .header-actions .header-functions > .br-list > .br-item > .br-button {
+          border-radius: 50%;
+          color: var(--interactive);
+          justify-content: center;
+          padding: 0;
+          width: var(--button-small);
+
+          font-size: var(--font-size-scale-base);
+          font-weight: var(--item-font-weight);
+      }
+
+      .br-header .header-actions .header-functions .br-list .br-button .text {
+          display: none;
+      }
+
+    }
+
+    /*zoom: 170%*/
+    @media only screen and (max-width: 1200px) { 
+
+        .login-left{ width:59% !important; }
+        .login-right{ width:40% !important; margin-left:2px !important; }
+        .box-btn-class-risco{ width:100% !important; }
+        .btn-classificacao-atendimento{ height: 74px !important; width:140px !important; text-transform: uppercase !important; border-radius:4px !important; font-size: 15px !important; }
+        .col-title-classificacao-left{ width: 73% !important; }
+        .col-title-classificacao-right{ width: 27% !important; }
+        .col-btn-justificativa-left {width: 15% !important;}
+        .col-btn-justificativa-ringth {width: 15% !important;}
+        .container-lg-custom {max-width: 100% !important;}
+    }
+
+    @media only screen and (min-width: 900px) and (max-width: 1200px) {
+      .box-paciente-02 > div > p{
+        display: flex;
+        gap: 5px;
+      }
+    }
+
+    @media only screen and (min-width: 505px) and (max-width: 1200px) {
+      /* .col-right-search > .br-select{
+        max-width: 2000px !important;
+      } */
+      .container-lg-custom {max-width: 100% !important;}
+    }
+
+
+    
+
+    /* ################## */
+    /* ##### MOBILE ##### */
+    /* ################## */
+
+    /* Dimensões: Menores */
+    @media only screen and (min-width: 200px) and (max-width: 767px) {
+
+      /* CSS Cadastros */
+      .button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        }
+  
+      .buttonbusctb2 { margin-left: -15px !important; }
+
+      .buttonbusc2tb2 { margin-left: -25px !important; }
+
+      .buttonbusc3tb2 { margin-left: -15px !important; }
+
+      .buttonbusc4tb2 { margin-left: -55px !important; }
+
+      .buttonsavemobile { margin-left: 60px !important; }
+
+      .buttonreturnmobile { margin-left: -56px !important; }
+
+      /* classificacao de risco */
+      body{ background-color:#f3f2f6 !important; }
+      .width100-w{ width: 100% !important;}
+      .txt-center-w{ text-align: center !important; }
+      .txt-left-w{ text-align:left !important; }
+      .br-card{ border-radius:5px !important; box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px !important; }
+      .margin0-mb{ margin:0 auto !important; }
+
+      .col-left-search{ width: 100% !important; }
+      .col-right-search{ width: 100% !important; }
+
+      /* informações do paciente */
+      .col-atendimento-info-left{ width:100% !important; text-align: left !important; margin-left:-8px!important; }
+      .col-atendimento-info-right{ width:100% !important; margin-top:8px !important;}
+      
+      /* paciente_hist_list & classificacao de risco */
+      .col-title-paciente-left{ width: 30%; }
+      .col-title-paciente-right{ width: 70%; }
+      
+      /* atendimento medico */
+      .col-title-paciente-atend-left{ width: 30%; font-size: 18px; }
+      .col-title-paciente-atend-right{ width: 70%; font-size: 18px; }
+
+      .mt-5-w{ margin-top:5px !important; }
+      .mt-6-w{ margin-top:6px !important; }
+      .mt-7-w{ margin-top:7px !important; }
+      .mt-8-w{ margin-top:8px !important; }
+      .mt-9-w{ margin-top:9px !important; }
+      .mt-10-w{ margin-top:10px !important; }
+      .mt-15-w{ margin-top:15px !important; }
+      .mt-20-w{ margin-top:20px !important; }
+      .mt-25-w{ margin-top:25px !important; }
+
+      .mt-1-nmb{ margin-top:-1px !important; }
+      .mt-10-nmb{ margin-top:-10px !important; }
+      .mt-15-nmb{ margin-top:-15px !important; }
+      .mt-20-nmb{ margin-top:-20px !important; }
+      .mt-25-nmb{ margin-top:-25px !important; }
+      .mt-40-nmb{ margin-top:-40px !important; }
+
+      .img-title{ width:100% !important; height:100% !important; }
+
+      .fontsize15-w{ font-size:15px !important; }
+      .fontsize20-w{ font-size:20px !important; }
+
+      .ml-5-w{ margin-left:5px !important; }
+      .mt-4-w{ margin-top:4px !important; }
+      .mt-3-w{ margin-top:3px !important; }
+      .mt-2-w{ margin-top:2px !important; }
+      .ml-8-w{ margin-left:8px !important; }
+      .ml-10-w{ margin-left:10px !important; }
+      .ml-20-w{ margin-left:20px !important; }
+      .ml-50-w{ margin-left:50px !important; }
+
+        .dp-none{ display: block !important; }
+
+        .left-box-doc{ width:100% !important; }
+        .right-box-doc{ width:100% !important; }
+
+        .login-right{ width:100% !important; }
+        .btn-left-search{ margin-left:-20px !important; }
+        #navhearder-logo{ width:110px !important; }
+        .group-btn-search{ margin-left:-23px !important; }
+        .box-concessao-alta{ position:relative !important; top:0 !important; }
+        .td-class-color{ margin-left:-250px !important; } 
+
+        /* classificacao de risco */
+        .btn-tipo-classificacao{ width:90% !important; }
+
+        .box-paciente-01{ width:80% !important; margin:0 auto !important; }
+        .box-paciente-02{ width:100% !important; text-align:center !important; margin-top:px !important; }
+
+        /* collapse-informacoes-paciente */
+
+        .col-info-left-atendimentomedico{ width:100% !important; }
+        .col-info-right-atendimentomedico{ width:100% !important; }
+        .col-btn-justificativa-left {width: 50% !important;}
+        .col-btn-justificativa-ringth {width: 50% !important;}
+    }
+
+    /* Dimensões: Iphone 5/SE */
+    @media only screen and (min-width: 320px) and (max-width: 568px) {
+
+        body{ background-color:#f3f2f6 !important; }
+        .width100-w{ width: 100% !important;}
+        .txt-center-w{ text-align: center !important; }
+        .txt-left-w{ text-align:left !important; }
+        .br-card{ border-radius:5px !important; box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px !important; }
+        
+        .col-left-search{ width: 100% !important; }
+        .col-right-search{ width: 100% !important; }
+
+        .col-atendimento-info-left{ width:100% !important; text-align: left !important; margin-left:-8px!important; }
+        .col-atendimento-info-right{ width:100% !important; margin-top:8px !important;}
+
+        .margin0-mb{ margin:0 auto !important; }
+
+        .mt-5-w{ margin-top:5px !important; }
+        .mt-4-w{ margin-top:4px !important; }
+        .mt-3-w{ margin-top:3px !important; }
+        .mt-2-w{ margin-top:2px !important; }
+        .mt-6-w{ margin-top:6px !important; }
+        .mt-7-w{ margin-top:7px !important; }
+        .mt-8-w{ margin-top:8px !important; }
+        .mt-9-w{ margin-top:9px !important; }
+        .mt-10-w{ margin-top:10px !important; }
+        .mt-15-w{ margin-top:15px !important; }
+        .mt-20-w{ margin-top:20px !important; }
+
+        .mt-1-nmb{ margin-top:-1px !important; }
+        .mt-10-nmb{ margin-top:-10px !important; }
+        .mt-15-nmb{ margin-top:-15px !important; }
+        .mt-20-nmb{ margin-top:-20px !important; }
+        .mt-25-nmb{ margin-top:-25px !important; }
+        .mt-40-nmb{ margin-top:-40px !important; }
+
+        .img-title{ width:100% !important; height:100% !important; }
+
+        .fontsize15-w{ font-size:15px !important; }
+        .fontsize20-w{ font-size:20px !important; }
+
+        .ml-5-w{ margin-left:5px !important; }
+        .ml-8-w{ margin-left:8px !important; }
+        .ml-15-w{ margin-left:10px !important; }
+        .ml-20-w{ margin-left:20px !important; }
+
+        .left-box-doc{ width:100% !important; }
+        .right-box-doc{ width:100% !important; }
+
+        .dp-none{ display: block !important; }
+
+        .login-right{ width:100% !important; }
+        .btn-left-search{ margin-left:-20px !important; }
+        #navhearder-logo{ width:110px !important; }
+        .group-btn-search{ margin-left:-23px !important; }
+        .box-concessao-alta{ position:relative !important; top:0 !important; }
+        .td-class-color{ margin-left:-250px !important; } 
+
+        /* classificacao de risco */
+        .btn-tipo-classificacao{ width:90% !important; }
+
+        .box-paciente-01{ width:80% !important; margin:0 auto !important; }
+        .box-paciente-02{ width:100% !important; text-align:center !important; margin-top:px !important; }
+
+        /* collapse-informacoes-paciente */
+
+        .col-info-left-atendimentomedico{ width:100% !important; }
+        .col-info-right-atendimentomedico{ width:100% !important; }
+        .select2-container {min-width: 13em !important;}
+    } 
+
+    /* Dimensões: 6/7/8 */
+    @media only screen and (min-width: 375px) and (max-width: 667px) {
+
+        body{ background-color:#f3f2f6 !important; }
+        .width100-w{ width: 100% !important;}
+        .txt-center-w{ text-align: center !important; }
+        .txt-left-w{ text-align:left !important; }
+        .br-card{ border-radius:5px !important; box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px !important; }
+        
+        .col-left-search{ width: 100% !important; }
+        .col-right-search{ width: 100% !important; }
+
+        .col-atendimento-info-left{ width:100% !important; text-align: left !important; margin-left:-8px!important; }
+        .col-atendimento-info-right{ width:100% !important; margin-top:8px !important;}
+
+        .margin0-mb{ margin:0 auto !important; }
+
+        .mt-5-w{ margin-top:5px !important; }
+        .mt-4-w{ margin-top:4px !important; }
+        .mt-3-w{ margin-top:3px !important; }
+        .mt-2-w{ margin-top:2px !important; }
+        .mt-6-w{ margin-top:6px !important; }
+        .mt-7-w{ margin-top:7px !important; }
+        .mt-8-w{ margin-top:8px !important; }
+        .mt-9-w{ margin-top:9px !important; }
+        .mt-10-w{ margin-top:10px !important; }
+        .mt-15-w{ margin-top:15px !important; }
+        .mt-20-w{ margin-top:20px !important; }
+
+        .mt-1-nmb{ margin-top:-1px !important; }
+        .mt-10-nmb{ margin-top:-10px !important; }
+        .mt-15-nmb{ margin-top:-15px !important; }
+        .mt-20-nmb{ margin-top:-20px !important; }
+        .mt-25-nmb{ margin-top:-25px !important; }
+        .mt-40-nmb{ margin-top:-40px !important; }
+
+        .img-title{ width:100% !important; height:100% !important; }
+
+        .fontsize15-w{ font-size:15px !important; }
+        .fontsize20-w{ font-size:20px !important; }
+
+        .ml-5-w{ margin-left:5px !important; }
+        .ml-8-w{ margin-left:8px !important; }
+        .ml-15-w{ margin-left:10px !important; }
+        .ml-20-w{ margin-left:20px !important; }
+
+        .left-box-doc{ width:100% !important; }
+        .right-box-doc{ width:100% !important; }
+
+        .dp-none{ display: block !important; }
+
+        .login-right{ width:100% !important; }
+        .btn-left-search{ margin-left:-20px !important; }
+        #navhearder-logo{ width:110px !important; }
+        .group-btn-search{ margin-left:-23px !important; }
+        .box-concessao-alta{ position:relative !important; top:0 !important; }
+        .td-class-color{ margin-left:-250px !important; } 
+
+        /* classificacao de risco */
+        .btn-tipo-classificacao{ width:90% !important; }
+
+        .box-paciente-01{ width:80% !important; margin:0 auto !important; }
+        .box-paciente-02{ width:100% !important; text-align:center !important; margin-top:px !important; }
+
+        /* collapse-informacoes-paciente */
+
+        .col-info-left-atendimentomedico{ width:100% !important; }
+        .col-info-right-atendimentomedico{ width:100% !important; }
+        .select2-container {min-width: 14em !important;}
+        .col-btn-justificativa-left {width: 50% !important;}
+        .col-btn-justificativa-ringth {width: 50% !important;}
+    } 
+    
+    /* Dimensões Iphone X */
+    @media only screen and (min-width: 375px) and (max-width: 812px) {
+
+        body{ background-color:#f3f2f6 !important; }
+        .width100-w{ width: 100% !important;}
+        .txt-center-w{ text-align: center !important; }
+        .txt-left-w{ text-align:left !important; }
+        .br-card{ border-radius:5px !important; box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px !important; }
+        
+        .col-left-search{ width: 100% !important; }
+        .col-right-search{ width: 100% !important; }
+
+        .col-atendimento-info-left{ width:100% !important; text-align: left !important; margin-left:-8px!important; }
+        .col-atendimento-info-right{ width:100% !important; margin-top:8px !important;}
+
+        .margin0-mb{ margin:0 auto !important; }
+
+        .mt-5-w{ margin-top:5px !important; }
+        .mt-4-w{ margin-top:4px !important; }
+        .mt-3-w{ margin-top:3px !important; }
+        .mt-2-w{ margin-top:2px !important; }
+        .mt-6-w{ margin-top:6px !important; }
+        .mt-7-w{ margin-top:7px !important; }
+        .mt-8-w{ margin-top:8px !important; }
+        .mt-9-w{ margin-top:9px !important; }
+        .mt-10-w{ margin-top:10px !important; }
+        .mt-15-w{ margin-top:15px !important; }
+        .mt-20-w{ margin-top:20px !important; }
+
+        .mt-1-nmb{ margin-top:-1px !important; }
+        .mt-10-nmb{ margin-top:-10px !important; }
+        .mt-15-nmb{ margin-top:-15px !important; }
+        .mt-20-nmb{ margin-top:-20px !important; }
+        .mt-25-nmb{ margin-top:-25px !important; }
+        .mt-40-nmb{ margin-top:-40px !important; }
+
+        .img-title{ width:100% !important; height:100% !important; }
+
+        .fontsize15-w{ font-size:15px !important; }
+        .fontsize20-w{ font-size:20px !important; }
+
+        .ml-5-w{ margin-left:5px !important; }
+        .ml-8-w{ margin-left:8px !important; }
+        .ml-15-w{ margin-left:10px !important; }
+        .ml-20-w{ margin-left:20px !important; }
+
+        .left-box-doc{ width:100% !important; }
+        .right-box-doc{ width:100% !important; }
+
+        .dp-none{ display: block !important; }
+
+        .login-right{ width:100% !important; }
+        .btn-left-search{ margin-left:-20px !important; }
+        #navhearder-logo{ width:110px !important; }
+        .group-btn-search{ margin-left:-23px !important; }
+        .box-concessao-alta{ position:relative !important; top:0 !important; }
+        .td-class-color{ margin-left:-250px !important; } 
+
+        /* classificacao de risco */
+        .btn-tipo-classificacao{ width:90% !important; }
+
+        .box-paciente-01{ width:80% !important; margin:0 auto !important; }
+        .box-paciente-02{ width:100% !important; text-align:center !important; margin-top:px !important; }
+
+        /* collapse-informacoes-paciente */
+
+        .col-info-left-atendimentomedico{ width:100% !important; }
+        .col-info-right-atendimentomedico{ width:100% !important; }
+        /* .select2-container {min-width: 12em !important;} */
+    } 
+
+    /* Dimensões Iphone 12 pro */
+    @media only screen and (min-width: 390px) and (max-width: 844px) {
+      
+        body{ background-color:#f3f2f6 !important; }
+        .width100-w{ width: 100% !important;}
+        .txt-center-w{ text-align: center !important; }
+        .txt-left-w{ text-align:left !important; }
+        .br-card{ border-radius:5px !important; box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px !important; }
+        
+        .col-left-search{ width: 100% !important; }
+        .col-right-search{ width: 100% !important; }
+
+        .col-atendimento-info-left{ width:100% !important; text-align: left !important; margin-left:-8px!important; }
+        .col-atendimento-info-right{ width:100% !important; margin-top:8px !important;}
+
+        .margin0-mb{ margin:0 auto !important; }
+
+        .mt-5-w{ margin-top:5px !important; }
+        .mt-4-w{ margin-top:4px !important; }
+        .mt-3-w{ margin-top:3px !important; }
+        .mt-2-w{ margin-top:2px !important; }
+        .mt-6-w{ margin-top:6px !important; }
+        .mt-7-w{ margin-top:7px !important; }
+        .mt-8-w{ margin-top:8px !important; }
+        .mt-9-w{ margin-top:9px !important; }
+        .mt-10-w{ margin-top:10px !important; }
+        .mt-15-w{ margin-top:15px !important; }
+        .mt-20-w{ margin-top:20px !important; }
+
+        .mt-1-nmb{ margin-top:-1px !important; }
+        .mt-10-nmb{ margin-top:-10px !important; }
+        .mt-15-nmb{ margin-top:-15px !important; }
+        .mt-20-nmb{ margin-top:-20px !important; }
+        .mt-25-nmb{ margin-top:-25px !important; }
+        .mt-40-nmb{ margin-top:-40px !important; }
+
+        .img-title{ width:100% !important; height:100% !important; }
+
+        .fontsize15-w{ font-size:15px !important; }
+        .fontsize20-w{ font-size:20px !important; }
+
+        .ml-5-w{ margin-left:5px !important; }
+        .ml-8-w{ margin-left:8px !important; }
+        .ml-15-w{ margin-left:10px !important; }
+        .ml-20-w{ margin-left:20px !important; }
+
+        /* collapse-informacoes-paciente */
+
+        .col-info-left-atendimentomedico{ width:100% !important; }
+        .col-info-right-atendimentomedico{ width:100% !important; }
+        .select2-container {min-width: 16em !important;}
+        .col-btn-justificativa-left {width: 50% !important;}
+        .col-btn-justificativa-ringth {width: 50% !important;}
+    
+    }
+    
+    /* Dimensões: Iphone 6/7/8 Plus */
+    @media only screen and (min-width: 414px) and (max-width: 736px) {
+
+        body{ background-color:#f3f2f6 !important; }
+        .width100-w{ width: 100% !important;}
+        .txt-center-w{ text-align: center !important; }
+        .txt-left-w{ text-align:left !important; }
+        .br-card{ border-radius:5px !important; box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px !important; }
+        
+        .col-left-search{ width: 100% !important; }
+        .col-right-search{ width: 100% !important; }
+
+        .col-atendimento-info-left{ width:100% !important; text-align: left !important; margin-left:-8px!important; }
+        .col-atendimento-info-right{ width:100% !important; margin-top:8px !important;}
+
+        .margin0-mb{ margin:0 auto !important; }
+
+        .mt-5-w{ margin-top:5px !important; }
+        .mt-4-w{ margin-top:4px !important; }
+        .mt-3-w{ margin-top:3px !important; }
+        .mt-2-w{ margin-top:2px !important; }
+        .mt-6-w{ margin-top:6px !important; }
+        .mt-7-w{ margin-top:7px !important; }
+        .mt-8-w{ margin-top:8px !important; }
+        .mt-9-w{ margin-top:9px !important; }
+        .mt-10-w{ margin-top:10px !important; }
+        .mt-15-w{ margin-top:15px !important; }
+        .mt-20-w{ margin-top:20px !important; }
+
+        .mt-1-nmb{ margin-top:-1px !important; }
+        .mt-10-nmb{ margin-top:-10px !important; }
+        .mt-15-nmb{ margin-top:-15px !important; }
+        .mt-20-nmb{ margin-top:-20px !important; }
+        .mt-25-nmb{ margin-top:-25px !important; }
+        .mt-40-nmb{ margin-top:-40px !important; }
+
+        .img-title{ width:100% !important; height:100% !important; }
+
+        .fontsize20-w{ font-size:20px !important; }
+
+        .ml-5-w{ margin-left:5px !important; }
+        .ml-8-w{ margin-left:8px !important; }
+        .ml-15-w{ margin-left:10px !important; }
+        .ml-20-w{ margin-left:20px !important; }
+
+        .left-box-doc{ width:100% !important; }
+        .right-box-doc{ width:100% !important; }
+
+        .dp-xs{ display: none !important; }
+
+        .login-right{ width:100% !important; }
+        .btn-left-search{ margin-left:-20px !important; }
+        #navhearder-logo{ width:110px !important; }
+        .group-btn-search{ margin-left:-23px !important; }
+        .box-concessao-alta{ position:relative !important; top:0 !important; }
+        .td-class-color{ margin-left:-250px !important; } 
+
+        /* classificacao de risco */
+        .btn-tipo-classificacao{ width:90% !important; }
+
+        .box-paciente-01{ width:50% !important; margin:0 auto !important; }
+        .box-paciente-02{ width:100% !important; text-align:center !important; margin-top:px !important; }
+
+        /* collapse-informacoes-paciente */
+
+        .col-info-left-atendimentomedico{ width:100% !important; }
+        .col-info-right-atendimentomedico{ width:100% !important; }
+        .select2-container {min-width: 14em !important;}
+        .col-btn-justificativa-left {width: 50% !important;}
+        .col-btn-justificativa-ringth {width: 50% !important;}
+    } 

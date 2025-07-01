@@ -1,0 +1,39 @@
+{% extends 'dashboard/base//base-pdf.html' %}
+{% load static %}
+{% block title %}DECLARAÇÃO DE COMPARECIMENTO{% endblock %}
+{% load widget_tweaks %}
+
+{% block css-extra-pdf %}
+{% endblock %}
+
+{% block contentpdf %}
+
+    <div class="container" style="text-align:center;">
+
+        <div class="" style="margin-top:10%;">
+            <h5 style="color:var(--interactive);"><b>DECLARAÇÃO DE COMPARECIMENTO <br/>CONSULTA/EXAME</b></h5>
+        </div>
+
+        <div class="" style="margin-top:10%;">
+            <p>Declaramos, para os devidos fins que compareceu a este HEMOCENTRO o(a) senhor(a) <br/>
+               {{atendimento}} com a finalidade de realizar consulta e/ou exames para controle <br/>
+               ambulatorial, na data de {{data_atual}}</p>
+        </div>
+
+        <div class="" style="margin-top:20%;">
+            <p>Natal (RN), {{data_atual}}
+        </div>
+
+        <div class="" style="margin-top:20%; ">
+            <hr style="border:1px solid gray; width:40%; margin:0 auto;"><br/>
+            {% for dados in atendimento.profissionais.all %}
+                <p><b>Dr. {{dados.nome_profissional}} </br> CRM: {{dados.crm}}</b></p>
+            {% endfor %}
+        </div>
+
+        <div class="" style="margin-top:10%;">
+            <p>.<p>
+        </div>
+    </div> 
+
+{% endblock %}

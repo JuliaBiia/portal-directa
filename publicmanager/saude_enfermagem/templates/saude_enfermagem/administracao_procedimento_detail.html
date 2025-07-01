@@ -1,0 +1,669 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% load static %}
+
+{% block title %}Administração de Procedimento{% endblock %}
+{% load widget_tweaks %}
+{% load saude_extras %}
+
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'css/saude/enfermagem.css' %}"/>
+
+<style>
+    .drop-container {position: relative; display: flex; gap: 10px; flex-direction: column; justify-content: center; align-items: center; height: 162px; padding: 6px; border-radius: 10px; border: 2px dashed #555; color: #444; cursor: pointer; transition: background .2s ease-in-out, border .2s ease-in-out;} 
+    .drop-container:hover {background: #eee; border-color: #111;}
+    .drop-container:hover .drop-title {color: #222;}
+    .drop-title {color: #140101; font-size: 20px; font-weight: bold; text-align: center; transition: color .2s ease-in-out;}
+    input::file-selector-button {font-weight: bold; color: dodgerblue; padding: 0.5em; border: thin solid #fff; border-radius: 3px; background-color: #fff;}
+    div:where(.swal2-container) div:where(.swal2-popup) {width: 730px !important;}
+    .swal2-confirm {width: 153px;}
+
+    /* Customização Select2: Modal editar procedimento */
+    .select2-container{ z-index: 10000000 !important; margin-top:5px !important; }
+    .select2-container--default .select2-selection--single{ border: 1px solid #737373 !important; height:38px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered{ padding-top:4px !important; }
+    .select2-container--default .select2-selection--single .select2-selection__placeholder{ color:#333 !important; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 25px !important; top: 7px !important; right: 1px !important; width: 37px !important; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow b{ border-color: black transparent transparent transparent !important; border-width: 6px 4px 0 4px !important; }
+
+    .badge {
+        display: inline-block;
+        padding: 0.35em 0.65em;
+        font-size: .75em;
+        font-weight: 700;
+        line-height: 1;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+    }
+
+    /* Estilos para a tabela no mobile */
+
+    @media (max-width: 576px) {
+        .button-list-aplic {
+            width: 120px !important; /* Reduz ainda mais a largura do botão */
+            font-size: 10px !important; /* Reduz ainda mais o tamanho da fonte */
+            padding: 0.2rem 0.4rem !important; /* Ajusta ainda mais o padding */
+        }
+        .badge-mobile {
+            font-size: 6px !important; /* Reduz ainda mais o tamanho da fonte */
+            padding: 0.1rem 0.2rem; /* Ajusta ainda mais o padding */
+        }
+        .badge-mobile .badge {
+            margin-left: 3px; /* Ajusta ainda mais a margem interna */
+            font-size: 6px !important; /* Reduz ainda mais o tamanho da fonte interna */
+        }
+        .overflow-xs {
+        overflow-x: auto; /* Adiciona rolagem lateral */
+        -webkit-overflow-scrolling: touch; /* Suaviza a rolagem no iOS */
+        }
+        .table-header, .table-title {
+            font-size: 10px; /* Reduz o tamanho da fonte para cabeçalhos e títulos */
+        }
+        .br-table th, .br-table td {
+            font-size: 14px; /* Reduz o tamanho da fonte para células da tabela */
+            padding: 0.25rem; /* Ajusta o padding das células da tabela */
+            text-align: center;
+        }
+        .modal-mobile {
+        font-size: 8px !important; /* Reduz o tamanho da fonte */
+        padding: 0.1rem 0.2rem !important; /* Ajusta o padding */
+        }
+        .modal-mobile .badge {
+            font-size: 12px !important; /* Reduz o tamanho da fonte dos badges */
+            padding: 0.1rem 0.2rem; /* Ajusta o padding dos badges */
+            margin-left: 3px; /* Ajusta a margem interna dos badges */
+        }
+        .modal-mobile .br-button {
+            width: 80px !important; /* Reduz a largura dos botões */
+            font-size: 10px !important; /* Reduz o tamanho da fonte dos botões */
+            padding: 0.1rem 0.2rem !important; /* Ajusta o padding dos botões */
+        }
+        .modal-mobile table th, .modal-mobile table td {
+            font-size: 12px !important; /* Reduz o tamanho da fonte das células da tabela */
+            padding: 0.1rem !important; /* Ajusta o padding das células da tabela */
+        }
+        .modal-mobile .br-modal-header h4 {
+            font-size: 12px !important; /* Reduz o tamanho da fonte do título do modal */
+        }
+        .btn-mobile {
+        width: 45% !important; /* Ajusta a largura dos botões para caberem lado a lado */
+        font-size: 12px !important; /* Reduz o tamanho da fonte */
+        padding: 0.25rem 0.5rem !important; /* Ajusta o padding */
+        }
+        .border-mobile {
+            height: 20% !important; /* Ajusta a altura do container */
+        }
+    }
+
+    @media (min-width: 768px) and (max-width: 1205px) {
+        .table-tablet th, .table-tablet td {
+            font-size: 12px !important; /* Ajusta o tamanho da fonte para tablets */
+            padding: 0.5rem !important; /* Ajusta o padding das células da tabela */
+        }
+        .table-tablet .button-list-aplic {
+            width: 150px !important; /* Ajusta a largura dos botões para tablets */
+            font-size: 12px !important; /* Ajusta o tamanho da fonte dos botões */
+            padding: 0.25rem 0.5rem !important; /* Ajusta o padding dos botões */
+        }
+        .table-tablet .badge-mobile {
+            font-size: 10px !important; /* Ajusta o tamanho da fonte dos badges */
+            padding: 0.2rem 0.4rem; /* Ajusta o padding dos badges */
+        }
+        .table-tablet .badge-mobile .badge {
+            margin-left: 5px; /* Ajusta a margem interna dos badges */
+            font-size: 10px !important; /* Ajusta o tamanho da fonte interna dos badges */
+        }
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <!-- paciente -->
+        <div class="br-card mt-1">
+
+            <div class="card-header">
+                <div class="row ml-1">
+                    <div class="col-10">
+                        <div class="text-weight-semi-bold text-up-02 color-title pdt-10 font-size18 fontsize15-w"><i class="fas fa-band-aid" style="font-size:20px; margin-left:-5px;"></i> &nbsp;REALIZAÇÃO DE PROCEDIMENTO</div>
+                    </div>
+                </div>
+            </div>
+            <hr style="border-color:#f2f2f2;">
+
+            <div class="card-content">
+                <div class="container">
+                    <div class="row">
+
+                        <div class="col-md-auto">
+                            <div class="txt-center-tb margin-0">
+                                {% if get_paciente.classificacao_risco.paciente.foto_paciente %}
+                                    <img src="{{get_paciente.classificacao_risco.paciente.foto_paciente.url}}" class="img-title" style="width:100%;" alt="Avatar"/>
+                                {% else %}
+                                    <span class="br-avatar large"><span class="content"><i class="fas fa-user" aria-hidden="true"></i></span></span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <div style="width:105px;">
+                                    <p class="color-title">Nome:</p> 
+                                </div>
+                                <div class="col-10">
+                                    <p>{{get_paciente.classificacao_risco.paciente.nome_paciente}}</p>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div style="width:105px;">
+                                    <p class="color-title">CPF:</p> 
+                                </div>
+                                <div class="col-10">
+                                    <p>{{get_paciente.classificacao_risco.paciente.cpf|format_cpf}}</p>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div style="width:105px;">
+                                    <p class="color-title">CNS:</p> 
+                                </div>
+                                <div class="col-10">
+                                    <p>{{get_paciente.classificacao_risco.paciente.cartao_sus}}</p>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div style="width:105px;">
+                                    <p class="color-title">Idade:</p> 
+                                </div>
+                                <div class="col-10">
+                                    <p>{{get_paciente.classificacao_risco.paciente.calcular_idade}}</p>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div style="width:105px;">
+                                    <p class="color-title">Data Entrada:</sppan> 
+                                </div>
+                                <div class="col-10">
+                                    <p>{{get_paciente.classificacao_risco.boletim.data_entrada}}</p>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div style="width:105px;">
+                                    <p class="color-title">Situação:</p> 
+                                </div>
+                                <div class="col-10">
+                                    <p class="bold">EM ATENDIMENTO</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 mb-3">   
+                            <div class="d-flex align-items-center flex-column bd-highlight mt-2 mb-3 mt-3">
+                                <div class="col-11" {% if receita_procedimento.arquivo %}onclick="window.open('{{receita_procedimento.arquivo.url}}', '_blank')"{% endif %} style="padding-left: 5px !important;padding-right: 0px !important;">
+                                    <label for="fileInput" class="drop-container border-mobile" id="dropcontainer" style="border: 1px dashed #1351b4;">
+                                        <i class="far fa-image text-color-blue-1gov" style="font-size: 50px; margin-right: 19px;"></i>
+                                        {% if receita_procedimento.arquivo %}
+                                            <span class="drop-title">Clique aqui para visualizar a foto</span>
+                                        {% else %}
+                                            <span class="drop-title">Atendimento sem foto anexada</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- table -->
+        <div class="row mt-2">
+            <div class="col-md">
+                <div class="br-card hover">
+                    <div class="card-content">
+                        <div class="br-table overflow-xs" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+                            <div class="table-header">
+                                <div class="top-bar">
+                                    <div class="table-title color-title fontsize15-w">LISTAGEM DE PROCEDIMENTOS</div><hr>
+                                </div>
+                            </div>
+
+                            <table class="mt-2 table-tablet">
+                                <thead>
+                                    <tr>
+                                        <th style="width:5%;"></th>
+                                        <th style="width:5%;"></th>
+                                        <th style="width:5%;"></th>
+                                        <th class="color-title"><b>Procedimento</b></th>
+                                        <th class="color-title hidden-xs"><b>Quantidade</b></th>
+                                        <th class="color-title hidden-xs"><b>Justificativa</b></th>
+                                        <th class="color-title text-center"><b>Situação</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>  
+                                    <template v-if="listagemProcedimentos.length > 0">
+                                        <tr class="capslock" v-for="procedimento in listagemProcedimentos">
+                                            <td style="padding: 5px; text-align: center;">
+                                                <button :disabled="procedimento.situacao_procedimento === 1" class="br-button circle" @click="editarProcedimentoEletivo(procedimento.id, procedimento.id_procedimento)" type="button" style="font-size:20px; margin-top:2px;">
+                                                    <i class="fa-solid fa-edit"></i>
+                                                </button>
+                                            </td>
+                                            <td style="padding: 5px;">
+                                                <button :disabled="procedimento.situacao_procedimento === 1" class="br-button primary small ml-2" type="button" @click="ConfirmarSuspender(procedimento.id, 'confirmar')" style="font-size:15px; margin-top:2px;">
+                                                    <i class="fa-solid fa-check mr-2"></i> CONFIRMAR
+                                                </button>
+                                            </td>
+                                            <td style="padding: 5px; text-align: center;">
+                                                <button :disabled="procedimento.situacao_procedimento === 2" class="br-button primary small" type="button" @click="ConfirmarSuspender(procedimento.id, 'suspender')" style="font-size:15px; margin-top:2px;">
+                                                    <i class="fa-solid fa-xmark mr-2"></i> SUSPENDER
+                                                </button>
+                                            </td>
+                                            <td>${procedimento.nome_procedimento}</td>
+                                            <td>${procedimento.quantidade}</td>
+                                            <td>${procedimento.justificativa}</td>
+                                            <td style="text-align: center;">
+                                                <span v-if="procedimento.situacao_procedimento === 0" class="br-tag" style="padding: 12px; font-size: 15px; height: 32px; background-color: #FF9D29 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                                    <i class="fa-solid fa-clock-rotate-left mr-2"></i> Aguardando
+                                                </span>
+                                                <span v-if="procedimento.situacao_procedimento === 2" class="br-tag" style="padding: 12px; font-size: 15px; height: 32px; background-color: #e52207 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                                    <i class="fa-solid fa-link-slash mr-2"></i>
+                                                    Suspenso
+                                                </span>
+                                                <span v-if="procedimento.situacao_procedimento === 1" class="br-tag" style="padding: 12px; font-size: 15px; height: 32px; background-color: #289e34f7 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                                    <i class="fa-solid fa-paperclip mr-2"></i>
+                                                    Concluído
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr v-else>
+                                        <td colspan="9" style="text-align: center;">
+                                            <span>Ainda não Existe nenhum procedimento vinculado a esse paciente!</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="table-footer">
+                                <div class="row mt-4">
+                                    <div class="col-6">
+                                        <a href="{% url 'saude_enfermagem:procedimentos_list' %}" class="br-button secondary mr-3"> <i class="fas fa-arrow-left"></i> VOLTAR </a>
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <button :disabled="procedimentosAbertas" @click="finalizarAtendimentoProcedimentos()" type="button" class="br-button primary mr-3">
+                                            <i class="fa-solid fa-circle-check mr-2"></i> FINALIZAR ATENDIMENTO
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/moment.locale.min.js' %}"></script>
+<script src="{% static 'js/sweetalert2@11.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/pt.js"></script>
+
+<script>
+    moment.locale('pt-br');
+
+    var app = new Vue({
+        delimiters: ['${', '}'],
+        el: '#base-vue',
+        data: {
+            {% include 'saude_enfermagem/includes/vue-atendimento-enfermagem-data.js' %},
+            listagemProcedimentos: [],
+            unidadeSaudeSessionId: '{{unidade_saude_session_id}}',
+            titulo: 'PROCEDIMENTOS',
+            iconeTitulo: '{% static "img/icons/icon_solicitacoes.svg" %}',
+            medicacaoListUrl: '{% url "saude_enfermagem:procedimentos_list" %}',
+            currentTime: '',
+            textAlert: 'Deseja finalizar o atendimento dos procedimentos para este paciente?',
+            receitaId: '{{receita_procedimento.id}}',
+            listaProcedimentoId: '{{lista_procedimento_id}}',
+        },
+        computed: {
+            converterParaCapitalized() {
+                return (frase) => {
+                    return frase.split(' ').map(word => {
+                      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                    }).join(' ');
+                };
+            },
+            procedimentosAbertas() {
+                return this.listagemProcedimentos.some((item) => item.situacao_procedimento === 0 || item.situacao_procedimento === '0');
+            },
+        },
+        methods: {
+            {% include 'saude_enfermagem/includes/vue-atendimento-enfermagem-functions.js' %},
+
+            getSolicitacoes(){
+                let url = `{% url 'saude_enfermagem:admin-procedimento-list' %}?receita_id=${this.receitaId}`
+
+                axios.get(url.replace('00000000-0000-0000-0000-000000000000', this.objectPk))
+                .then((response)=>{  
+                    console.log({
+                        listagemProcedimentos: this.listagemProcedimentos,
+                    });
+
+                    this.listagemProcedimentos =  response.data
+                });
+            },
+            ConfirmarSuspender(pk, situacao){
+                self = this;
+                let observacaoSuspender = '';
+
+                let message = ''
+                let textButton = ''
+                if(situacao === 'confirmar'){
+                    message = 'Deseja confirmar o procedimento do paciente?'
+                    textButton = '<i class="fa-solid fa-check mr-2"></i> CONFIRMAR'
+                }else if(situacao === 'suspender'){
+                    message = 'Deseja suspender o procedimento do paciente?'
+                    textButton = 'SUSPENDER'
+                    observacaoSuspender = '<div><textarea id="swal2-textarea" class="swal2-textarea" placeholder="Por favor, adicione a justivicativa da suspensão." style="width: 80%; font-size: 16px !important;"></textarea></div>'
+                }
+
+                Swal.fire({
+                    html: `
+                        <h2 class="swal2-title" id="swal2-title" style="display: block; font-size: 20px; color: var(--interactive);">Atenção!</h2>
+                        <div class="swal2-html-container mt-2" id="swal2-html-container" style="display: block; font-size: 18px; color: var(--interactive); margin-top: 7px;">${message}</div>
+                        ${observacaoSuspender}
+                    `,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    confirmButtonText: textButton,
+                    cancelButtonText: 'CANCELAR',
+                    preConfirm: () => {
+                        const selectElement = document.getElementById('swal2-textarea');
+                        const justificativa = selectElement.value;
+
+                        if(justificativa === '' && situacao === 'suspender') {
+                            Swal.showValidationMessage('Adicione uma justificativa.');
+                        }else{
+
+                            let url  = "{% url 'saude_enfermagem:admin-procedimento-atualizar-situacao' pk='00000000-0000-0000-0000-000000000000' %}"
+                            axios.put(url.replace('00000000-0000-0000-0000-000000000000', pk), {situacao: situacao, justificativa: justificativa })
+
+                            .then((response)=>{  
+                                console.log("Resposta do SituaçãoProcedimento:", response.data);
+                                // console.log("Resposta do id-admin-procediumento:", response.data.administracao_procedimento);
+                                // console.log("Resposta do AdministraçãoProcedimento:", this.listagemProcedimentos);
+
+                                const procedimento = this.listagemProcedimentos.find(p => p.id === response.data.administracao_procedimento);
+                                console.log("Resposta do procedimento:", procedimento);
+
+                                if (procedimento) {
+                                    procedimento.situacao_procedimento = response.data.situacao;
+                                }
+
+                                Swal.fire({
+                                    title: "Informação!",
+                                    text: "Registro salvo com sucesso",
+                                    icon: "success",
+                                    customClass: { popup: 'custom-popup' },
+                                });
+                            })
+                            .catch((error) => {
+                                console.error("Erro ao atualizar situação:", error);
+
+                                if (error.response) {
+                                    console.error("Detalhes do erro:", error.response.data);
+                                    alert(`Erro: ${error.response.data.error || "Erro desconhecido"}`);
+                                } else {
+                                    console.error("Erro inesperado:", error);
+                                    alert("Ocorreu um erro inesperado.");
+                                }
+                            });
+
+                        }
+                    },
+                });
+            },
+            finalizarAtendimentoProcedimentos(){
+                self = this;
+
+                Swal.fire({
+                    html: `<h2 class="swal2-title" id="swal2-title" style="display: block; font-size: 20px; color: var(--interactive);">Atenção!</h2>
+                            <div class="swal2-html-container" id="swal2-html-container" style="display: block; font-size: 18px; color: var(--interactive); margin-top: 7px;">${this.textAlert}</div>
+                        `,
+                    icon: "warning",
+                    cancelButtonText: 'CANCELAR',
+                    confirmButtonText: 'FINALIZAR ATENDIMENTO ',
+                    showCancelButton: true,
+                    showConfirmButton: true,
+                    reverseButtons: true,
+                    allowOutsideClick: false,
+                    customClass: {popup: 'custom-popup-finalizar-modal-simples', confirmButton: 'swal2-confirm-custom', cancelButton: 'swal2-cancel-custom'},
+                    preConfirm: () => {
+                        if (!this.listaProcedimentoId) {
+                            Swal.fire({ title: "Erro!", text: "ID do procedimento não encontrado.", icon: "error" });
+                            return;
+                        }
+
+                        let url  = "{% url 'saude_enfermagem:admin-procedimento-finalizar-atendimento' pk='00000000-0000-0000-0000-000000000000' %}"
+                        axios.put(url.replace('00000000-0000-0000-0000-000000000000'), {solicitacao_pk: this.listaProcedimentoId})
+                        .then((response) => {
+
+                            Swal.fire({
+                                icon: "success",
+                                title: 'Finalizado com Sucesso!',
+                                text: "Procedimento finalizado com sucesso!",
+                                showCancelButton: true,
+                                confirmButtonColor: "#3085d6",
+                                cancelButtonColor: "#fff",
+                                confirmButtonText: "VOLTAR",
+                                cancelButtonText: 'FECHAR',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '{% url "saude_enfermagem:procedimentos_list" %}';
+                                }
+                            });
+
+                        });
+                    },
+                });
+            },
+            editarProcedimentoEletivo(id, idProcedimento) {
+                let self = this;
+                console.log('id_admin_procedimento', id);
+                console.log('id_procedimento', idProcedimento);
+
+                let url = `{% url 'saude_enfermagem:admin-procedimento-lista-procedimentos-detail' pk='00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', id);
+                axios.get(url)
+                .then(response => {
+                
+                    const procedimento = response.data;
+
+                    const swalConfig = {
+                        html: `
+                            <div class="swal2-title swal2-title-custom text-left" id="swal2-title" style="display: block; height: 48px; margin-top: -32px;">
+                                <h2 class="ml-3">
+                                    <i class="fas fa-edit text-color-blue-1gov" style="font-size: 23px; margin-right: 5px;"></i>
+                                    <label class="text-color-blue-1gov custom-text" style="font-size: var(--font-size-scale-up-02) !important; font-weight: 700 !important;">EDITAR PROCEDIMENTO</label>
+                                    <button type="button" class="close mr-2" aria-label="Close" onclick="Swal.close()" style="border: 0px; color: var(--blue-vivid-60); background-color: var(--lt-color-gray-100) !important;">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </h2>
+                            </div>
+
+                            <div class="container" style="padding: 25px;">
+                                <div class="row br-input justify-content-center mt-2">
+                                    <div class="col-11">
+                                        <label class="text-color-blue-1gov custom-text">PROCEDIMENTO:</label>
+                                        <select id="procedimento-select" name="procedimento" class="form-control campo-select"></select>
+                                    </div>
+                                </div>
+                                <div class="row br-input justify-content-center mt-3">
+                                    <div class="col-11 br-input">
+                                        <label class="text-color-blue-1gov custom-text">QUANTIDADE:</label>
+                                        <input id="quantidade-input" name="quantidade" value="${procedimento.quantidade}" class="input-highlight-labeless capslock" type="text">
+                                    </div>
+                                </div>
+                                <div class="row br-input justify-content-center mt-2">
+                                    <div class="col-11 br-input">
+                                        <label class="text-color-blue-1gov custom-text">JUSTIFICATIVA:</label>
+                                        <input id="justificativa-input" name="justificativa" value="${procedimento.justificativa}" class="input-highlight-labeless capslock" type="text">
+                                    </div>
+                                </div>
+                                <div class="row br-input justify-content-center mt-3" style="display:none;">
+                                    <div class="col-11 br-input">
+                                        <label class="text-color-blue-1gov custom-text">OBSERVAÇÃO:</label>
+                                        <input id="observacao-input" name="observacao" value="${procedimento.observacao}" class="input-highlight-labeless capslock" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        didOpen: () => {
+                            console.log("didOpen foi chamado!");
+
+                            $('#procedimento-select').select2({
+                                placeholder: ":: SELECIONE UM PROCEDIMENTO ::",
+                                width: '100%',
+                                type: "GET",
+                                ajax: {
+                                    url: '{% url "saude_cadastro:api_procedimento_list" %}',
+                                    dataType: 'json',
+                                    delay: 250,
+                                    data: function (params) {
+                                        return {
+                                            search: params.term,
+                                            unidade_saude_id: self.unidadeSaudeSessionId,
+                                        };
+                                    },
+                                    processResults: function (data) {
+                                        console.log("Dados da API:", data);
+
+                                        let formattedResults = {
+                                            results: data.map(proc => ({
+                                                id: proc.value,
+                                                codigo: proc.codigo,
+                                                text: proc.text ? proc.text.trim() : "Sem descrição",
+                                            }))
+                                        };
+                                        console.log("Dados Select2:", formattedResults);
+                                        return formattedResults;
+                                    },
+                                    cache: true
+                                },
+                                minimumInputLength: 0
+                            }).on('change', function(e) {
+                                const selectedOption = $(this).find('option:selected');
+                                selectedProcedimento = {
+                                    id: selectedOption.val(),
+                                    codigo: selectedOption.data('codigo'),
+                                    text: selectedOption.text()
+                                };
+                                console.log("Selected Procedimento:", selectedProcedimento);
+                            });
+                        },
+                        reverseButtons: true,
+                        allowOutsideClick: true,
+                        showClass: {popup: 'animated fadeInDown faster'},
+                        hideClass: {popup: 'animated fadeOutUp faster'},
+                        customClass: {popup: 'custom-popup-view-procedimento'},
+
+                        preConfirm: () => {
+                            const idAdminProcedimento = id;
+                            const quantidade = document.getElementById('quantidade-input').value;
+                            const justificativa = document.getElementById('justificativa-input').value;
+                            const observacao = document.getElementById('observacao-input').value;
+
+                            return { 
+                                idAdminProcedimento,
+                                idProcedimento: selectedProcedimento.id, 
+                                codigo: selectedProcedimento.codigo, 
+                                text: selectedProcedimento.text, 
+                                quantidade, 
+                                justificativa, 
+                                observacao 
+                            };
+                        }
+
+                    };
+
+                    swalConfig.showCancelButton = true,
+                    swalConfig.showConfirmButton = true,
+                    swalConfig.confirmButtonText = "EDITAR",
+
+                    Swal.fire(swalConfig).then((result) => {
+                        if (result.isConfirmed) {
+                            self.atualizarProcedimentoEletivo(result.value.idAdminProcedimento, result.value.idProcedimento, result.value.codigo, result.value.text, result.value.quantidade, result.value.justificativa, result.value.observacao);
+                        }
+                    });
+
+                }).catch(error => {
+                    console.error("Error:", error);
+                });
+            },
+            atualizarProcedimentoEletivo(idAdminProcedimento, idProcedimento, codigo, text, quantidade, justificativa, observacao){
+                console.log('idAdminProcedimento:', idAdminProcedimento);
+                console.log('idProcedimento:', idProcedimento);
+                console.log('codigo:', codigo);
+                console.log('text:', text);
+                console.log('quantidade:', quantidade);
+                console.log('justificativa:', justificativa);
+                console.log('observacao:', observacao);
+
+                let url  = "{% url 'saude_enfermagem:admin-procedimento-atualiza-procedimento-eletivo' pk='00000000-0000-0000-0000-000000000000' %}"
+                axios.put(url.replace('00000000-0000-0000-0000-000000000000', idAdminProcedimento), {idProcedimento: idProcedimento, text: text, quantidade: quantidade, justificativa: justificativa, observacao: observacao })
+
+                .then((response)=>{  
+                    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", response.data);
+                    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", this.listagemProcedimentos);
+
+                    const procedimento = this.listagemProcedimentos.find(item => item.id === response.data.id);
+                    console.log("Resposta do procedimento:", procedimento);
+
+                    if (procedimento) {
+                        procedimento.nome_procedimento = response.data.nome_procedimento;
+                        procedimento.quantidade = response.data.quantidade;
+                        procedimento.justificativa = response.data.justificativa;
+                        procedimento.observacao = response.data.observacao;
+                    }
+
+                    Swal.fire({
+                        title: "Informação!",
+                        text: "Registro salvo com sucesso",
+                        icon: "success",
+                        customClass: { popup: 'custom-popup' },
+                    });
+                })
+                .catch((error) => {
+                    console.error("Erro ao atualizar situação:", error);
+
+                    if (error.response) {
+                        console.error("Detalhes do erro:", error.response.data);
+                        alert(`Erro: ${error.response.data.error || "Erro desconhecido"}`);
+                    } else {
+                        console.error("Erro inesperado:", error);
+                        alert("Ocorreu um erro inesperado.");
+                    }
+                });
+                
+            },
+
+        },
+        mounted(){
+            this.getSolicitacoes()
+        }
+    });
+</script>
+
+{% endblock %}

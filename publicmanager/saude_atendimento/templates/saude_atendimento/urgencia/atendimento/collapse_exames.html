@@ -1,0 +1,127 @@
+<div v-if="atendimentoMedico" class="container" id="focus-container-exame">
+    <div id="focus-container-topo" class="" style="margin:0 auto;">
+        <div style="color:white;">.</div>
+
+        <div class="">
+            
+            <div class="container box-card-border">
+                <div class="">
+                    <h5 class="color-title ml-2 font-size17"><i class="fas fa-book"></i> SOLICITAÇÃO DE EXAMES</h5>
+                    <hr>
+                </div>
+
+                <div class="row" style="margin-top:50px;">
+                    <div class="col-3 col-left">
+                        <span class="col-form-label font-size16 color-title" style="padding-top:30px;">Data:</span>
+                    </div>
+                    <div v-if="atendimentoMedico" class="col-9 br-input input-highlight">
+                        <input id="input-highlight-labeless font-size15" style="height:43px; margin-top: -9px !important;" type="text" :value="atendimentoMedico.data_atual" readonly/>
+                    </div>
+                </div>
+
+                <form method="" id="">
+                    <div class="row mt-30" style="margin-bottom: 31px !important;">
+                        <div class="col-3 txt-right">
+                            <span class="col-form-label font-size16 color-title">Solicitar Exame:</span><br/>
+                            <span style="color:red; opacity:1 !important;">(Obrigatório)</span>
+                        </div>
+                        <div class="br-input col-9">
+                            <custom-single-select
+                                ref="customExames"
+                                placeholder="Digite o nome do Exame desejado.."
+                                :load-options="getExames"
+                                v-model="selectExame"
+                                style="width: 100%; height: 42px; background-color:white; border-radius:5px; color:black; margin-top: -9px !important;"
+                                :disabled="verificarAtendimentoEncerrado"
+                            ></custom-single-select>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-3 col-left">
+                            <span class="col-form-label font-size16 color-title">Justificativa da Solicitação:</span>
+                        </div>
+                        <div class="col-9">
+                            <textarea v-model="formularioExame.observacao" class="form-control w100 capslock" type="text" style="height:180px; border-radius:6px;" :disabled="verificarAtendimentoEncerrado"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="card-footer mt-3 mb-1">
+                        <div class="row">
+                            <div class="col-3">
+                            </div>
+                            <div class="col-9">
+                                <button :disabled="!selectExame || verificarAtendimentoEncerrado" @click="crudExame('POST')" type="button" class="br-button primary">Registrar Exame</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+            </div>
+
+            <div class="container box-card-border mt-4">
+                <div class="row">
+                    <h5 class="color-title ml-2 font-size17"><i class="fas fa-history"></i> LISTA DE SOLICITAÇÕES DE EXAMES</h5>
+                    <hr>
+                </div>
+
+                <div class="overflow-auto mt-3" style="overflow-x: auto;">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th class="color-title" scope="col" style="width:5%;"></th>
+                                <th class="color-title" scope="col" style="width:5%;"></th>
+                                <th class="color-title" scope="col"><b>Exame</b></th>
+                                <th class="color-title" scope="col"><b>Médico</b></th>
+                                <th class="color-title" scope="col"><b>Data</b></th>
+                                <th class="color-title" scope="col" style="text-align: center;"><b>Situação</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-if="listagemExames.length > 0">
+                                <tr class="capslock" v-for="exame in listagemExames">
+                                    <th scope="row">
+                                        <i class="fa fa-eye font-size17" @click="visualizarInformacoes('exame', exame)" style="cursor: pointer;"></i>
+                                    </th>
+                                    <th scope="row">
+                                        <i :class="exame.medico_solicitante.id !== profissionalPk || exame.situacao === 1 || exame.situacao === 2 || paciente.situacao === 'EM PROCEDIMENTO' || verificarAtendimentoEncerrado ? 'button-disabled' : ''" @click="showModalDelete('exame', 'Exame', exame)" class="far fa-trash-alt" style="cursor: pointer;"></i>
+                                    </th>
+                                    {% comment %} <th scope="row"><i class="fas fa-print"></i></th> {% endcomment %}
+                                    <td>${exame.nome}</td>
+                                    <td>${exame.medico_solicitante.nome}</td>
+                                    <td>${convertDate(exame.created_at, 'DD/MM/YYYY')}</td>
+                                    <td style="text-align: center;">
+                                        <span v-if="exame.situacao === 0" class="br-tag" style="font-size: 15px; height: 30px; background-color: #FF9D29 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                            <i class="fa-solid fa-clock-rotate-left mr-2"></i>Solicitado
+                                        </span>
+                                        <span v-if="exame.situacao === 1" class="br-tag" style="font-size: 15px; height: 30px; background-color: #289e34f7 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                            <i v-if="exame.situacao === 1" class="fa-solid fa-paperclip mr-2"></i>
+                                            Concluído
+                                        </span>
+                                        <span v-if="exame.situacao === 2" class="br-tag" style="font-size: 15px; height: 30px; background-color: #e52207 !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                            <i v-if="exame.situacao === 2" class="fa-solid fa-link-slash mr-2"></i>
+                                            Cancelado
+                                        </span>
+                                        <span v-if="exame.situacao === 3" class="br-tag" style="padding: 12px; font-size: 15px; height: 32px; background-color: var(--interactive-light) !important; border-radius: 25px; font-weight: var(--font-weight-semi-bold);">
+                                            <i v-if="exame.situacao === 3" class="fa-solid fa-arrow-rotate-right mr-2"></i>
+                                            Reaberto
+                                        </span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <tr v-else>
+                                <td colspan="8" style="text-align: center;">
+                                    <span>Ainda não existe nenhum exame vinculado a esse paciente!</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-4" style="color:white;">.</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div style="color:white;">.</div>
+    </div>
+</div>

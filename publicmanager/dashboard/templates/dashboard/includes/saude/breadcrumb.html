@@ -1,0 +1,13 @@
+{% if not user.deve_mudar_senha %}
+<div class="container br-breadcrumb mt-n10 ml-20-w hidden-xs">
+    <ul class="crumb-list" style="margin-left:-39px;">
+        <li class="crumb home mt-20-w"><a class="br-button circle" href="{% url 'dashboard:index' %}"><span class="sr-only">Página inicial</span><i class="fas fa-home"></i></a></li>
+        {% for crumb_item in crumbs %}
+            <li class="crumb capslock">
+                <i class="icon fas fa-chevron-right"></i>
+                <a href="{{ crumb_item.url }}" style="color:black !important;">{{ crumb_item.label }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

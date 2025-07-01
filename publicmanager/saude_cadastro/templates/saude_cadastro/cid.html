@@ -1,0 +1,170 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de CIDs{% endblock %}
+{% load widget_tweaks %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/estilizacao-grid.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/icones-acoes-mod-cadastro.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+<link rel=" stylesheet" href="{% static 'css/responsividade_tb.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/responsividade.css' %}"/>
+<style>
+    .select-simple{
+        color: var(--blue-vivid-60) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-lg">
+    {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+    <div class="row mt-1">
+        <div class="col-md">
+            <div class="br-card">
+                <div class="card-header">
+                    <div class="d-flex">
+                        <div class="ml-3">
+                            <div class="text-weight-semi-bold text-up-02 color-title font-size24">
+                                {% comment %} <img src="{% static 'img/icons/icone-cid.svg' %}" alt="Ícone de livro médico" title="Ícone de livro médico" style="display: block;">
+                                <span class="mt-1 ml-4" style="display: block;">CIDs</span> {% endcomment %}
+                                <i class="fa-solid fa-book-medical font-size25 mr-2"></i> CIDs
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="card-content mt-n10-tb">
+                    <form
+                        class="box-wdth-search"
+                        id="cid_form"
+                        method="get"
+                        onsubmit="setDate()"
+                    >
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8">
+                                    <div class="br-input">
+                                        <label for="id_nome">Dados da Busca</label>
+                                        <input type="text" name="buscar_nome" maxlength="255" class="form-control input-com-alfanumericas" value="{{buscar_nome}}">
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                    <div class="br-select">
+                                        <div class="br-input">
+                                        <label for="select-simple">Opção de Busca</label>
+                                        <input id="select-simple" type="text" placeholder="Selecione o item"/>
+                                        <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1" data-trigger="data-trigger">
+                                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                        </button>
+                                        </div>
+                                        <div class="br-list" tabindex="0">
+                                            <div class="br-item {% if opcao_filtro == 'cid' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb0" type="radio" name="opcao_filtro" value="cid"/>
+                                                <label for="rb0">CID</label>
+                                                </div>
+                                            </div>
+                                            <div class="br-item {% if opcao_filtro == 'codigo' %} selected {% endif %}" tabindex="-1">
+                                                <div class="br-radio">
+                                                <input id="rb1" type="radio" name="opcao_filtro" value="codigo"/>
+                                                <label for="rb1">Código</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer mt-4 ml-6 buttonbusctb2">
+                            <button type="submit" class="br-button primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <!-- /.card-footer -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Mensagens de Alerta {% endcomment %}
+    {% include 'dashboard/includes/mensagens.html' %}
+    <div class="row">
+        <div class="col-md">
+            <div class="br-card hover">
+              <div class="card-content">
+                <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse"
+                    data-random="data-random">
+                    <div class="table-header">
+                        <div>
+                            <span class="br-divider mt-1 divider-grid col-xl-12 col-lg-12 col-md-12 col-sm-12" style="border-color: var(--interactive);"></span>
+                        </div>
+                        <div class="top-bar mt-2">
+                            <div class="table-title">
+                                {% comment %} <img src="{% static 'img/icons/icone-cid.svg' %}" alt="Ícone de livro médico" title="Ícone de livro médico" style="display: block; height: 30px;"> 
+                                <span class="mt-1 ml-4" style="display: block;">Listagem de CIDs</span> {% endcomment %}
+                                <i class="fa-solid fa-book-medical mr-2" style="font-size: 20.16px;"></i> <span>Listagem de CIDs</span>
+                            </div>
+                            <div class="search-trigger">
+                                <a href="{% url 'saude_cadastro:cid_add' %}" class="br-button primary"><i class="fas fa-plus-circle"></i> Adicionar</a>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="mt-2">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th style="width: 100px; text-align: center;">Código</th>
+                            <th>Nome</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if object_list %}
+                            {% for cid in object_list %}
+                                <tr>
+                                    <td data-th="Editar">
+                                        <a href="{% url 'saude_cadastro:cid_update' pk=cid.id %}"><i class="fas fa-edit" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td data-th="Excluir">
+                                        <a href="javascript:void(0)" onclick="confirmCancel('{% url 'saude_cadastro:cid_delete' cid.id %}', 'cid')">
+                                            <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td data-th="Código do CID" style="text-align: center;">{{ cid.codigo }}</td>
+                                    <td data-th="Nome do CID">{{ cid.nome }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                        {% endif %}
+                        </tbody>
+                    </table>
+    
+                    {% comment %} Paginação {% endcomment %}
+                    {% include 'dashboard/includes/paginacao.html' %}
+    
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'dashboard/includes/modals-notificacao-usuario.html' %}
+</div>
+{% endblock %}
+
+{% block components-modal %}
+    {% include 'dashboard/includes/confirmar_cancelar_remocao.html' %}
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/gerenciamento_modal_notificacao_usuarios.js' %}"></script>
+<script src="{% static 'js/scripts_agendamedica/gerenciamento_remocao_dados.js' %}"></script>
+<script src="{% static 'js/alterar_caracteres_input_tempo_real.js' %}"></script>
+{% endblock %}

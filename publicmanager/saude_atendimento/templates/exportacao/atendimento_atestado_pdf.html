@@ -1,0 +1,43 @@
+{% extends 'dashboard/base/base-pdf.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Relatório Atestado Médico{% endblock %}
+
+{% block contentpdf %}
+
+    <div classp="container">
+
+        <div class="mt-p-15 txt-center">
+            <h5 class="color-title bold">ATESTADO MÉDICO</h5>
+        </div>
+
+        <div class="mt-p-15 txt-center">
+            <p>Atestado para fins de comprovação que o Sr.(a) {{atestado.atendimento.paciente.nome_paciente}},<br/>
+            necessita de {{atestado.quantidade}} dias de afastamento de suas atividades profissionais, a<br/>
+            contar desta data.  
+            {% if atestado.cid %}
+                (CID: {{atestado.cid.codigo}})
+            {% else %}
+                
+            {% endif %}
+            </p>
+        </div>
+
+        <div class="mt-p-30 txt-center">
+            <p>{{unidade_saude.municipio.nome}} ({{unidade_saude.estado.sigla}}), <br/>{{data_atual}}
+        </div>
+
+        <div class="mt-p-25 txt-center">
+            {% for dados in atestado.atendimento.profissionais.all %}
+            <p><b>
+                Dr. {{dados.nome_profissional}}<br/>
+                CRM: {{dados.crm}}
+            </b></p> 
+            {% endfor %}
+        </div>
+
+    </div>
+   
+{% endblock %}

@@ -1,0 +1,322 @@
+{% extends 'dashboard/base/index-govbr.html' %}
+{% block title %}Listagem de Pacientes{% endblock %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/icones-acoes.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/modal-notificacao-usuario.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}"/>
+    <style>
+        .hidden-columns {display: none;}
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-lg">
+
+        {% include 'dashboard/includes/saude/breadcrumb.html' %}
+
+        <div class="row mt-1">
+            <div class="col-md">
+                <div class="br-card">
+
+                    <div class="card-header">
+                        <div class="d-flex">
+                            <div class="ml-3">
+                                <div class="text-weight-semi-bold text-up-02 color-title font-size24"><i class="fa-solid fa-user-plus"></i> PACIENTES</div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    
+                    <div class="card-content mt-n10-tb">
+                        <form class="box-wdth-search" id="formSubmit" method="get" onsubmit="setDate()">
+                            <input type="hidden" name="modulo" value="{{modulo}}">
+
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-left-search">
+                                        <div class="br-input">
+                                            <label for="id_nome">Dados da Busca</label>
+                                            <input type="text" name="buscar_nome" maxlength="255" class="form-control input-com-alfanumericas mt-2" value="{{buscar_nome}}" style="height:44px !important;">
+                                        </div>
+                                    </div>
+                                    <div class="col-right-search">
+                                        <div class="br-select mt-10-w mt-10-tb">
+                                            <div class="br-input">
+                                                <label for="select-simple">Opção de Busca</label>
+                                                <input class="mt-2" id="select-simple" type="text" placeholder="Selecione o item" style="height:44px !important;"/>
+                                                <button class="br-button" type="button" aria-label="Exibir lista" tabindex="-1" data-trigger="data-trigger">
+                                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                            <div class="br-list" tabindex="0">
+                                                <div class="br-item {% if opcao_filtro == 'paciente' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                    <input id="rb0" type="radio" name="opcao_filtro" value="paciente"/>
+                                                    <label for="rb0">Paciente</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item {% if opcao_filtro == 'cpf' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                    <input id="rb1" type="radio" name="opcao_filtro" value="cpf"/>
+                                                    <label for="rb1">CPF</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item {% if opcao_filtro == 'rg' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                    <input id="rb2" type="radio" name="opcao_filtro" value="rg"/>
+                                                    <label for="rb2">RG</label>
+                                                    </div>
+                                                </div>
+                                                <div class="br-item {% if opcao_filtro == 'sus' %} selected {% endif %}" tabindex="-1">
+                                                    <div class="br-radio">
+                                                    <input id="rb3" type="radio" name="opcao_filtro" value="sus"/>
+                                                    <label for="rb3">Cartão Sus</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer mt-3">
+                                <div class="row group-btn-search txt-center-w">
+                                    <div class="col">
+                                        <button class="br-button primary ml-n15" type="submit"><i class="fas fa-search"></i> Buscar</button>
+                                    </div>
+                                    <div class="col">
+                                        <a href="{% url 'saude_atendimento:admissao_paciente_add' %}?modulo={{modulo}}" class="br-button primary ml-n15 visible-xs"><i class="fas fa-plus-circle"></i> Adicionar</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% comment %} Mensagens de Alerta {% endcomment %}
+        {% include 'dashboard/includes/mensagens.html' %}
+
+        <div class="row">
+            <div class="col-md">
+                <div class="br-card hover">
+                    <div class="card-content">
+                        <div class="br-table" data-search="data-search" data-selection="data-selection" data-collapse="data-collapse" data-random="data-random">
+
+                            <div class="table-header">
+                                <div class="top-bar">
+                                    <div class="table-title"><i class="fa-solid fa-list-ul color-title"></i> LISTAGEM DE PACIENTES</div>
+                                    <div class="search-trigger">
+                                        <a href="{% url 'saude_atendimento:admissao_paciente_add' %}?modulo={{modulo}}" class="br-button primary hidden-xs"><i class="fas fa-plus-circle"></i> Adicionar</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table class="table table-responsive mt-2">
+                                <thead>
+                                    <tr>
+                                        <th class="th-color visible-xs" style="width:5%;"></th>
+                                        <th class="th-color hidden-xs" style="width:5%;"></th>
+                                        {% if modulo == 'urgencia' %}
+                                            <th class="hidden-xs"></th>
+                                        {% endif %}
+                                        <th class="th-color hidden-xs"></th>
+                                        <th class="th-color"><b>Nome do Paciente</b></th>
+                                        <th class="th-color hidden-xs"><b>CPF</b></th>
+                                        <th class="th-color hidden-xs"><b>Cartão SUS</b></th>
+                                        <th class="th-color hidden-xs"><b>RG</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% if pacientes %}
+                                    {% for paciente in pacientes %}
+                                        <tr>
+                                            <td class="visible-xs">
+                                                <button class="mostra-columns br-button circle" onclick="modalInfo('{{paciente.id}}', '{{paciente.nome_paciente}}', '{{paciente.cpf}}', '{{paciente.cartao_sus}}', '{{paciente.rg}}')"><i class="fa-solid fa-circle-plus font-size18"></i></button>
+                                            </td>
+                                            <td class="hidden-xs">
+                                                <a data-th="Editar" href="{% url 'saude_atendimento:admissao_paciente_update' pk=paciente.id %}?modulo={{modulo}}" class="br-button circle "><i class="fas fa-edit" aria-hidden="true"></i></a>
+                                            </td>
+                                            {% if modulo == 'urgencia' %}
+                                                <td class="hidden-xs" style="width:10%;">
+                                                    <a href="{% url 'saude_atendimento:paciente_boletim_listagem' pk=paciente.id %}?modulo=urgencia"><button class="br-button primary small" type="button" style="width:125px; font-size:15px;">Novo Boletim</button></a>
+                                                </td>
+                                            {% endif %}
+                                            <td class="hidden-xs" style="width:10%;">
+                                                <a href="{% url 'saude_atendimento:paciente_historico_list' pk=paciente.id %}?modulo={{modulo}}"><button class="br-button primary small" type="button" style="width:125px; font-size:15px;">Abrir Histórico</button></a>
+                                            </td>
+                                            <td data-th="Código" style="text-transform:uppercase;">{{ paciente.nome_paciente }}</td>
+                                            <td class="hidden-xs mask-cpf" data-th="Nome Longo">{{ paciente.cpf|default:"Não informado" }}</td>
+                                            <td class="hidden-xs " data-th="Nome Longo">{{ paciente.cartao_sus|default:"Não informado" }}</td>
+                                            <td class="hidden-xs " data-th="Nome Longo">{{ paciente.rg|default_if_none:"Não informado"|default:"Não informado" }}</td>
+                                        </tr>
+                                        {% comment %} <tr class="hidden-columns column-set{{paciente.pk}}">
+                                            <td>
+                                                <a href="{% url 'saude_atendimento:paciente_boletim_listagem' pk=paciente.id %}"><button class="br-button primary small" type="button" style="width:125px; font-size:15px;">Novo Boletim</button></a>
+                                                <a href="{% url 'saude_atendimento:paciente_boletim_listagem' pk=paciente.id %}"><button class="br-button primary small" type="button" style="width:125px; font-size:15px;">Novo Boletim</button></a>
+
+                                            </td>
+                                        </tr> {% endcomment %}
+                                    {% endfor %}
+                                {% else %}
+                                    <p style="text-align: center" class="my-2">Não encontramos nenhum dado para a pesquisa realizada!</p>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                            {% include 'dashboard/includes/paginacao.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block components-modal %}
+    <div class="br-scrim-util foco" id="pacienteModal" data-scrim="true">
+        <div class="br-modal" aria-labelledby="titulomodalexemplo" style="padding: 0px; width: 700px;">
+            <div class="br-modal-header" style="border-bottom: 1px double #ccc; height: 48px; background-color: #f8f9fc !important;">
+                <div class="modal-title" id="modalalerttitle" style="font-size: 20px !important; font-weight: var(--font-weight-semi-bold); color: var(--interactive); padding-top: 8px;">
+                    <i class="fa-solid fa-timeline ml-2" style="font-size:22px; padding-top:1px;"></i> <span class="ml-2">ORDENAR</span>
+                </div>
+                </button>
+            </div>
+            <div class="br-modal-body">
+                <section class="showcase showcase-2">
+                    <div class="container justify-content-start mt-2">
+                        a
+                    </div>
+                </section>
+            </div>
+            <div class="br-modal-footer justify-content-center" style="margin-bottom: 20px; padding-top: 30px;">
+                <button class="br-button secondary" type="button" data-dismiss="true"><i class="fa-solid fa-xmark mr-2 mt-1"></i>Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    function modalInfo(id, nome, cpf, sus, rg){
+        let modulo = '{{modulo}}'
+        let urlEditar  = `{% url 'saude_atendimento:admissao_paciente_update' pk='00000000-0000-0000-0000-000000000000' %}?modulo=${modulo}`
+        let urlBoletim = `{% url 'saude_atendimento:paciente_boletim_listagem' pk='00000000-0000-0000-0000-000000000000' %}?modulo=${modulo}`
+        let urlHistorico = `{% url 'saude_atendimento:paciente_historico_list' pk='00000000-0000-0000-0000-000000000000' %}?modulo=${modulo}`
+        
+        Swal.fire({
+            html: `
+            <div class="swal2-title swal2-title-custom text-left" id="swal2-title">
+                <div class="row">
+                    <div class="col-9">
+                        <h2 class="ml-3 mt-n1"><label class="text-color-blue-1gov custom-text font-size20">Detalhes do Paciente</label></h2>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="close" style="background-color:#0459A1; border:none; color:white; font-size:15px; width:30px; height:30px;" aria-label="Close" onclick="Swal.close()">X</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+
+                <div class="row font-size16">
+                    <div class="col-3 color-title">
+                        <span class="">Paciente:</span>
+                    </div>
+                    <div class="col-9">
+                        <span>${nome}<span/>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-3 color-title">
+                        <span>CPF:</span>
+                    </div>
+                    <div class="col-9">
+                        <span>${cpf}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-3 color-title">
+                        <span>Cartão SUS:</span>
+                    </div>
+                    <div class="col-9">
+                        <span>${sus}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-3 color-title">
+                        <span>RG:</span>
+                    </div>
+                    <div class="col-9">
+                        <span>${rg}</span>
+                    </div>
+                </div><hr/>
+
+                <div class="row font-size16 mt-2">
+                    <div class="col-3 color-title">
+                        <span>Editar:</span>
+                    </div>
+                    <div class="col-9">
+                        <a data-th="Editar" href="${urlEditar.replace('00000000-0000-0000-0000-000000000000', id)}" class="br-button circle mt-n8"><i class="fas fa-edit" aria-hidden="true" style="font-size:22px;"></i></a>
+                    </div>
+                </div><hr/>
+
+                <div class="row mt-2 mb-3">
+                    <div class="col-6">
+                        <a href="${urlBoletim.replace('00000000-0000-0000-0000-000000000000', id)}"><button class="br-button primary small" type="button" style="width:125px; font-size:15px;">Novo Boletim</button></a>
+                    </div>
+                    <div class="col-6">
+                        <a href="${urlHistorico.replace('00000000-0000-0000-0000-000000000000', id)}"><button class="br-button primary small" type="button" style="width:125px; font-size:15px;">Abrir Histórico</button></a>
+                    </div>
+                </div>
+            </div>
+            `,
+            confirmButtonColor: "#1250b4",
+            confirmButtonText: '<i class="fa-regular fa-floppy-disk mr-2"></i>Salvar',
+            cancelButtonText: '<i class="fa-solid fa-xmark mr-2"></i> Fechar',
+            showCancelButton: false,
+            showConfirmButton: false,
+            //reverseButtons: true,
+            allowOutsideClick: true,
+        });
+
+    }
+    document.querySelectorAll('.show-columns').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var target = this.getAttribute('data-target');
+            var hiddenRows = document.querySelectorAll('.hidden-columns.' + target);
+            hiddenRows.forEach(function(row) {
+                if (row.style.display === 'none') {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll('.mostra-columns').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var target = this.getAttribute('id');
+            var hiddenRows = document.querySelectorAll('.dp-xs.' + target);
+            hiddenRows.forEach(function(row) {
+                if (row.style.display === 'none') {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+<script src="{% static 'js/mask.js' %}"></script>
+{% endblock %}

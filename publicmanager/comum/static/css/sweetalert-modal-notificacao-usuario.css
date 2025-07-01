@@ -1,0 +1,26 @@
+.modal-sweetalert-notificao-usuario .swal2-confirm {
+    background-color: var(--interactive) !important;
+    border-radius: 25px !important;
+    font-weight: bold !important;
+    width: 130px !important;
+}
+
+.modal-sweetalert-notificao-usuario .swal2-actions{
+    width: auto !important;
+    height: 53.188px !important;
+    position: relative !important;
+}
+
+div:where(.modal-sweetalert-notificao-usuario ) .swal2-html-container {
+    margin: 1em 1.6em .3em !important;
+}
+
+.modal-sweetalert-notificao-usuario .swal2-actions-delete {
+    width: 100% !important;
+    bottom: 0 !important;
+    background-color: #fff;
+    border: 0px solid #fff;
+    position: static !important;
+}
+
+.modal-sweetalert-notificao-usuario .swal2-title-delete {margin-top: -20px !important; margin-bottom: 10px;}
