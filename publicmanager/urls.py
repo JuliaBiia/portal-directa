@@ -31,6 +31,9 @@ urlpatterns = [
     path('', include('publicmanager.autenticacao.urls', namespace='autenticacao')),
     path('painel/', include('publicmanager.dashboard.urls', namespace='dashboard')),
     
+    # Directa
+    path('portal-directa/', include('publicmanager.portal_directa.urls', namespace='portal_directa')),
+
     # Saúde
     path('saude/', include('publicmanager.saude.urls', namespace='saude')),
     path('cadastro/', include('publicmanager.saude_cadastro.urls', namespace='saude_cadastro')),

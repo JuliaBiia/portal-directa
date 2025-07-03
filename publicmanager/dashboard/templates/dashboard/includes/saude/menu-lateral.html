@@ -212,15 +212,10 @@
             </span><span class="content">SEMURB</span>
         </a>
         <ul>
-            <a class="menu-item {% if request.path == '/alterar-senha/' %}active{% endif %}" href="{% url 'autenticacao:alterar_senha' %}">
+            <a class="menu-item {% if request.path == '/alterar-senha/' %}active{% endif %}" href="{% url 'portal_directa:semurb_solicitar_alvara_funcionamento' %}">
                 <span class="icon">
                     <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                </span><span class="content">Item 1</span>
-            </a>
-            <a class="menu-item {% if request.path|comparar_urls:'/painel/perfil/detalhes/' %}active{% endif %}" href="{% url 'dashboard:meu_perfil_atualizar' pk=user.profissional_set.first.id %}">
-                <span class="icon">
-                    <i class="fa-regular fa-address-card" aria-hidden="true"></i>
-                </span><span class="content">Item 2</span>
+                </span><span class="content">Solicitar Alvará de Funcionamento</span>
             </a>
         </ul>
     </div>
