@@ -37,7 +37,6 @@ urlpatterns = [
     path('farmacia/', include('publicmanager.saude_farmacia.urls', namespace='saude_farmacia')),
     path('atendimento/', include('publicmanager.saude_atendimento.urls', namespace='saude_atendimento')),
     path('enfermagem/', include('publicmanager.saude_enfermagem.urls', namespace='saude_enfermagem')),
-    path('financeiro/', include('publicmanager.saude_financeiro.urls', namespace='saude_financeiro')),
 
     # Outros Modulos Adicionais
     path('comum/', include('publicmanager.comum.urls', namespace='comum')),

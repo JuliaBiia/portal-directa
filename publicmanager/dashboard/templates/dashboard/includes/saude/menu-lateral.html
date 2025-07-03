@@ -97,27 +97,6 @@
                         </span><span class="content">Cadastros</span>
                     </a>
                 </li>
-                <li>
-                    <a class="menu-item {% if request.path == '/financeiro/relatorio-procedimentos/gerar/' %}active{% endif %}" href="{% url 'saude_financeiro:procedimentos_gerar_view' %}">
-                        <span class="icon">
-                            <i class="fas fa-file-pdf" aria-hidden="true"></i>
-                        </span><span class="content">Consultas</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="menu-item {% if request.path == '/financeiro/relatorio-procedimentos/gerar/' %}active{% endif %}" href="{% url 'saude_financeiro:procedimentos_gerar_view' %}">
-                        <span class="icon">
-                            <i class="fas fa-file-pdf" aria-hidden="true"></i>
-                        </span><span class="content">Documentos</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="menu-item {% if request.path == '/financeiro/relatorio-procedimentos/gerar/' %}active{% endif %}" href="{% url 'saude_financeiro:procedimentos_gerar_view' %}">
-                        <span class="icon">
-                            <i class="fas fa-file-pdf" aria-hidden="true"></i>
-                        </span><span class="content">Operações</span>
-                    </a>
-                </li>
             </ul>
         </div>
     {% endif %}
