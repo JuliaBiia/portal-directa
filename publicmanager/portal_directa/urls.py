@@ -6,4 +6,6 @@ app_name = 'portal_directa'
 
 urlpatterns = [
     path('pacientes/semurb/solicitar-alvara-funcionamento', views.SemurbSolicitarAlvaraFuncionamentoView.as_view(), name='semurb_solicitar_alvara_funcionamento'),
+
+    # path('novaPagina/', views.novaPagina, name='nova_pagina')
 ]

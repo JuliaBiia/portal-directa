@@ -1,5 +1,5 @@
 import tempfile
-import weasyprint
+# import weasyprint
 from django.db.models import Q
 from django.urls import reverse
 from django.conf import settings
@@ -876,7 +876,7 @@ class AtendimentosRealizadosPDFView(CheckUserTypeMixin, LoginRequiredMixin, View
             'linhas_brancas': range(5),
         })
         
-        html = weasyprint.HTML(string=html_index, base_url=request.build_absolute_uri('/media/'))
+        # html = weasyprint.HTML(string=html_index, base_url=request.build_absolute_uri('/media/'))
 
         pdf_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
         html.write_pdf(target=pdf_file.name)

@@ -27,3 +27,4 @@ class SemurbSolicitarAlvaraFuncionamentoView(LoginRequiredMixin, SuccessMessageM
         context = super().get_context_data(**kwargs)
         context['title'] = 'Solicitar Alvará de Funcionamento'
         return context
+    
